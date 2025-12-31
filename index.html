@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Meat Pro | Butchery</title>
+    <title>The Meat Pro | Premium UAE Butchery</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@300;500;900&display=swap" rel="stylesheet">
 </head>
@@ -21,24 +21,46 @@
         </button>
     </nav>
 
-    <main id="product-grid">
-        <div style="text-align: center; grid-column: 1/-1; padding: 100px; color: #888;">
-            <p>Selecting the finest cuts...</p>
+    <div id="category-section" class="category-grid">
+        <div class="cat-card" onclick="filterByCategory('Chicken')">
+            <img src="chicken-thumb.jpg" alt="Chicken">
+            <h3>CHICKEN</h3>
         </div>
-    </main>
+        <div class="cat-card" onclick="filterByCategory('Mutton')">
+            <img src="mutton-thumb.jpg" alt="Mutton">
+            <h3>MUTTON</h3>
+        </div>
+        <div class="cat-card" onclick="filterByCategory('Beef')">
+            <img src="beef-thumb.jpg" alt="Beef">
+            <h3>BEEF</h3>
+        </div>
+        <div class="cat-card" onclick="filterByCategory('Fish')">
+            <img src="fish-thumb.jpg" alt="Fish">
+            <h3>FISH</h3>
+        </div>
+        <div class="cat-card" onclick="filterByCategory('Marinades')">
+            <img src="marinades-thumb.jpg" alt="Marinades">
+            <h3>MARINADES</h3>
+        </div>
+    </div>
+
+    <div id="product-header" style="display:none; padding: 20px 8%; align-items: center; justify-content: space-between; background: #fff; border-bottom: 1px solid #eee;">
+        <h2 id="current-category-name" style="text-transform: uppercase; margin: 0; font-family: 'Roboto'; font-weight: 900;"></h2>
+        <button onclick="showCategories()" style="background:none; border:none; text-decoration:underline; cursor:pointer; color:var(--primary-red); font-weight: 700;">&larr; Back to Categories</button>
+    </div>
+
+    <main id="product-grid" style="display:none;"></main>
 
     <div id="cart-sidebar">
         <div class="cart-header">
             <h2>Your Order</h2>
             <button onclick="toggleCart()" class="close-cart">&times;</button>
         </div>
-
         <div id="cart-items"></div>
-
         <div class="cart-footer">
             <div class="total-display">
                 <span>Total</span>
-                <span id="cart-total-container">
+                <span>
                     <img src="currency-logo.png" class="currency-icon">
                     <span id="cart-total">0.00</span>
                 </span>
