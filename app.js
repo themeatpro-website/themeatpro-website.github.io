@@ -124,7 +124,44 @@ function processOrder() {
     // Clear cart and go home
     localStorage.removeItem('meatProCart');
     window.location.href = 'index.html';
-}
+};
+function loadCheckout() {
+    const cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
+    const listContainer = document.getElementById('checkout-items-list');
+    const totalDisplay = document.getElementById('summary-total');
+    const subtotalDisplay = document.getElementById('summary-subtotal');
+
+    if (cart.length === 0) {
+        listContainer.innerHTML = '<p>Your cart is empty.</p>';
+        return;
+    }
+
+    let total = 0;
+    listContainer.innerHTML = cart.map(item => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        
+        // We use a placeholder if the image is missing, 
+        // but it will try to load the item.image from your Excel data
+        return `
+            <div class="checkout-item">
+                <div class="item-left-group">
+                    <div class="item-icon-box">
+                        <img src="${item.image || 'https://via.placeholder.com/50'}" alt="${item.name}">
+                    </div>
+                    <div class="item-details">
+                        <span class="item-name">${item.name}</span>
+                        <span class="item-qty-tag">Qty: ${item.quantity}</span>
+                    </div>
+                </div>
+                <span class="item-price">$${itemTotal.toFixed(2)}</span>
+            </div>
+        `;
+    }).join('');
+
+    subtotalDisplay.innerText = `$${total.toFixed(2)}`;
+    totalDisplay.innerText = `$${total.toFixed(2)}`;
+};
 
 // Start everything
 document.addEventListener('DOMContentLoaded', loadProducts);
