@@ -32,6 +32,27 @@ function renderProducts(products) {
 function toggleCart() {
     document.getElementById('cart-sidebar').classList.toggle('active');
 }
+function goToCheckout() {
+    if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+    }
+    // Save the cart to local storage so checkout.html can read it
+    localStorage.setItem('meatProCart', JSON.stringify(cart));
+    window.location.href = 'checkout.html';
+}
+
+// Update your addToCart function to also save to localStorage for persistence
+function addToCart(name, price) {
+    const existingItem = cart.find(item => item.name === name);
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({ name, price, quantity: 1 });
+    }
+    localStorage.setItem('meatProCart', JSON.stringify(cart));
+    updateCartUI();
+}
 
 // Initial Load
 loadProducts();
