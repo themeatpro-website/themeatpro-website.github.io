@@ -7,172 +7,83 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@300;900&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #f4f4f4; }
-        
-        .checkout-wrapper {
-            max-width: 850px;
-            margin: 0 auto;
-            padding: 80px 20px; /* High top/bottom padding for "luxury" feel */
-        }
-
-        .checkout-card {
-            background: #ffffff;
-            padding: 60px; /* Deep internal padding */
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
-        }
-
-        .section-title {
-            font-family: 'Roboto', sans-serif;
-            font-weight: 900;
-            font-size: 2rem;
-            margin-bottom: 40px;
-            letter-spacing: -1px;
-        }
-
-        .checkout-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 25px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .item-thumb {
-            width: 80px;
-            height: 80px;
-            border-radius: 12px;
-            object-fit: cover;
-            background: #f8f8f8;
-        }
-
-        .instructions-container {
-            margin: 50px 0;
-        }
-
-        .instructions-container label {
-            display: block;
-            font-weight: 700;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-        }
-
-        #order-notes {
-            width: 100%;
-            height: 140px;
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid #ddd;
-            font-family: inherit;
-            font-size: 1rem;
-            resize: none;
-            background: #fafafa;
-        }
-
-        .summary-box {
-            background: #fcfcfc;
-            padding: 40px;
-            border-radius: 20px;
-            border: 1px solid #eee;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-        }
-
-        .grand-total-row {
-            margin-top: 25px;
-            padding-top: 25px;
-            border-top: 2px solid #000;
-            font-size: 1.6rem;
-            font-weight: 900;
-        }
-
-        .place-order-btn {
-            width: 100%;
-            padding: 25px;
-            background: var(--primary-red);
-            color: white;
-            border: none;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-top: 40px;
-            transition: transform 0.2s;
-        }
-
-        .place-order-btn:active { transform: scale(0.98); }
+        body { background-color: #f8f8f8; }
+        .checkout-wrapper { max-width: 900px; margin: 0 auto; padding: 60px 20px; }
+        .checkout-card { background: #fff; padding: 50px; border-radius: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.05); }
+        .checkout-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; }
+        .logo-group { display: flex; align-items: center; }
+        .checkout-item { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #eee; }
+        .item-thumb { width: 70px; height: 70px; border-radius: 10px; object-fit: cover; }
+        .summary-box { background: #fafafa; padding: 30px; border-radius: 16px; margin-top: 30px; }
+        .grand-total { font-size: 1.8rem; font-weight: 900; border-top: 2px solid #000; padding-top: 20px; margin-top: 20px; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
 
     <div class="checkout-wrapper">
-        <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:50px;">
-            <div class="logo-text">THE MEAT <span>PRO</span></div>
-            <a href="index.html" style="text-decoration:none; color:#666; font-weight:700;">&larr; Back to Shop</a>
-        </header>
+        <div class="checkout-header">
+            <div class="logo-group">
+                <img src="logo.png" alt="Logo" style="height: 40px; margin-right: 12px;">
+                <div class="logo-text">THE MEAT <span>PRO</span></div>
+            </div>
+            <a href="index.html" style="text-decoration: none; color: #666; font-weight: 700;">&larr; Return to Shop</a>
+        </div>
 
         <div class="checkout-card">
-            <h1 class="section-title">Review Order</h1>
+            <h1 style="font-family:'Roboto'; font-weight:900; margin-bottom:30px;">ORDER SUMMARY</h1>
+            
+            <div id="checkout-list"></div>
 
-            <div id="checkout-list">
-                </div>
-
-            <div class="instructions-container">
-                <label>Special Instructions</label>
-                <textarea id="order-notes" placeholder="e.g. Cut steaks into 1.5 inch thickness, vacuum pack separately..."></textarea>
+            <div style="margin: 40px 0;">
+                <label style="display:block; font-weight:700; margin-bottom:10px;">Special Requests</label>
+                <textarea id="order-notes" placeholder="e.g., Vacuum seal individually..." style="width:100%; height:100px; padding:15px; border-radius:12px; border:1px solid #ddd; font-family:inherit;"></textarea>
             </div>
 
             <div class="summary-box">
-                <div class="summary-row">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                     <span>Subtotal</span>
-                    <span id="sub-total">0.00</span>
+                    <span id="sub-total"></span>
                 </div>
-                <div class="summary-row">
-                    <span>Delivery Fee</span>
-                    <span style="color:#2e7d32; font-weight:700;">Free</span>
+                <div style="display:flex; justify-content:space-between; color:#2e7d32; font-weight:700;">
+                    <span>Delivery</span>
+                    <span>FREE</span>
                 </div>
-                <div class="summary-row grand-total-row">
+                <div class="grand-total">
                     <span>Total</span>
-                    <span id="grand-total">0.00</span>
+                    <span id="grand-total"></span>
                 </div>
             </div>
 
-            <button class="place-order-btn" onclick="sendToWhatsApp()">Place Order via WhatsApp</button>
+            <button class="confirm-btn" onclick="sendToWhatsApp()" style="width:100%; padding:25px; margin-top:30px; font-size:1.2rem;">Place Order via WhatsApp</button>
         </div>
     </div>
 
     <script>
-        function renderCheckout() {
+        function initCheckout() {
             const cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
             const list = document.getElementById('checkout-list');
-            const logo = `<img src="currency-logo.png" class="currency-icon" style="height:0.85em; margin-right:5px;">`;
-
+            const logo = `<img src="currency-logo.png" class="currency-icon" style="height:0.8em; margin-right:4px;">`;
+            
             if(cart.length === 0) {
-                list.innerHTML = "<p style='padding:40px; text-align:center;'>Your cart is empty.</p>";
+                list.innerHTML = "<p>Your cart is empty.</p>";
                 return;
             }
 
             let total = 0;
             list.innerHTML = cart.map(item => {
-                const rowTotal = item.price * item.quantity;
-                total += rowTotal;
+                const rowPrice = item.price * item.quantity;
+                total += rowPrice;
                 return `
-                    <div class="checkout-item">
-                        <div style="display:flex; align-items:center; gap:20px;">
-                            <img src="${item.image}" class="item-thumb" onerror="this.src='https://via.placeholder.com/80'">
-                            <div>
-                                <div style="font-weight:700; font-size:1.1rem;">${item.name}</div>
-                                <div style="color:var(--primary-red); font-size:0.9rem;">Qty: ${item.quantity}</div>
-                            </div>
+                <div class="checkout-item">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <img src="${item.image}" class="item-thumb" onerror="this.src='https://via.placeholder.com/70'">
+                        <div>
+                            <div style="font-weight:700;">${item.name}</div>
+                            <div style="color:var(--primary-red); font-size:0.9rem;">Qty: ${item.quantity}</div>
                         </div>
-                        <div style="font-weight:700; font-size:1.1rem;">${logo}${rowTotal.toFixed(2)}</div>
                     </div>
-                `;
+                    <div style="font-weight:700;">${logo}${rowPrice.toFixed(2)}</div>
+                </div>`;
             }).join('');
 
             document.getElementById('sub-total').innerHTML = `${logo}${total.toFixed(2)}`;
@@ -182,20 +93,13 @@
         function sendToWhatsApp() {
             const cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
             const notes = document.getElementById('order-notes').value;
-            const phone = "971589388096";
-
-            let message = "*New Order from The Meat Pro*%0A%0A";
-            cart.forEach(item => {
-                message += `• ${item.name} (x${item.quantity})%0A`;
-            });
-            
-            if(notes) message += `%0A*Notes:* ${notes}`;
-            
-            const url = `https://wa.me/${phone}?text=${message}`;
-            window.open(url, '_blank');
+            let msg = "*New Order from The Meat Pro*%0A%0A";
+            cart.forEach(i => msg += `- ${i.name} (x${i.quantity})%0A`);
+            if(notes) msg += `%0A*Notes:* ${notes}`;
+            window.open(`https://wa.me/971589388096?text=${msg}`, '_blank');
         }
 
-        document.addEventListener('DOMContentLoaded', renderCheckout);
+        document.addEventListener('DOMContentLoaded', initCheckout);
     </script>
 </body>
 </html>
