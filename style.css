@@ -206,6 +206,15 @@ nav {
         width: 100%;
         right: -100%;
     }
+body.cart-open {
+    overflow: hidden; /* Stops the background from scrolling while cart is open */
+}
+
+/* Optional: Adding a soft blur to the main content when cart is active */
+#cart-sidebar.active ~ main, #cart-sidebar.active ~ header {
+    filter: blur(4px);
+    transition: filter 0.4s ease;
+}
     
     nav {
         padding: 1rem 5%;
