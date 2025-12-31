@@ -1,167 +1,79 @@
-// 1. Initialize Cart
 let cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
 
-// 2. Define UI Functions FIRST
+window.toggleCart = function() {
+    document.getElementById('cart-sidebar').classList.toggle('active');
+};
+
 window.updateCartUI = function() {
     const cartCount = document.getElementById('cart-count');
     const cartItems = document.getElementById('cart-items');
     const cartTotal = document.getElementById('cart-total');
 
-    if (!cartCount || !cartItems || !cartTotal) return;
+    cartCount.innerText = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-    // Update Nav Count
-    const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartCount.innerText = totalQty;
-
-    // Update Sidebar
-    cartItems.innerHTML = cart.map((item, index) => `
-        <div class="cart-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #eee; padding-bottom:10px;">
-            <div>
-                <div style="font-weight:bold; color: #1a1a1a;">${item.name}</div>
-                <div style="font-size:0.85rem; color:#666;">$${item.price.toFixed(2)} x ${item.quantity}</div>
+    if (cart.length === 0) {
+        cartItems.innerHTML = '<p>Your cart is empty.</p>';
+        cartTotal.innerText = "0.00";
+    } else {
+        cartItems.innerHTML = cart.map((item, index) => `
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
+                <div>
+                    <strong>${item.name}</strong><br>
+                    <small><img src="currency-logo.png" class="currency-icon" style="height:0.7em;">${item.price} x ${item.quantity}</small>
+                </div>
+                <button onclick="removeFromCart(${index})" style="color:red; background:none; border:none; cursor:pointer;">&times;</button>
             </div>
-            <button onclick="removeFromCart(${index})" style="background:none; border:none; color:#C62828; cursor:pointer; font-size:1.2rem;">&times;</button>
-        </div>
-    `).join('');
-
-    // Update Total
-    const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    cartTotal.innerText = totalAmount.toFixed(2);
+        `).join('');
+        
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        cartTotal.innerText = total.toFixed(2);
+    }
 };
 
-// 3. Define Interaction Functions
-window.addToCart = function(name, price) {
-    const existingItem = cart.find(item => item.name === name);
-    if (existingItem) {
-        existingItem.quantity += 1;
+window.addToCart = function(name, price, image) {
+    const existing = cart.find(item => item.name === name);
+    if (existing) {
+        existing.quantity += 1;
     } else {
-        cart.push({ name, price: parseFloat(price), quantity: 1 });
+        cart.push({ name, price: parseFloat(price), image: image, quantity: 1 });
     }
-    
     localStorage.setItem('meatProCart', JSON.stringify(cart));
-    window.updateCartUI();
-    
-    // Open cart sidebar automatically
-    const sidebar = document.getElementById('cart-sidebar');
-    if(sidebar) sidebar.classList.add('active');
+    updateCartUI();
+    document.getElementById('cart-sidebar').classList.add('active');
 };
 
 window.removeFromCart = function(index) {
     cart.splice(index, 1);
     localStorage.setItem('meatProCart', JSON.stringify(cart));
-    window.updateCartUI();
+    updateCartUI();
 };
 
-window.toggleCart = function() {
-    console.log("Cart Toggle Clicked"); // Check your browser console (F12) to see if this appears
-    const sidebar = document.getElementById('cart-sidebar');
-    if (sidebar) {
-        sidebar.classList.toggle('active');
-    } else {
-        console.error("Could not find element with ID 'cart-sidebar'");
-    }
+window.goToCheckout = function() {
+    if (cart.length > 0) window.location.href = 'checkout.html';
 };
 
-// 4. Data Loading
 async function loadProducts() {
     try {
-        const response = await fetch('products.xlsx');
-        if (!response.ok) throw new Error("Excel file not found");
-        
-        const arrayBuffer = await response.arrayBuffer();
-        const data = new Uint8Array(arrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
+        const resp = await fetch('products.xlsx');
+        const data = await resp.arrayBuffer();
+        const workbook = XLSX.read(new Uint8Array(data), {type: 'array'});
         const products = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
         
-        renderProducts(products);
-        window.updateCartUI(); // Initial UI sync
-    } catch (error) {
-        console.error("The Meat Pro Load Error:", error);
-    }
-}
-
-function renderProducts(products) {
-    const grid = document.getElementById('product-grid');
-    if (!grid) return;
-    
-    grid.innerHTML = products.map(p => `
-        <div class="product-card">
-            <img src="${p.Image}" alt="${p.Name}" onerror="this.src='https://via.placeholder.com/400x300?text=Premium+Meat'">
-            <div class="product-info">
-                <h3>${p.Name}</h3>
-                <p>${p.Description}</p>
-                <div class="price-row" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span class="price-tag">$${parseFloat(p.Price).toFixed(2)}</span>
-                    <button class="add-btn" onclick="addToCart('${p.Name}', ${p.Price})" style="width:auto; margin:0; padding: 10px 20px;">Add +</button>
-                </div>
-            </div>
-        </div>
-    `).join('');
-}
-// Ensure goToCheckout is available globally
-window.goToCheckout = function() {
-    console.log("Checkout button clicked"); // This will show in F12 console
-    
-    if (cart.length === 0) {
-        alert("Your cart is empty! Add some premium cuts before checking out.");
-        return;
-    }
-    
-    // The data is already in localStorage from the addToCart function,
-    // so we just need to move to the next page.
-    window.location.href = 'checkout.html';
-};
-
-function processOrder() {
-    const notes = document.getElementById('order-notes').value;
-    const cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
-    
-    // In a real scenario, you would send 'cart' and 'notes' to your email or server.
-    console.log("Order Notes:", notes);
-    
-    alert(`🚀 Order Received!\n\nInstructions: ${notes || "None"}\n\nThank you for choosing The Meat Pro!`);
-    
-    // Clear cart and go home
-    localStorage.removeItem('meatProCart');
-    window.location.href = 'index.html';
-};
-function loadCheckout() {
-    const cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
-    const listContainer = document.getElementById('checkout-items-list');
-    const totalDisplay = document.getElementById('summary-total');
-    const subtotalDisplay = document.getElementById('summary-subtotal');
-
-    if (cart.length === 0) {
-        listContainer.innerHTML = '<p>Your cart is empty.</p>';
-        return;
-    }
-
-    let total = 0;
-    listContainer.innerHTML = cart.map(item => {
-        const itemTotal = item.price * item.quantity;
-        total += itemTotal;
-        
-        // We use a placeholder if the image is missing, 
-        // but it will try to load the item.image from your Excel data
-        return `
-            <div class="checkout-item">
-                <div class="item-left-group">
-                    <div class="item-icon-box">
-                        <img src="${item.image || 'https://via.placeholder.com/50'}" alt="${item.name}">
-                    </div>
-                    <div class="item-details">
-                        <span class="item-name">${item.name}</span>
-                        <span class="item-qty-tag">Qty: ${item.quantity}</span>
+        document.getElementById('product-grid').innerHTML = products.map(p => `
+            <div class="product-card">
+                <img src="${p.Image}" style="width:100%; height:200px; object-fit:cover;">
+                <div class="product-info">
+                    <h3>${p.Name}</h3>
+                    <p>${p.Description}</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto;">
+                        <span class="price-tag"><img src="currency-logo.png" class="currency-icon">${parseFloat(p.Price).toFixed(2)}</span>
+                        <button class="add-btn" onclick="addToCart('${p.Name}', ${p.Price}, '${p.Image}')">Add +</button>
                     </div>
                 </div>
-                <span class="item-price">$${itemTotal.toFixed(2)}</span>
             </div>
-        `;
-    }).join('');
+        `).join('');
+        updateCartUI();
+    } catch (e) { console.error("Excel Load Error", e); }
+}
 
-    subtotalDisplay.innerText = `$${total.toFixed(2)}`;
-    totalDisplay.innerText = `$${total.toFixed(2)}`;
-};
-
-// Start everything
 document.addEventListener('DOMContentLoaded', loadProducts);
