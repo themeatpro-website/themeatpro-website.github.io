@@ -148,24 +148,26 @@ nav {
 }
 
 /* --- Sliding Cart Sidebar --- */
+/* Ensure the sidebar is hidden by default and positioned correctly */
 #cart-sidebar {
     position: fixed;
     top: 0;
-    right: -450px; /* Hidden position */
+    right: -450px; /* This MUST be negative to hide it */
     width: 400px;
     height: 100vh;
-    background: var(--white);
-    box-shadow: -10px 0 30px rgba(0,0,0,0.1);
-    z-index: 1000;
-    padding: 30px;
+    background: white;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+    z-index: 9999; /* Higher than everything else */
+    transition: all 0.4s ease-in-out; 
     display: flex;
     flex-direction: column;
-    transition: right 0.4s cubic-bezier(0.82, 0.01, 0.77, 0.41);
+    padding: 20px;
     box-sizing: border-box;
 }
 
+/* This class is added/removed by JavaScript */
 #cart-sidebar.active {
-    right: 0; /* Slide in */
+    right: 0 !important; /* Forces it to show */
 }
 
 #cart-items {
