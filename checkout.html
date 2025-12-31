@@ -17,31 +17,35 @@
 
         <main class="checkout-main">
             <div class="checkout-card">
-                <h2 class="section-title">Order Summary</h2>
-                
-                <div id="checkout-items-list">
-                    </div>
-
-                <div class="order-totals">
-                    <div class="total-row">
-                        <span>Subtotal</span>
-                        <span id="summary-subtotal">$0.00</span>
-                    </div>
-                    <div class="total-row">
-                        <span>Shipping</span>
-                        <span style="color: #2e7d32; font-weight: bold;">FREE</span>
-                    </div>
-                    <hr>
-                    <div class="total-row grand-total">
-                        <span>Total</span>
-                        <span id="summary-total">$0.00</span>
-                    </div>
+            <h2 class="section-title">Order Summary</h2>
+            
+            <div id="checkout-items-list">
                 </div>
-
-                <button class="confirm-btn" onclick="processOrder()">Place Order</button>
+        
+            <div class="instructions-section" style="margin-top: 30px;">
+                <label for="order-notes" style="display: block; font-weight: 700; margin-bottom: 10px; color: var(--medium-grey);">Special Instructions & Cutting Notes</label>
+                <textarea id="order-notes" placeholder="e.g., Please vacuum pack the ribeye separately, or cut the brisket into two pieces..." 
+                    style="width: 100%; height: 100px; padding: 15px; border-radius: var(--rounded); border: 1px solid #ddd; font-family: inherit; resize: none; box-sizing: border-box; outline: none; transition: border-color 0.3s;"></textarea>
             </div>
-        </main>
-    </div>
+        
+            <div class="order-totals">
+                <div class="total-row">
+                    <span>Subtotal</span>
+                    <span id="summary-subtotal">$0.00</span>
+                </div>
+                <div class="total-row">
+                    <span>Delivery</span>
+                    <span style="color: #2e7d32; font-weight: bold;">FREE</span>
+                </div>
+                <hr>
+                <div class="total-row grand-total">
+                    <span>Total</span>
+                    <span id="summary-total">$0.00</span>
+                </div>
+            </div>
+
+    <button class="confirm-btn" onclick="processOrder()">Place Order</button>
+</div>
 
     <script>
         function loadCheckout() {
