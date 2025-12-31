@@ -9,14 +9,22 @@
 </head>
 <body>
 <header>
-  <img src="logo.png" alt="The Meat Pro Logo">
+  <img src="logo.png" alt="Logo">
   <h1>The Meat Pro</h1>
+  <button id="cart-toggle" style="position:absolute;top:20px;right:20px;background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer;">🛒</button>
 </header>
 
 <div class="container">
   <h2>Shop</h2>
   <div class="product-grid" id="product-grid"></div>
-  <div id="cart-summary"></div>
+</div>
+
+<!-- Cart Sidebar -->
+<div id="cart-sidebar">
+  <span id="close-cart">&times;</span>
+  <h3>Your Cart</h3>
+  <div id="cart-items"></div>
+  <div class="cart-total" id="cart-total"></div>
   <button id="checkout-btn">Go to Checkout</button>
 </div>
 
@@ -26,11 +34,15 @@
 
 <script>
 const grid = document.getElementById('product-grid');
-const cartSummary = document.getElementById('cart-summary');
+const cartSidebar = document.getElementById('cart-sidebar');
+const cartItemsDiv = document.getElementById('cart-items');
+const cartTotalDiv = document.getElementById('cart-total');
 const checkoutBtn = document.getElementById('checkout-btn');
+const cartToggle = document.getElementById('cart-toggle');
+const closeCart = document.getElementById('close-cart');
+
 let cart = [];
 
-// Load products.xlsx automatically
 fetch('products.xlsx')
 .then(res=>res.arrayBuffer())
 .then(data=>{
@@ -53,17 +65,27 @@ fetch('products.xlsx')
     `;
     grid.appendChild(card);
     card.querySelector('.add-to-cart').addEventListener('click',()=>{
-      cart.push({...prod,qty:1});
-      updateCart();
+      cart.push({...prod, qty:1});
+      updateCartSidebar();
     });
   });
-  updateCart();
 });
 
-function updateCart(){
-  let total=cart.reduce((sum,p)=>sum+Number(p.Price)*(p.qty||1),0);
-  cartSummary.innerHTML=`<strong>Cart:</strong> ${cart.length} items — Total: $${total.toFixed(2)}`;
+function updateCartSidebar(){
+  cartItemsDiv.innerHTML='';
+  let total=0;
+  cart.forEach((p,i)=>{
+    const div=document.createElement('div');
+    div.className='cart-item';
+    div.innerHTML=`<span>${p.Name} x${p.qty||1}</span><span>$${(p.Price*(p.qty||1)).toFixed(2)}</span>`;
+    cartItemsDiv.appendChild(div);
+    total+=Number(p.Price)*(p.qty||1);
+  });
+  cartTotalDiv.textContent=`Total: $${total.toFixed(2)}`;
 }
+
+cartToggle.onclick=()=>cartSidebar.classList.add('active');
+closeCart.onclick=()=>cartSidebar.classList.remove('active');
 
 checkoutBtn.onclick=()=>{
   localStorage.setItem('cart',JSON.stringify(cart));
