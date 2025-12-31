@@ -53,8 +53,13 @@ window.removeFromCart = function(index) {
 };
 
 window.toggleCart = function() {
+    console.log("Cart Toggle Clicked"); // Check your browser console (F12) to see if this appears
     const sidebar = document.getElementById('cart-sidebar');
-    if(sidebar) sidebar.classList.toggle('active');
+    if (sidebar) {
+        sidebar.classList.toggle('active');
+    } else {
+        console.error("Could not find element with ID 'cart-sidebar'");
+    }
 };
 
 // 4. Data Loading
