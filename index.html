@@ -15,7 +15,6 @@
 
 <div class="container">
   <h2>Products</h2>
-  <input type="file" id="file-input" accept=".xlsx" style="margin-bottom:1rem;">
   <div class="product-grid" id="product-grid"></div>
 </div>
 
@@ -25,41 +24,53 @@
 
 <script>
 const grid = document.getElementById('product-grid');
-const input = document.getElementById('file-input');
 
-input.addEventListener('change', (e)=>{
-    const file = e.target.files[0];
-    if(!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = function(evt){
-        const data = evt.target.result;
-        const workbook = XLSX.read(data, {type:'binary'});
-        const firstSheet = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheet];
-        const products = XLSX.utils.sheet_to_json(worksheet);
+fetch('products.xlsx')
+  .then(res => res.arrayBuffer())
+  .then(data => {
+    const workbook = XLSX.read(data, {type:'array'});
+    const firstSheet = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[firstSheet];
+    const products = XLSX.utils.sheet_to_json(worksheet);
 
-        // Clear grid
-        grid.innerHTML = '';
+    products.forEach((prod, index) => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.style.animationDelay = `${index * 0.1}s`; // staggered animation
+      card.innerHTML = `
+        <img src="${prod.Image || 'logo.png'}" alt="${prod.Name}">
+        <div class="info">
+          <h3>${prod.Name}</h3>
+          <p>${prod.Description}</p>
+          <div class="price">$${prod.Price}</div>
+          <button class="add-to-cart">Add to Cart</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
 
-        products.forEach((prod, index)=>{
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.style.animationDelay = `${index*0.1}s`; // staggered animation
-            card.innerHTML = `
-                <img src="${prod.Image || 'logo.png'}" alt="${prod.Name}">
-                <div class="info">
-                    <h3>${prod.Name}</h3>
-                    <p>${prod.Description}</p>
-                    <div class="price">$${prod.Price}</div>
-                    <button>Add to Cart</button>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-    };
-    reader.readAsBinaryString(file);
-});
+    // Initialize cart
+    const cart = [];
+    const cartButtons = document.querySelectorAll('.add-to-cart');
+    cartButtons.forEach((btn, i) => {
+      btn.addEventListener('click', () => {
+        cart.push(products[i]);
+        updateCart();
+      });
+    });
+
+    const cartDiv = document.createElement('div');
+    cartDiv.id = 'cart-summary';
+    cartDiv.style.marginTop = '2rem';
+    cartDiv.style.textAlign = 'right';
+    grid.parentNode.appendChild(cartDiv);
+
+    function updateCart() {
+      let total = cart.reduce((sum, p) => sum + Number(p.Price), 0);
+      cartDiv.innerHTML = `<strong>Cart:</strong> ${cart.length} items — Total: $${total.toFixed(2)}`;
+    }
+  })
+  .catch(err => console.error('Error loading products:', err));
 </script>
 </body>
 </html>
