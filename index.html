@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Meat Pro | Premium Butchery</title>
+    <title>The Meat Pro | Premium UAE Butchery</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@300;500;900&display=swap" rel="stylesheet">
 </head>
@@ -22,37 +22,38 @@
 
     <header class="hero">
         <h1>Professional Grade Cuts</h1>
-        <p>From our farm to your kitchen. Minimalist quality, premium taste.</p>
+        <p>Premium quality meats delivered across the UAE.</p>
     </header>
 
     <main id="product-grid">
         <div style="text-align: center; grid-column: 1/-1; padding: 50px;">
-            <p>Loading premium selections...</p>
+            <p>Loading selections...</p>
         </div>
     </main>
 
     <div id="cart-sidebar">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px;">
-            <h2 style="margin: 0; font-family: 'Roboto'; text-transform: uppercase;">Your Order</h2>
-            <button onclick="toggleCart()" style="background: none; border: none; font-size: 2.5rem; cursor: pointer; line-height: 1;">&times;</button>
+        <div class="cart-header">
+            <h2>Your Order</h2>
+            <button onclick="toggleCart()" class="close-cart">&times;</button>
         </div>
 
         <div id="cart-items">
             <p style="color: #888; margin-top: 20px;">Your cart is empty.</p>
         </div>
 
-        <div style="margin-top: auto; border-top: 2px solid #eee; padding-top: 20px;">
-            <div style="display: flex; justify-content: space-between; font-size: 1.4rem; font-weight: 700;">
+        <div class="cart-footer">
+            <div class="total-display">
                 <span>Total</span>
-                <span>$<span id="cart-total">0.00</span></span>
+                <span>
+                    <img src="currency-logo.png" class="currency-icon">
+                    <span id="cart-total">0.00</span>
+                </span>
             </div>
             <button class="confirm-btn" onclick="goToCheckout()">Proceed to Checkout</button>
         </div>
     </div>
 
     <script src="xlsx.full.min.js"></script>
-    
     <script src="app.js"></script>
-
 </body>
 </html>
