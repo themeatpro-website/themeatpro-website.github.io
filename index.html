@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Meat Pro | Shop</title>
+<link rel="stylesheet" href="style.css">
+<script src="xlsx.full.min.js"></script>
+</head>
+<body>
+<header>
+  <img src="logo.png" alt="The Meat Pro Logo" style="width:120px;margin:0.5rem auto;display:block;">
+  <h1>The Meat Pro</h1>
+</header>
+
+<div class="container">
+  <h2>Products</h2>
+  <input type="file" id="file-input" accept=".xlsx" style="margin-bottom:1rem;">
+  <div class="product-grid" id="product-grid"></div>
+</div>
+
+<footer>
+  <p>© 2025 The Meat Pro. All rights reserved.</p>
+</footer>
+
+<script>
+const grid = document.getElementById('product-grid');
+const input = document.getElementById('file-input');
+
+input.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(evt){
+        const data = evt.target.result;
+        const workbook = XLSX.read(data, {type:'binary'});
+        const firstSheet = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheet];
+        const products = XLSX.utils.sheet_to_json(worksheet);
+
+        // Clear grid
+        grid.innerHTML = '';
+
+        products.forEach((prod, index)=>{
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.style.animationDelay = `${index*0.1}s`; // staggered animation
+            card.innerHTML = `
+                <img src="${prod.Image || 'logo.png'}" alt="${prod.Name}">
+                <div class="info">
+                    <h3>${prod.Name}</h3>
+                    <p>${prod.Description}</p>
+                    <div class="price">$${prod.Price}</div>
+                    <button>Add to Cart</button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    };
+    reader.readAsBinaryString(file);
+});
+</script>
+</body>
+</html>
