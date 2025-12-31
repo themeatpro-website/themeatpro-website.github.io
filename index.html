@@ -10,7 +10,8 @@
 <body>
 
     <nav>
-        <div class="logo-container" onclick="window.location.reload()">
+        <div class="logo-container" onclick="window.location.reload()" style="display: flex; align-items: center; cursor: pointer;">
+            <img src="logo.png" alt="Meat Pro Logo" style="height: 45px; margin-right: 12px;">
             <div class="logo-text">THE MEAT <span>PRO</span></div>
         </div>
         
@@ -32,8 +33,7 @@
             <button onclick="toggleCart()" class="close-cart">&times;</button>
         </div>
 
-        <div id="cart-items">
-            </div>
+        <div id="cart-items"></div>
 
         <div class="cart-footer">
             <div class="total-display">
@@ -43,7 +43,7 @@
                     <span id="cart-total">0.00</span>
                 </span>
             </div>
-            <button class="confirm-btn" onclick="goToCheckout()">Proceed to Checkout</button>
+            <button class="confirm-btn mobile-sticky" onclick="goToCheckout()">Proceed to Checkout</button>
         </div>
     </div>
 
