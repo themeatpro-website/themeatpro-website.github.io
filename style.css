@@ -220,3 +220,11 @@ body.cart-open {
         padding: 1rem 5%;
     }
 }
+
+.product-card img {
+    transition: opacity 0.5s ease-in;
+    opacity: 0;
+}
+.product-card img[src] {
+    opacity: 1;
+}
