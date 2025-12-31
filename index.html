@@ -30,11 +30,17 @@
         </main>
 
     <div id="cart-sidebar">
-        <h2>Your Cart</h2>
-        <div id="cart-items"></div>
-        <hr>
-        <p>Total: $<span id="cart-total">0.00</span></p>
-        <button class="btn-red" onclick="goToCheckout()">Checkout</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="margin:0;">Your Cart</h2>
+            <button onclick="toggleCart()" style="background:none; border:none; font-size:2rem; cursor:pointer;">&times;</button>
+        </div>
+        <div id="cart-items"></div> <div style="margin-top:20px; border-top:2px solid #eee; padding-top:20px;">
+            <div style="display:flex; justify-content:space-between; font-size:1.2rem; font-weight:bold;">
+                <span>Total:</span>
+                <span>$<span id="cart-total">0.00</span></span>
+            </div>
+            <button class="confirm-btn" onclick="goToCheckout()" style="margin-top:20px;">Checkout Now</button>
+        </div>
     </div>
 
     <script src="app.js"></script>
