@@ -1,32 +1,35 @@
-// 1. GLOBAL STATE
+// 1. Initialize Cart
 let cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
 
-// 2. DEFINE UI UPDATE FUNCTION FIRST (Prevents "Not Defined" Error)
-function updateCartUI() {
+// 2. Define UI Functions FIRST
+window.updateCartUI = function() {
     const cartCount = document.getElementById('cart-count');
     const cartItems = document.getElementById('cart-items');
     const cartTotal = document.getElementById('cart-total');
 
     if (!cartCount || !cartItems || !cartTotal) return;
 
+    // Update Nav Count
     const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
     cartCount.innerText = totalQty;
 
+    // Update Sidebar
     cartItems.innerHTML = cart.map((item, index) => `
-        <div class="cart-item" style="display:flex; justify-content:space-between; margin-bottom:15px;">
+        <div class="cart-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #eee; padding-bottom:10px;">
             <div>
-                <div style="font-weight:bold;">${item.name}</div>
-                <div style="font-size:0.8rem; color:#666;">$${item.price.toFixed(2)} x ${item.quantity}</div>
+                <div style="font-weight:bold; color: #1a1a1a;">${item.name}</div>
+                <div style="font-size:0.85rem; color:#666;">$${item.price.toFixed(2)} x ${item.quantity}</div>
             </div>
-            <button onclick="removeFromCart(${index})" style="background:none; border:none; color:#C62828; cursor:pointer; font-weight:bold;">✕</button>
+            <button onclick="removeFromCart(${index})" style="background:none; border:none; color:#C62828; cursor:pointer; font-size:1.2rem;">&times;</button>
         </div>
     `).join('');
 
+    // Update Total
     const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     cartTotal.innerText = totalAmount.toFixed(2);
-}
+};
 
-// 3. CART ACTIONS
+// 3. Define Interaction Functions
 window.addToCart = function(name, price) {
     const existingItem = cart.find(item => item.name === name);
     if (existingItem) {
@@ -34,34 +37,27 @@ window.addToCart = function(name, price) {
     } else {
         cart.push({ name, price: parseFloat(price), quantity: 1 });
     }
-    saveAndRefresh();
-    document.getElementById('cart-sidebar').classList.add('active');
+    
+    localStorage.setItem('meatProCart', JSON.stringify(cart));
+    window.updateCartUI();
+    
+    // Open cart sidebar automatically
+    const sidebar = document.getElementById('cart-sidebar');
+    if(sidebar) sidebar.classList.add('active');
 };
 
 window.removeFromCart = function(index) {
     cart.splice(index, 1);
-    saveAndRefresh();
-};
-
-function saveAndRefresh() {
     localStorage.setItem('meatProCart', JSON.stringify(cart));
-    updateCartUI();
-}
+    window.updateCartUI();
+};
 
 window.toggleCart = function() {
     const sidebar = document.getElementById('cart-sidebar');
-    sidebar.classList.toggle('active');
+    if(sidebar) sidebar.classList.toggle('active');
 };
 
-window.goToCheckout = function() {
-    if (cart.length === 0) {
-        alert("Your cart is empty!");
-        return;
-    }
-    window.location.href = 'checkout.html';
-};
-
-// 4. LOAD PRODUCTS FROM EXCEL
+// 4. Data Loading
 async function loadProducts() {
     try {
         const response = await fetch('products.xlsx');
@@ -73,29 +69,30 @@ async function loadProducts() {
         const products = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
         
         renderProducts(products);
-        updateCartUI();
+        window.updateCartUI(); // Initial UI sync
     } catch (error) {
-        console.error("Setup Error:", error);
+        console.error("The Meat Pro Load Error:", error);
     }
 }
 
 function renderProducts(products) {
     const grid = document.getElementById('product-grid');
     if (!grid) return;
+    
     grid.innerHTML = products.map(p => `
         <div class="product-card">
-            <img src="${p.Image}" alt="${p.Name}" onerror="this.src='https://via.placeholder.com/300x200?text=Meat+Pro'">
+            <img src="${p.Image}" alt="${p.Name}" onerror="this.src='https://via.placeholder.com/400x300?text=Premium+Meat'">
             <div class="product-info">
                 <h3>${p.Name}</h3>
-                <p style="color: #777; font-size: 0.85rem; height: 40px; overflow: hidden;">${p.Description}</p>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                <p>${p.Description}</p>
+                <div class="price-row" style="display:flex; justify-content:space-between; align-items:center;">
                     <span class="price-tag">$${parseFloat(p.Price).toFixed(2)}</span>
-                    <button class="add-btn" onclick="addToCart('${p.Name}', ${p.Price})" style="width: auto; padding: 8px 15px; margin: 0;">Add +</button>
+                    <button class="add-btn" onclick="addToCart('${p.Name}', ${p.Price})" style="width:auto; margin:0; padding: 10px 20px;">Add +</button>
                 </div>
             </div>
         </div>
     `).join('');
 }
 
-// Start
+// Start everything
 document.addEventListener('DOMContentLoaded', loadProducts);
