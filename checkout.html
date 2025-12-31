@@ -7,55 +7,66 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@300;900&display=swap" rel="stylesheet">
 </head>
-<body style="background-color: #f4f4f4;">
+<body style="background-color: var(--light-grey);">
 
     <div class="checkout-wrapper">
         <nav class="checkout-nav">
-            <div class="logo-text" onclick="window.location.href='index.html'" style="cursor:pointer">THE MEAT <span>PRO</span></div>
+            <div class="logo-text" onclick="window.location.href='index.html'" style="cursor:pointer">
+                THE MEAT <span>PRO</span>
+            </div>
             <a href="index.html" class="back-link">← Continue Shopping</a>
         </nav>
 
         <main class="checkout-main">
             <div class="checkout-card">
-            <h2 class="section-title">Order Summary</h2>
-            
-            <div id="checkout-items-list">
-                </div>
-        
-            <div class="instructions-section" style="margin-top: 30px;">
-                <label for="order-notes" style="display: block; font-weight: 700; margin-bottom: 10px; color: var(--medium-grey);">Special Instructions & Cutting Notes</label>
-                <textarea id="order-notes" placeholder="e.g., Please vacuum pack the ribeye separately, or cut the brisket into two pieces..." 
-                    style="width: 100%; height: 100px; padding: 15px; border-radius: var(--rounded); border: 1px solid #ddd; font-family: inherit; resize: none; box-sizing: border-box; outline: none; transition: border-color 0.3s;"></textarea>
-            </div>
-        
-            <div class="order-totals">
-                <div class="total-row">
-                    <span>Subtotal</span>
-                    <span id="summary-subtotal">$0.00</span>
-                </div>
-                <div class="total-row">
-                    <span>Delivery</span>
-                    <span style="color: #2e7d32; font-weight: bold;">FREE</span>
-                </div>
-                <hr>
-                <div class="total-row grand-total">
-                    <span>Total</span>
-                    <span id="summary-total">$0.00</span>
-                </div>
-            </div>
+                <h2 class="section-title">Order Summary</h2>
+                
+                <div id="checkout-items-list">
+                    </div>
 
-    <button class="confirm-btn" onclick="processOrder()">Place Order</button>
-</div>
+                <div class="instructions-section" style="margin-top: 30px;">
+                    <label for="order-notes" style="display: block; font-weight: 700; margin-bottom: 10px; color: var(--dark-grey);">
+                        Special Instructions & Cutting Notes
+                    </label>
+                    <textarea id="order-notes" placeholder="e.g., Please vacuum pack separately, or cut the steaks 2-inches thick..." 
+                        style="width: 100%; height: 100px; padding: 15px; border-radius: var(--rounded); border: 1px solid #ddd; font-family: inherit; resize: none; box-sizing: border-box; outline: none; transition: border-color 0.3s;"></textarea>
+                </div>
+
+                <div class="order-totals">
+                    <div class="total-row">
+                        <span>Subtotal</span>
+                        <span id="summary-subtotal">
+                            <img src="currency-logo.png" class="currency-icon" style="height:0.8em;">0.00
+                        </span>
+                    </div>
+                    <div class="total-row">
+                        <span>Shipping</span>
+                        <span style="color: #2e7d32; font-weight: bold;">FREE</span>
+                    </div>
+                    <hr style="border: 0; border-top: 1px solid #ddd; margin: 15px 0;">
+                    <div class="total-row grand-total">
+                        <span>Total</span>
+                        <span id="summary-total">
+                            <img src="currency-logo.png" class="currency-icon">0.00
+                        </span>
+                    </div>
+                </div>
+
+                <button class="confirm-btn" onclick="processOrder()">Place Order</button>
+            </div>
+        </main>
+    </div>
 
     <script>
         function loadCheckout() {
+            // Retrieve cart from LocalStorage
             const cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
             const listContainer = document.getElementById('checkout-items-list');
             const totalDisplay = document.getElementById('summary-total');
             const subtotalDisplay = document.getElementById('summary-subtotal');
 
             if (cart.length === 0) {
-                listContainer.innerHTML = '<p>Your cart is empty.</p>';
+                listContainer.innerHTML = '<p style="text-align:center; padding: 20px;">Your cart is empty.</p>';
                 return;
             }
 
@@ -63,28 +74,52 @@
             listContainer.innerHTML = cart.map(item => {
                 const itemTotal = item.price * item.quantity;
                 total += itemTotal;
+                
                 return `
-                    <div class="checkout-item">
-                        <div class="item-details">
-                            <span class="item-qty">${item.quantity}x</span>
-                            <span class="item-name">${item.name}</span>
+                    <div class="checkout-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div class="item-left-group" style="display: flex; align-items: center; gap: 15px;">
+                            <div class="item-icon-box" style="width: 60px; height: 60px; background: #eee; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                <img src="${item.image || 'https://via.placeholder.com/60'}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div class="item-details" style="display: flex; flex-direction: column;">
+                                <span class="item-name" style="font-weight: 700;">${item.name}</span>
+                                <span class="item-qty-tag" style="font-size: 0.85rem; color: var(--primary-red); font-weight: 600;">Qty: ${item.quantity}</span>
+                            </div>
                         </div>
-                        <span class="item-price">$${itemTotal.toFixed(2)}</span>
+                        <span class="item-price" style="font-weight: 700;">
+                            <img src="currency-logo.png" class="currency-icon" style="height:0.8em;">${itemTotal.toFixed(2)}
+                        </span>
                     </div>
                 `;
             }).join('');
 
-            subtotalDisplay.innerText = `$${total.toFixed(2)}`;
-            totalDisplay.innerText = `$${total.toFixed(2)}`;
+            // Update Totals with Logo
+            const logoHTML = `<img src="currency-logo.png" class="currency-icon">`;
+            const logoHTMLSmall = `<img src="currency-logo.png" class="currency-icon" style="height:0.8em;">`;
+            
+            subtotalDisplay.innerHTML = `${logoHTMLSmall}${total.toFixed(2)}`;
+            totalDisplay.innerHTML = `${logoHTML}${total.toFixed(2)}`;
         }
 
         function processOrder() {
-            // Placeholder for Stripe integration
-            alert("🚀 Order Received! Thank you for choosing The Meat Pro. (Demo Mode)");
+            const cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
+            const notes = document.getElementById('order-notes').value;
+
+            if (cart.length === 0) {
+                alert("Cart is empty!");
+                return;
+            }
+
+            // For now, we show a success message. 
+            // This is where you'd link to WhatsApp or an Email API.
+            alert(`Order Successful!\n\nInstructions: ${notes || "None"}\n\nThank you for choosing The Meat Pro.`);
+            
+            // Clear cart and return home
             localStorage.removeItem('meatProCart');
             window.location.href = 'index.html';
         }
 
+        // Initialize on load
         document.addEventListener('DOMContentLoaded', loadCheckout);
     </script>
 </body>
