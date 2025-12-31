@@ -113,4 +113,35 @@ window.goToCheckout = function() {
     if(cart.length > 0) window.location.href = 'checkout.html';
 };
 
+let currentFilteredProducts = []; // To keep track of the category items we are searching within
+
+// Update your existing filterByCategory function slightly:
+window.filterByCategory = function(categoryName) {
+    document.getElementById('category-section').style.display = 'none';
+    document.getElementById('product-header').style.display = 'flex';
+    document.getElementById('product-grid').style.display = 'grid';
+    document.getElementById('current-category-name').innerText = categoryName;
+    document.getElementById('product-search').value = ''; // Clear search on new category
+
+    // Store the category items globally so we can search them
+    currentFilteredProducts = allProducts.filter(p => 
+        p.Category && p.Category.toString().trim().toLowerCase() === categoryName.toLowerCase()
+    );
+    
+    renderProducts(currentFilteredProducts);
+    window.scrollTo(0,0);
+};
+
+// NEW: Search Handling Function
+window.handleSearch = function() {
+    const searchTerm = document.getElementById('product-search').value.toLowerCase();
+    
+    const searchedItems = currentFilteredProducts.filter(p => 
+        p.Name.toLowerCase().includes(searchTerm) || 
+        p.Description.toLowerCase().includes(searchTerm)
+    );
+    
+    renderProducts(searchedItems);
+};
+
 document.addEventListener('DOMContentLoaded', initStore);
