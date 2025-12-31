@@ -98,6 +98,19 @@ function renderProducts(products) {
         </div>
     `).join('');
 }
+// Ensure goToCheckout is available globally
+window.goToCheckout = function() {
+    console.log("Checkout button clicked"); // This will show in F12 console
+    
+    if (cart.length === 0) {
+        alert("Your cart is empty! Add some premium cuts before checking out.");
+        return;
+    }
+    
+    // The data is already in localStorage from the addToCart function,
+    // so we just need to move to the next page.
+    window.location.href = 'checkout.html';
+};
 
 // Start everything
 document.addEventListener('DOMContentLoaded', loadProducts);
