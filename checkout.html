@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Meat Pro | Checkout</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <img src="logo.png" alt="The Meat Pro Logo">
+  <h1>The Meat Pro</h1>
+</header>
+
+<div class="checkout-container">
+  <h2>Checkout</h2>
+  <div id="checkout-items"></div>
+  <div class="checkout-total" id="checkout-total"></div>
+  <button id="confirm-btn">Confirm Order</button>
+</div>
+
+<footer>
+  <p>© 2025 The Meat Pro. All rights reserved.</p>
+</footer>
+
+<script>
+const itemsDiv = document.getElementById('checkout-items');
+const totalDiv = document.getElementById('checkout-total');
+const confirmBtn = document.getElementById('confirm-btn');
+
+const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+let total = 0;
+cart.forEach(p=>{
+  const div = document.createElement('div');
+  div.className = 'checkout-item';
+  div.innerHTML = `<span>${p.Name} x${p.qty || 1}</span><span>$${(p.Price*(p.qty||1)).toFixed(2)}</span>`;
+  itemsDiv.appendChild(div);
+  total += Number(p.Price)*(p.qty||1);
+});
+
+totalDiv.textContent = `Total: $${total.toFixed(2)}`;
+
+confirmBtn.onclick = ()=>{
+  alert('Order confirmed! (Demo)');
+  localStorage.removeItem('cart');
+  window.location.href = 'index.html';
+};
+</script>
+</body>
+</html>
