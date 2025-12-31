@@ -41,8 +41,6 @@ nav {
     height: 0.9em;
     vertical-align: middle;
     margin-right: 2px;
-    /* This filter converts black to #C62828 */
-    filter: brightness(0) saturate(100%) invert(14%) sepia(85%) saturate(3635%) hue-rotate(352deg) brightness(89%) contrast(92%);
 }
 
 /* Product Grid */
