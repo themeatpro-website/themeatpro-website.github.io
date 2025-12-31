@@ -14,7 +14,7 @@
 </header>
 
 <div class="container">
-  <h2>Products</h2>
+  <h2>Shop</h2>
   <div class="product-grid" id="product-grid"></div>
   <div id="cart-summary"></div>
   <button id="checkout-btn">Go to Checkout</button>
@@ -30,46 +30,44 @@ const cartSummary = document.getElementById('cart-summary');
 const checkoutBtn = document.getElementById('checkout-btn');
 let cart = [];
 
-// Load products from Excel
+// Load products.xlsx automatically
 fetch('products.xlsx')
-  .then(res => res.arrayBuffer())
-  .then(data => {
-    const workbook = XLSX.read(data,{type:'array'});
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const products = XLSX.utils.sheet_to_json(sheet);
+.then(res=>res.arrayBuffer())
+.then(data=>{
+  const workbook = XLSX.read(data,{type:'array'});
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  const products = XLSX.utils.sheet_to_json(sheet);
 
-    products.forEach((prod,index)=>{
-      const card = document.createElement('div');
-      card.className = 'product-card';
-      card.style.animationDelay = `${index*0.1}s`;
-      card.innerHTML = `
-        <img src="${prod.Image || 'logo.png'}" alt="${prod.Name}">
-        <div class="info">
-          <h3>${prod.Name}</h3>
-          <p>${prod.Description}</p>
-          <div class="price">$${prod.Price}</div>
-          <button class="add-to-cart">Add to Cart</button>
-        </div>
-      `;
-      grid.appendChild(card);
-
-      card.querySelector('.add-to-cart').addEventListener('click', ()=>{
-        cart.push({...prod, qty:1});
-        updateCart();
-      });
+  products.forEach((prod,index)=>{
+    const card = document.createElement('div');
+    card.className='product-card';
+    card.style.animationDelay=`${index*0.1}s`;
+    card.innerHTML=`
+      <img src="${prod.Image||'logo.png'}" alt="${prod.Name}">
+      <div class="info">
+        <h3>${prod.Name}</h3>
+        <p>${prod.Description}</p>
+        <div class="price">$${prod.Price}</div>
+        <button class="add-to-cart">Add to Cart</button>
+      </div>
+    `;
+    grid.appendChild(card);
+    card.querySelector('.add-to-cart').addEventListener('click',()=>{
+      cart.push({...prod,qty:1});
+      updateCart();
     });
-    updateCart();
   });
+  updateCart();
+});
 
 function updateCart(){
-  let total = cart.reduce((sum,p)=>sum + Number(p.Price)*(p.qty||1),0);
-  cartSummary.innerHTML = `<strong>Cart:</strong> ${cart.length} items — Total: $${total.toFixed(2)}`;
+  let total=cart.reduce((sum,p)=>sum+Number(p.Price)*(p.qty||1),0);
+  cartSummary.innerHTML=`<strong>Cart:</strong> ${cart.length} items — Total: $${total.toFixed(2)}`;
 }
 
-// Go to checkout
-checkoutBtn.onclick = ()=>{
-  localStorage.setItem('cart', JSON.stringify(cart));
-  window.location.href = 'checkout.html';
+checkoutBtn.onclick=()=>{
+  localStorage.setItem('cart',JSON.stringify(cart));
+  window.location.href='checkout.html';
 };
 </script>
 </body>
