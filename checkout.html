@@ -1,49 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Meat Pro | Checkout</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | The Meat Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
 </head>
 <body>
-<header>
-  <img src="logo.png" alt="Logo">
-  <h1>The Meat Pro</h1>
-</header>
+    <div class="checkout-container">
+        <header>
+            <a href="index.html" class="back-btn">← Back to Shop</a>
+            <h1>Order Summary</h1>
+        </header>
 
-<div class="checkout-container">
-  <h2>Checkout</h2>
-  <div id="checkout-items"></div>
-  <div class="checkout-total" id="checkout-total"></div>
-  <button id="confirm-btn">Confirm Order</button>
-</div>
+        <div class="checkout-card">
+            <div id="order-items">
+                </div>
+            
+            <div class="checkout-totals">
+                <div class="total-row">
+                    <span>Subtotal</span>
+                    <span id="subtotal">$0.00</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>Total</span>
+                    <span id="grand-total">$0.00</span>
+                </div>
+            </div>
 
-<footer>
-  <p>© 2025 The Meat Pro. All rights reserved.</p>
-</footer>
+            <button class="confirm-btn" onclick="confirmOrder()">Confirm Order</button>
+        </div>
+    </div>
 
-<script>
-const itemsDiv=document.getElementById('checkout-items');
-const totalDiv=document.getElementById('checkout-total');
-const confirmBtn=document.getElementById('confirm-btn');
-const cart=JSON.parse(localStorage.getItem('cart')||'[]');
+    <script>
+        // Load cart from localStorage
+        const cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
+        const orderItemsContainer = document.getElementById('order-items');
+        
+        function displayOrder() {
+            if (cart.length === 0) {
+                orderItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
+                return;
+            }
 
-let total=0;
-cart.forEach(p=>{
-  const div=document.createElement('div');
-  div.className='checkout-item';
-  div.innerHTML=`<span>${p.Name} x${p.qty||1}</span><span>$${(p.Price*(p.qty||1)).toFixed(2)}</span>`;
-  itemsDiv.appendChild(div);
-  total+=Number(p.Price)*(p.qty||1);
-});
-totalDiv.textContent=`Total: $${total.toFixed(2)}`;
+            let total = 0;
+            orderItemsContainer.innerHTML = cart.map(item => {
+                total += item.price * item.quantity;
+                return `
+                    <div class="order-item">
+                        <span>${item.name} (x${item.quantity})</span>
+                        <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                `;
+            }).join('');
 
-confirmBtn.onclick=()=>{
-  alert('Order confirmed! (Demo)');
-  localStorage.removeItem('cart');
-  window.location.href='index.html';
-};
-</script>
+            document.getElementById('subtotal').innerText = `$${total.toFixed(2)}`;
+            document.getElementById('grand-total').innerText = `$${total.toFixed(2)}`;
+        }
+
+        function confirmOrder() {
+            alert("Thank you for your order! This is a demo. Integration with Stripe would be the next step.");
+            localStorage.removeItem('meatProCart');
+            window.location.href = 'index.html';
+        }
+
+        displayOrder();
+    </script>
 </body>
 </html>
