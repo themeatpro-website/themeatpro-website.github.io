@@ -44,8 +44,17 @@
         </div>
     </div>
 
-    <div id="product-header" style="display:none; padding: 20px 8%; align-items: center; justify-content: space-between; background: #fff; border-bottom: 1px solid #eee;">
-        <h2 id="current-category-name" style="text-transform: uppercase; margin: 0; font-family: 'Roboto'; font-weight: 900;"></h2>
+    <div id="product-header" style="display:none; padding: 20px 8%; align-items: center; justify-content: space-between; background: #fff; border-bottom: 1px solid #eee; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <h2 id="current-category-name" style="text-transform: uppercase; margin: 0; font-family: 'Roboto'; font-weight: 900; min-width: 120px;"></h2>
+            
+            <div class="search-container" style="position: relative;">
+                <input type="text" id="product-search" placeholder="Search in this category..." 
+                    onkeyup="handleSearch()"
+                    style="padding: 10px 15px; border-radius: 25px; border: 1px solid #ddd; width: 250px; outline: none; font-family: inherit;">
+            </div>
+        </div>
+        
         <button onclick="showCategories()" style="background:none; border:none; text-decoration:underline; cursor:pointer; color:var(--primary-red); font-weight: 700;">&larr; Back to Categories</button>
     </div>
 
