@@ -8,9 +8,8 @@
 <script src="xlsx.full.min.js"></script>
 </head>
 <body>
-
 <header>
-  <img src="logo.png" alt="The Meat Pro Logo" style="width:120px;margin:0.5rem auto;display:block;">
+  <img src="logo.png" alt="The Meat Pro Logo">
   <h1>The Meat Pro</h1>
 </header>
 
@@ -18,19 +17,7 @@
   <h2>Products</h2>
   <div class="product-grid" id="product-grid"></div>
   <div id="cart-summary"></div>
-</div>
-
-<!-- Modal -->
-<div class="modal" id="modal">
-  <div class="modal-content">
-    <span class="close-modal" id="close-modal">&times;</span>
-    <img id="modal-img" src="" alt="Product Image">
-    <h3 id="modal-name"></h3>
-    <p id="modal-desc"></p>
-    <div class="price" id="modal-price"></div>
-    <label>Quantity: <input type="number" id="modal-qty" value="1" min="1" style="width:50px;"></label>
-    <button id="modal-add">Add to Cart</button>
-  </div>
+  <button id="checkout-btn">Go to Checkout</button>
 </div>
 
 <footer>
@@ -40,18 +27,18 @@
 <script>
 const grid = document.getElementById('product-grid');
 const cartSummary = document.getElementById('cart-summary');
+const checkoutBtn = document.getElementById('checkout-btn');
 let cart = [];
 
-// Load products.xlsx automatically
+// Load products from Excel
 fetch('products.xlsx')
   .then(res => res.arrayBuffer())
   .then(data => {
-    const workbook = XLSX.read(data, {type:'array'});
+    const workbook = XLSX.read(data,{type:'array'});
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const products = XLSX.utils.sheet_to_json(sheet);
 
-    // Render products
-    products.forEach((prod, index) => {
+    products.forEach((prod,index)=>{
       const card = document.createElement('div');
       card.className = 'product-card';
       card.style.animationDelay = `${index*0.1}s`;
@@ -66,54 +53,24 @@ fetch('products.xlsx')
       `;
       grid.appendChild(card);
 
-      // Open modal on click
-      card.querySelector('img').addEventListener('click', () => openModal(prod));
-      card.querySelector('.info h3').addEventListener('click', () => openModal(prod));
-
-      // Add to cart button
-      card.querySelector('.add-to-cart').addEventListener('click', () => {
-        cart.push({...prod, qty: 1});
+      card.querySelector('.add-to-cart').addEventListener('click', ()=>{
+        cart.push({...prod, qty:1});
         updateCart();
       });
     });
-
     updateCart();
   });
 
-// Cart update
-function updateCart() {
-  let total = cart.reduce((sum, p) => sum + p.Price * (p.qty || 1), 0);
+function updateCart(){
+  let total = cart.reduce((sum,p)=>sum + Number(p.Price)*(p.qty||1),0);
   cartSummary.innerHTML = `<strong>Cart:</strong> ${cart.length} items — Total: $${total.toFixed(2)}`;
 }
 
-// Modal logic
-const modal = document.getElementById('modal');
-const modalImg = document.getElementById('modal-img');
-const modalName = document.getElementById('modal-name');
-const modalDesc = document.getElementById('modal-desc');
-const modalPrice = document.getElementById('modal-price');
-const modalQty = document.getElementById('modal-qty');
-const modalAdd = document.getElementById('modal-add');
-const closeModalBtn = document.getElementById('close-modal');
-
-function openModal(prod) {
-  modal.style.display = 'flex';
-  modalImg.src = prod.Image || 'logo.png';
-  modalName.textContent = prod.Name;
-  modalDesc.textContent = prod.Description;
-  modalPrice.textContent = `$${prod.Price}`;
-  modalQty.value = 1;
-
-  modalAdd.onclick = () => {
-    cart.push({...prod, qty: Number(modalQty.value)});
-    updateCart();
-    modal.style.display = 'none';
-  };
-}
-
-closeModalBtn.onclick = () => modal.style.display = 'none';
-window.onclick = e => { if(e.target==modal) modal.style.display='none'; };
+// Go to checkout
+checkoutBtn.onclick = ()=>{
+  localStorage.setItem('cart', JSON.stringify(cart));
+  window.location.href = 'checkout.html';
+};
 </script>
-
 </body>
 </html>
