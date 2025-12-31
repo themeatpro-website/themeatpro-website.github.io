@@ -18,12 +18,14 @@ function renderProducts(products) {
     const grid = document.getElementById('product-grid');
     grid.innerHTML = products.map(p => `
         <div class="product-card">
-            <img src="${p.Image}" alt="${p.Name}" class="product-img">
-            <h3>${p.Name}</h3>
-            <p>${p.Description}</p>
-            <div class="price-row">
-                <span>$${p.Price}</span>
-                <button onclick="addToCart('${p.Name}', ${p.Price})">Add to Cart</button>
+            <img src="${p.Image}" alt="${p.Name}">
+            <div class="product-info">
+                <h3>${p.Name}</h3>
+                <p style="color: #777; font-size: 0.9rem;">${p.Description}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                    <span class="price-tag">$${parseFloat(p.Price).toFixed(2)}</span>
+                </div>
+                <button class="add-btn" onclick="addToCart('${p.Name}', ${p.Price})">Add to Cart</button>
             </div>
         </div>
     `).join('');
