@@ -45,3 +45,56 @@ body {
 #cart-sidebar.active {
   right: 0;
 }
+/* Checkout Specific Styles */
+.checkout-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+}
+
+.checkout-card {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: var(--rounded);
+    box-shadow: var(--shadow);
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.checkout-totals {
+    margin-top: 20px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.grand-total {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--primary-red);
+}
+
+.confirm-btn {
+    width: 100%;
+    background: var(--primary-red);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: var(--rounded);
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: opacity 0.3s;
+}
+
+.confirm-btn:hover {
+    opacity: 0.9;
+}
