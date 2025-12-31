@@ -5,67 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | The Meat Pro</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@300;900&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="checkout-container">
-        <header>
-            <a href="index.html" class="back-btn">← Back to Shop</a>
-            <h1>Order Summary</h1>
-        </header>
+<body style="background-color: #f4f4f4;">
 
-        <div class="checkout-card">
-            <div id="order-items">
+    <div class="checkout-wrapper">
+        <nav class="checkout-nav">
+            <div class="logo-text" onclick="window.location.href='index.html'" style="cursor:pointer">THE MEAT <span>PRO</span></div>
+            <a href="index.html" class="back-link">← Continue Shopping</a>
+        </nav>
+
+        <main class="checkout-main">
+            <div class="checkout-card">
+                <h2 class="section-title">Order Summary</h2>
+                
+                <div id="checkout-items-list">
+                    </div>
+
+                <div class="order-totals">
+                    <div class="total-row">
+                        <span>Subtotal</span>
+                        <span id="summary-subtotal">$0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Shipping</span>
+                        <span style="color: #2e7d32; font-weight: bold;">FREE</span>
+                    </div>
+                    <hr>
+                    <div class="total-row grand-total">
+                        <span>Total</span>
+                        <span id="summary-total">$0.00</span>
+                    </div>
                 </div>
-            
-            <div class="checkout-totals">
-                <div class="total-row">
-                    <span>Subtotal</span>
-                    <span id="subtotal">$0.00</span>
-                </div>
-                <div class="total-row grand-total">
-                    <span>Total</span>
-                    <span id="grand-total">$0.00</span>
-                </div>
+
+                <button class="confirm-btn" onclick="processOrder()">Place Order</button>
             </div>
-
-            <button class="confirm-btn" onclick="confirmOrder()">Confirm Order</button>
-        </div>
+        </main>
     </div>
 
     <script>
-        // Load cart from localStorage
-        const cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
-        const orderItemsContainer = document.getElementById('order-items');
-        
-        function displayOrder() {
+        function loadCheckout() {
+            const cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
+            const listContainer = document.getElementById('checkout-items-list');
+            const totalDisplay = document.getElementById('summary-total');
+            const subtotalDisplay = document.getElementById('summary-subtotal');
+
             if (cart.length === 0) {
-                orderItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
+                listContainer.innerHTML = '<p>Your cart is empty.</p>';
                 return;
             }
 
             let total = 0;
-            orderItemsContainer.innerHTML = cart.map(item => {
-                total += item.price * item.quantity;
+            listContainer.innerHTML = cart.map(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
                 return `
-                    <div class="order-item">
-                        <span>${item.name} (x${item.quantity})</span>
-                        <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                    <div class="checkout-item">
+                        <div class="item-details">
+                            <span class="item-qty">${item.quantity}x</span>
+                            <span class="item-name">${item.name}</span>
+                        </div>
+                        <span class="item-price">$${itemTotal.toFixed(2)}</span>
                     </div>
                 `;
             }).join('');
 
-            document.getElementById('subtotal').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('grand-total').innerText = `$${total.toFixed(2)}`;
+            subtotalDisplay.innerText = `$${total.toFixed(2)}`;
+            totalDisplay.innerText = `$${total.toFixed(2)}`;
         }
 
-        function confirmOrder() {
-            alert("Thank you for your order! This is a demo. Integration with Stripe would be the next step.");
+        function processOrder() {
+            // Placeholder for Stripe/Payment integration
+            alert("🚀 Order Received! Thank you for choosing The Meat Pro. (Demo Mode)");
             localStorage.removeItem('meatProCart');
             window.location.href = 'index.html';
         }
 
-        displayOrder();
+        document.addEventListener('DOMContentLoaded', loadCheckout);
     </script>
 </body>
 </html>
