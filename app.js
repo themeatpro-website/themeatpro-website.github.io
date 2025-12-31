@@ -112,5 +112,19 @@ window.goToCheckout = function() {
     window.location.href = 'checkout.html';
 };
 
+function processOrder() {
+    const notes = document.getElementById('order-notes').value;
+    const cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
+    
+    // In a real scenario, you would send 'cart' and 'notes' to your email or server.
+    console.log("Order Notes:", notes);
+    
+    alert(`🚀 Order Received!\n\nInstructions: ${notes || "None"}\n\nThank you for choosing The Meat Pro!`);
+    
+    // Clear cart and go home
+    localStorage.removeItem('meatProCart');
+    window.location.href = 'index.html';
+}
+
 // Start everything
 document.addEventListener('DOMContentLoaded', loadProducts);
