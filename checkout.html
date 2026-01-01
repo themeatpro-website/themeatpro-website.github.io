@@ -7,14 +7,13 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@900&display=swap" rel="stylesheet">
 </head>
-<body>
+<body style="background:#f8f8f8;">
 
     <nav>
-        <div class="logo-container" onclick="window.location.href='index.html'" style="cursor:pointer; display:flex; align-items:center;">
+        <div onclick="window.location.href='index.html'" style="display:flex; align-items:center; cursor:pointer;">
             <img src="assets/logo.png" style="height:45px; margin-right:12px;" onerror="this.src='assets/logo.png'">
-            <div class="logo-text">THE MEAT <span>PRO</span></div>
+            <div class="logo-text">THE MEAT <span style="color:var(--primary-red)">PRO</span></div>
         </div>
-        <button class="add-btn" onclick="window.location.href='index.html'" style="background:#eee; color:black;">&larr; Back</button>
     </nav>
 
     <div style="display:grid; grid-template-columns: 1fr 400px; gap:40px; padding:40px 8%; max-width:1400px; margin:0 auto;">
@@ -23,79 +22,83 @@
             
             <div style="margin-bottom:20px;">
                 <label style="display:block; font-weight:700; margin-bottom:8px;">Full Name</label>
-                <input type="text" id="cust-name" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px;" placeholder="John Doe">
+                <input type="text" id="fn" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px;" placeholder="John Doe">
             </div>
 
             <div style="margin-bottom:20px;">
-                <label style="display:block; font-weight:700; margin-bottom:8px;">Full Address</label>
-                <input type="text" id="cust-address" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px;" placeholder="Villa/Apt, Street, Area">
-            </div>
-
-            <div style="margin-bottom:20px;">
-                <label style="display:block; font-weight:700; margin-bottom:8px;">Phone Number</label>
-                <input type="text" id="cust-phone" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px;" placeholder="+971">
+                <label style="display:block; font-weight:700; margin-bottom:8px;">Full Delivery Address</label>
+                <input type="text" id="ad" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px;" placeholder="Street, Villa/Apt, Area">
             </div>
 
             <div style="margin-bottom:30px;">
                 <label style="display:block; font-weight:700; margin-bottom:8px;">Order Notes (Optional)</label>
-                <textarea id="cust-notes" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px; font-family:inherit; height:80px;" placeholder="e.g. Leave at door, extra marinade..."></textarea>
+                <textarea id="nt" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px; height:80px; font-family:inherit;" placeholder="e.g. Cut into small pieces..."></textarea>
             </div>
 
-            <button class="confirm-btn" onclick="processOrder(false)" style="margin-bottom:10px;">Confirm Order</button>
-            <button onclick="processOrder(true)" style="background:#25D366; color:white; border:none; padding:18px; border-radius:12px; font-weight:700; cursor:pointer; width:100%;">Order via WhatsApp</button>
+            <button class="confirm-btn" onclick="done(false)" style="margin-bottom:12px;">Confirm Order</button>
+            <button onclick="done(true)" style="background:#25D366; color:white; border:none; padding:18px; border-radius:12px; font-weight:700; cursor:pointer; width:100%;">Order via WhatsApp</button>
         </div>
 
         <div style="background:white; padding:30px; border-radius:16px; box-shadow:var(--shadow); height:fit-content;">
-            <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">Your Order</h3>
-            <div id="checkout-items-list"></div>
-            <div style="margin-top:20px; padding-top:15px; border-top:2px solid #eee; display:flex; justify-content:space-between; font-weight:900; font-size:1.4rem;">
+            <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:15px;">Summary</h3>
+            <div id="check-list"></div>
+            <div style="margin-top:20px; font-weight:900; font-size:1.4rem; display:flex; justify-content:space-between;">
                 <span>Total</span>
-                <span>AED <span id="checkout-total-val">0.00</span></span>
+                <span>AED <span id="check-total">0.00</span></span>
             </div>
         </div>
     </div>
 
     <script>
         let cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
+        const WEBHOOK_URL = 'https://w3bhookecho42x9.dpdns.org/';
 
-        function init() {
-            const list = document.getElementById('checkout-items-list');
-            if(cart.length === 0) return window.location.href = 'index.html';
-            
-            list.innerHTML = cart.map(i => `
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.9rem;">
-                    <span>${i.quantity} x ${i.name}</span>
-                    <span>${(i.price * i.quantity).toFixed(2)}</span>
-                </div>
-            `).join('');
-            
-            const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
-            document.getElementById('checkout-total-val').innerText = total.toFixed(2);
+        function load() {
+            const list = document.getElementById('check-list');
+            list.innerHTML = cart.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>${i.quantity} x ${i.name}</span><span>${(i.price*i.quantity).toFixed(2)}</span></div>`).join('');
+            document.getElementById('check-total').innerText = cart.reduce((s,i)=>s+(i.price*i.quantity),0).toFixed(2);
         }
 
-        function processOrder(isWhatsapp) {
-            const name = document.getElementById('cust-name').value;
-            const addr = document.getElementById('cust-address').value;
-            const phone = document.getElementById('cust-phone').value;
-            const notes = document.getElementById('cust-notes').value || "No extra notes";
+        async function done(wa) {
+            const n = document.getElementById('fn').value;
+            const a = document.getElementById('ad').value;
+            const notes = document.getElementById('nt').value || "No notes";
+            
+            if(!n || !a) return alert("Please provide a name and address.");
 
-            if(!name || !addr || !phone) return alert("Please fill Name, Address, and Phone.");
+            const orderData = {
+                id: Date.now(),
+                customer: n,
+                address: a,
+                notes: notes,
+                items: cart,
+                total: cart.reduce((s,i)=>s+(i.price*i.quantity),0).toFixed(2),
+                timestamp: new Date().toISOString()
+            };
+
+            // SEND TO YOUR WEBHOOK
+            try {
+                await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                });
+            } catch (e) {
+                console.error("Webhook failed, but proceeding with order flow.");
+            }
 
             localStorage.setItem('lastMeatOrder', JSON.stringify(cart));
             
-            if(isWhatsapp) {
-                let msg = `*NEW ORDER FROM THE MEAT PRO*%0A%0A`;
-                msg += `*Name:* ${name}%0A*Phone:* ${phone}%0A*Address:* ${addr}%0A*Notes:* ${notes}%0A%0A*Items:*%0A`;
-                cart.forEach(i => msg += `- ${i.quantity} x ${i.name}%0A`);
-                const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
-                msg += `%0A*Total: AED ${total.toFixed(2)}*`;
-                window.open(`https://wa.me/971589388096?text=${msg}`);
+            if(wa) {
+                let txt = `*NEW ORDER*%0A*Name:* ${n}%0A*Address:* ${a}%0A*Notes:* ${notes}%0A%0A`;
+                cart.forEach(i => txt += `- ${i.quantity} x ${i.name}%0A`);
+                window.open(`https://wa.me/971501234567?text=${txt}`);
             }
-
+            
             localStorage.removeItem('meatProCart');
             window.location.href = 'success.html';
         }
-        init();
+        load();
     </script>
 </body>
 </html>
