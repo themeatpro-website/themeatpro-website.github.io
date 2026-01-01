@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Meat Pro | Premium UAE Butchery</title>
+    <title>The Meat Pro | Butchery</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@300;500;900&display=swap" rel="stylesheet">
 </head>
@@ -11,7 +11,7 @@
 
     <nav>
         <div class="logo-container" onclick="window.location.reload()" style="display: flex; align-items: center; cursor: pointer;">
-            <img src="logo.png" alt="Meat Pro Logo" style="height: 45px; margin-right: 12px;">
+            <img src="assets/logo.png" alt="Meat Pro Logo" style="height: 45px; margin-right: 12px;">
             <div class="logo-text">THE MEAT <span>PRO</span></div>
         </div>
         
@@ -23,23 +23,23 @@
 
     <div id="category-section" class="category-grid">
         <div class="cat-card" onclick="filterByCategory('Chicken')">
-            <img src="chicken-thumb.jpg" alt="Chicken">
+            <img src="chicken-thumb.jpg" alt="Chicken" onerror="this.src='assets/logo.png'">
             <h3>CHICKEN</h3>
         </div>
         <div class="cat-card" onclick="filterByCategory('Mutton')">
-            <img src="mutton-thumb.jpg" alt="Mutton">
+            <img src="mutton-thumb.jpg" alt="Mutton" onerror="this.src='assets/logo.png'">
             <h3>MUTTON</h3>
         </div>
         <div class="cat-card" onclick="filterByCategory('Beef')">
-            <img src="beef-thumb.jpg" alt="Beef">
+            <img src="beef-thumb.jpg" alt="Beef" onerror="this.src='assets/logo.png'">
             <h3>BEEF</h3>
         </div>
         <div class="cat-card" onclick="filterByCategory('Fish')">
-            <img src="fish-thumb.jpg" alt="Fish">
+            <img src="fish-thumb.jpg" alt="Fish" onerror="this.src='assets/logo.png'">
             <h3>FISH</h3>
         </div>
         <div class="cat-card" onclick="filterByCategory('Marinades')">
-            <img src="marinades-thumb.jpg" alt="Marinades">
+            <img src="marinades-thumb.jpg" alt="Marinades" onerror="this.src='assets/logo.png'">
             <h3>MARINADES</h3>
         </div>
     </div>
@@ -59,7 +59,7 @@
             <button class="close-modal" onclick="closeModal()">&larr; Back</button>
             <div class="modal-content">
                 <div class="modal-image-side">
-                    <img id="modal-img" src="" alt="Product">
+                    <img id="modal-img" src="" alt="Product" onerror="this.src='assets/logo.png'">
                 </div>
                 <div class="modal-info-side">
                     <h2 id="modal-name"></h2>
