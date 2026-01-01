@@ -8,98 +8,47 @@
     --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-body {
-    font-family: 'Noto Sans', sans-serif;
-    background-color: var(--light-grey);
-    margin: 0;
-    color: var(--dark-grey);
-}
+body { font-family: 'Noto Sans', sans-serif; background-color: var(--light-grey); margin: 0; color: var(--dark-grey); }
 
 /* Navigation */
 nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 8%;
-    background: var(--white);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px 8%; background: var(--white); position: sticky; top: 0; z-index: 1000;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
 .logo-text { font-family: 'Roboto'; font-weight: 900; font-size: 1.4rem; }
 .logo-text span { color: var(--primary-red); }
 
-.cart-trigger {
-    background: var(--dark-grey);
-    color: white;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-weight: 700;
-    transition: var(--transition);
-}
+/* Product Cards & Buttons */
+.product-card { background: white; border-radius: var(--rounded); overflow: hidden; box-shadow: var(--shadow); transition: var(--transition); }
+.product-card:hover { transform: translateY(-5px); }
 
-/* Category Grid */
-.category-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 15px;
-    padding: 30px 8%;
-}
-
-.cat-card {
-    position: relative;
-    height: 180px;
-    border-radius: 12px;
-    overflow: hidden;
-    cursor: pointer;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-}
-
-.cat-card:hover { transform: translateY(-5px); }
-.cat-card img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
-.cat-card:hover img { transform: scale(1.1); }
-
-.cat-card h3 {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(0,0,0,0.4); color: white; margin: 0;
-    font-weight: 900;
-}
-
-/* Product Grid */
-#product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; padding: 40px 8%; }
-.product-card { 
-    background: white; border-radius: var(--rounded); overflow: hidden; 
-    box-shadow: var(--shadow); cursor: pointer; transition: var(--transition);
-}
-.product-card:hover { transform: translateY(-8px); }
 .price-tag { color: var(--primary-red); font-weight: 900; font-size: 1.2rem; }
 .currency-icon { height: 0.85em; vertical-align: middle; margin-right: 2px; }
 
-/* Full-Page Modal */
-.modal-overlay {
-    position: fixed; top: 0; right: -100%;
-    width: 100%; height: 100%; background: var(--white);
-    z-index: 4000; transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+.add-btn {
+    background: var(--dark-grey); color: white; border: none; padding: 8px 18px;
+    border-radius: 20px; font-weight: 700; cursor: pointer; transition: var(--transition);
 }
-.modal-overlay.active { right: 0; }
-.modal-content { display: flex; height: 100vh; }
-.modal-image-side { flex: 1.2; background: #f0f0f0; }
-.modal-image-side img { width: 100%; height: 100%; object-fit: cover; }
-.modal-info-side { flex: 1; padding: 60px; overflow-y: auto; display: flex; flex-direction: column; justify-content: center; }
+.add-btn:hover { background: var(--primary-red); transform: scale(1.05); }
 
-.close-modal {
-    position: absolute; top: 30px; left: 30px; z-index: 100;
-    background: white; border: 1px solid #ddd; padding: 10px 25px;
-    border-radius: 30px; font-weight: 700; cursor: pointer;
+/* Modal Quantity Controls */
+.qty-controls {
+    display: flex; align-items: center; gap: 15px; margin: 20px 0;
+    background: #f0f0f0; width: fit-content; padding: 5px; border-radius: 30px;
+}
+.qty-controls button {
+    width: 35px; height: 35px; border-radius: 50%; border: none;
+    background: white; font-weight: 700; cursor: pointer; transition: 0.2s;
+}
+.qty-controls button:hover { background: var(--primary-red); color: white; }
+.qty-controls input {
+    width: 40px; text-align: center; border: none; background: transparent;
+    font-weight: 700; font-size: 1.1rem; outline: none;
 }
 
-/* Sidebar Cart & Close Button */
+/* Sidebar Cart */
 #cart-sidebar {
     position: fixed; top: 0; right: -450px; width: 400px; height: 100vh;
     background: white; z-index: 2000; padding: 30px; display: flex; flex-direction: column;
@@ -107,7 +56,6 @@ nav {
 }
 #cart-sidebar.active { right: 0; }
 
-.cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .close-cart-btn {
     background: #fdf2f2; color: var(--primary-red); border: none;
     width: 40px; height: 40px; border-radius: 50%; font-size: 1.8rem;
@@ -116,18 +64,24 @@ nav {
 }
 .close-cart-btn:hover { background: var(--primary-red); color: white; transform: rotate(90deg); }
 
-.remove-item-btn { 
-    background: #ffeeee; color: var(--primary-red); border: none; 
-    width: 30px; height: 30px; border-radius: 50%; cursor: pointer; 
+.confirm-btn { 
+    background: var(--primary-red); color: white; border: none; 
+    padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; 
 }
 
-/* Buttons */
-.confirm-btn { background: var(--primary-red); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; }
-.whatsapp-btn { background: #25D366; color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 10px; }
+/* Category Grid */
+.category-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; padding: 30px 8%; }
+.cat-card { 
+    position: relative; height: 180px; border-radius: 12px; overflow: hidden; cursor: pointer; 
+    box-shadow: var(--shadow); transition: var(--transition);
+}
+.cat-card img { width: 100%; height: 100%; object-fit: cover; }
+.cat-card h3 { 
+    position: absolute; inset: 0; background: rgba(0,0,0,0.4); color: white; 
+    display: flex; align-items: center; justify-content: center; margin: 0; font-weight: 900; 
+}
 
 @media (max-width: 900px) {
     .category-grid { grid-template-columns: repeat(2, 1fr); }
-    .modal-content { flex-direction: column; }
-    .modal-image-side { height: 40vh; }
     #cart-sidebar { width: 100%; }
 }
