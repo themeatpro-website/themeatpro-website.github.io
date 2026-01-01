@@ -6,218 +6,57 @@
     <title>Checkout | The Meat Pro</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@900&display=swap" rel="stylesheet">
-    <style>
-        .checkout-layout {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 40px;
-            padding: 40px 8%;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        .checkout-box {
-            background: white;
-            padding: 40px;
-            border-radius: var(--rounded);
-            box-shadow: var(--shadow);
-        }
-        .form-section h2 { margin-top: 0; margin-bottom: 25px; font-family: 'Roboto'; font-weight: 900; }
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.9rem; color: #555; }
-        .checkout-input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 1rem;
-            box-sizing: border-box;
-            transition: var(--transition);
-        }
-        .checkout-input:focus { border-color: var(--primary-red); outline: none; box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.1); }
-        
-        .summary-box {
-            background: white;
-            padding: 30px;
-            border-radius: var(--rounded);
-            box-shadow: var(--shadow);
-            height: fit-content;
-            position: sticky;
-            top: 100px;
-        }
-        .summary-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .summary-img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 8px;
-            background: #f9f9f9;
-        }
-        
-        /* Buttons */
-        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-        .whatsapp-btn {
-            background-color: #25D366;
-            color: white;
-            border: none;
-            padding: 18px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: 0.3s;
-        }
-        .whatsapp-btn:hover { background-color: #128C7E; }
-
-        @media (max-width: 1000px) {
-            .checkout-layout { grid-template-columns: 1fr; }
-            .summary-box { position: static; }
-        }
-    </style>
 </head>
 <body>
 
     <nav>
         <div class="logo-container" onclick="window.location.href='index.html'" style="cursor:pointer; display:flex; align-items:center;">
-            <img src="assets/logo.png" alt="Meat Pro Logo" style="height:45px; margin-right:12px;" onerror="this.src='assets/logo.png'">
+            <img src="assets/logo.png" style="height:45px; margin-right:12px;" onerror="this.src='assets/logo.png'">
             <div class="logo-text">THE MEAT <span>PRO</span></div>
         </div>
-        <button class="back-btn" onclick="window.location.href='index.html'">&larr; Back to Shop</button>
     </nav>
 
-    <div class="checkout-layout">
-        <div class="checkout-box form-section">
+    <div class="checkout-layout" style="display:grid; grid-template-columns:1fr 400px; gap:40px; padding:40px 8%;">
+        <div style="background:white; padding:40px; border-radius:16px; box-shadow:var(--shadow);">
             <h2>Delivery Details</h2>
-            <div class="input-group">
-                <label>Full Name</label>
-                <input type="text" class="checkout-input" id="name" placeholder="Enter your full name">
+            <div style="margin-bottom:20px;">
+                <label style="display:block; font-weight:700; margin-bottom:5px;">Full Name</label>
+                <input type="text" id="name" class="confirm-btn" style="background:white; color:black; border:1px solid #ddd; text-align:left; padding:12px;">
             </div>
-            <div class="input-group">
-                <label>Phone Number</label>
-                <input type="text" class="checkout-input" id="phone" placeholder="+971 50 XXX XXXX">
+            <div style="margin-bottom:20px;">
+                <label style="display:block; font-weight:700; margin-bottom:5px;">Full Address</label>
+                <input type="text" id="address" class="confirm-btn" style="background:white; color:black; border:1px solid #ddd; text-align:left; padding:12px;">
             </div>
-            <div class="input-group">
-                <label>Email Address</label>
-                <input type="email" class="checkout-input" id="email" placeholder="email@example.com">
-            </div>
-            <div class="input-group">
-                <label>Full Delivery Address</label>
-                <input type="text" class="checkout-input" id="address" placeholder="Villa/Apt No, Street Name, Area">
-            </div>
-            <div class="input-group">
-                <label>Order Notes (Optional)</label>
-                <input type="text" class="checkout-input" id="notes" placeholder="e.g. Leave at the door, extra spicy marinade...">
-            </div>
-
-            <div class="btn-group">
-                <button class="confirm-btn" onclick="submitOrder()">Confirm Order</button>
-                
-                <button class="whatsapp-btn" onclick="sendWhatsApp()">
-                    Order via WhatsApp
-                </button>
-            </div>
+            <button class="confirm-btn" onclick="alert('Order Recorded!')">Confirm Order</button>
+            <button class="whatsapp-btn" onclick="sendWhatsApp()">Order via WhatsApp</button>
         </div>
 
-        <div class="summary-box">
-            <h3 style="margin-top:0; font-family: 'Roboto'; font-weight: 900;">ORDER SUMMARY</h3>
+        <div style="background:white; padding:30px; border-radius:16px; box-shadow:var(--shadow); height:fit-content;">
+            <h3>Summary</h3>
             <div id="summary-list"></div>
-            <div style="margin-top: 25px; padding-top: 20px; border-top: 2px solid #eee;">
-                <div style="display:flex; justify-content:space-between; font-weight:900; font-size:1.4rem;">
-                    <span>Total</span>
-                    <span>AED <span id="checkout-total">0.00</span></span>
-                </div>
-            </div>
+            <div style="margin-top:20px; font-weight:900; font-size:1.4rem;">Total: AED <span id="checkout-total">0.00</span></div>
         </div>
     </div>
 
     <script>
         let cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
-        const WHATSAPP_NUMBER = "971589388096";
-
-        function renderSummary() {
+        function render() {
             const list = document.getElementById('summary-list');
-            const totalDisplay = document.getElementById('checkout-total');
-            
-            if (cart.length === 0) {
-                list.innerHTML = '<p style="color:#888;">Your cart is empty.</p>';
-                return;
-            }
-
-            list.innerHTML = cart.map(item => `
-                <div class="summary-item">
-                    <img src="${item.image}" class="summary-img" onerror="this.src='assets/logo.png'">
-                    <div style="flex-grow:1;">
-                        <div style="font-weight:700; font-size:0.95rem;">${item.name}</div>
-                        <div style="font-size:0.8rem; color:#666;">Qty: ${item.quantity}</div>
-                    </div>
-                    <div style="font-weight:700;">${(item.price * item.quantity).toFixed(2)}</div>
-                </div>
-            `).join('');
-
-            const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
-            totalDisplay.innerText = total.toFixed(2);
+            list.innerHTML = cart.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <span>${i.quantity} x ${i.name}</span>
+                <span>${(i.price * i.quantity).toFixed(2)}</span>
+            </div>`).join('');
+            document.getElementById('checkout-total').innerText = cart.reduce((s, i) => s + (i.price * i.quantity), 0).toFixed(2);
         }
-
-        function getOrderDetails() {
-            return {
-                name: document.getElementById('name').value,
-                phone: document.getElementById('phone').value,
-                email: document.getElementById('email').value,
-                address: document.getElementById('address').value,
-                notes: document.getElementById('notes').value || "None"
-            };
-        }
-
-        function validateForm(details) {
-            if (!details.name || !details.phone || !details.address) {
-                alert("Please fill in Name, Phone, and Address.");
-                return false;
-            }
-            return true;
-        }
-
-        function submitOrder() {
-            const details = getOrderDetails();
-            if (!validateForm(details)) return;
-            alert("Order Submitted! We will contact you shortly.");
-            // Here you could send data to a database
-        }
-
         function sendWhatsApp() {
-            const details = getOrderDetails();
-            if (!validateForm(details)) return;
-
-            // Format Order Text
-            let message = `*NEW ORDER FROM THE MEAT PRO*%0A%0A`;
-            message += `*Customer:* ${details.name}%0A`;
-            message += `*Phone:* ${details.phone}%0A`;
-            message += `*Address:* ${details.address}%0A`;
-            message += `*Notes:* ${details.notes}%0A%0A`;
-            message += `*ORDER ITEMS:*%0A`;
-
-            cart.forEach(item => {
-                message += `- ${item.quantity} x ${item.name} (AED ${(item.price * item.quantity).toFixed(2)})%0A`;
-            });
-
-            const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
-            message += `%0A*TOTAL: AED ${total.toFixed(2)}*`;
-
-            // Open WhatsApp
-            const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
-            window.open(url, '_blank').focus();
+            const name = document.getElementById('name').value;
+            const addr = document.getElementById('address').value;
+            if(!name || !addr) return alert("Fill details");
+            let msg = `*New Order*%0A*Name:* ${name}%0A*Address:* ${addr}%0A%0A`;
+            cart.forEach(i => msg += `- ${i.quantity}x ${i.name}%0A`);
+            window.open(`https://wa.me/971501234567?text=${msg}`);
         }
-
-        document.addEventListener('DOMContentLoaded', renderSummary);
+        render();
     </script>
 </body>
 </html>
