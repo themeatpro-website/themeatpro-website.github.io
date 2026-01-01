@@ -11,36 +11,41 @@
 
     <nav>
         <div class="logo-container" onclick="window.location.href='index.html'" style="cursor:pointer; display:flex; align-items:center;">
-            <img src="assets/logo.png" alt="Logo" style="height:45px; margin-right:12px;" onerror="this.src='assets/logo.png'">
+            <img src="assets/logo.png" style="height:45px; margin-right:12px;" onerror="this.src='assets/logo.png'">
             <div class="logo-text">THE MEAT <span>PRO</span></div>
         </div>
-        <button class="back-btn" onclick="window.location.href='index.html'">&larr; Back</button>
+        <button class="add-btn" onclick="window.location.href='index.html'" style="background:#eee; color:black;">&larr; Back</button>
     </nav>
 
-    <div class="checkout-layout" style="display:grid; grid-template-columns: 1fr 400px; gap:40px; padding:40px 8%; max-width:1400px; margin:0 auto;">
-        <div class="checkout-box" style="background:white; padding:40px; border-radius:var(--rounded); box-shadow:var(--shadow);">
+    <div style="display:grid; grid-template-columns: 1fr 400px; gap:40px; padding:40px 8%; max-width:1400px; margin:0 auto;">
+        <div style="background:white; padding:40px; border-radius:16px; box-shadow:var(--shadow);">
             <h2 style="font-family:'Roboto'; margin-top:0;">DELIVERY DETAILS</h2>
             
-            <div class="input-group" style="margin-bottom:20px;">
+            <div style="margin-bottom:20px;">
                 <label style="display:block; font-weight:700; margin-bottom:8px;">Full Name</label>
-                <input type="text" id="cust-name" class="checkout-input" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd;" placeholder="Enter your name">
+                <input type="text" id="cust-name" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px;" placeholder="John Doe">
             </div>
 
-            <div class="input-group" style="margin-bottom:20px;">
+            <div style="margin-bottom:20px;">
                 <label style="display:block; font-weight:700; margin-bottom:8px;">Full Address</label>
-                <input type="text" id="cust-address" class="checkout-input" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd;" placeholder="Villa/Apt, Street, Area">
+                <input type="text" id="cust-address" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px;" placeholder="Villa/Apt, Street, Area">
             </div>
 
-            <div class="input-group" style="margin-bottom:30px;">
+            <div style="margin-bottom:20px;">
                 <label style="display:block; font-weight:700; margin-bottom:8px;">Phone Number</label>
-                <input type="text" id="cust-phone" class="checkout-input" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd;" placeholder="+971">
+                <input type="text" id="cust-phone" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px;" placeholder="+971">
+            </div>
+
+            <div style="margin-bottom:30px;">
+                <label style="display:block; font-weight:700; margin-bottom:8px;">Order Notes (Optional)</label>
+                <textarea id="cust-notes" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px; font-family:inherit; height:80px;" placeholder="e.g. Leave at door, extra marinade..."></textarea>
             </div>
 
             <button class="confirm-btn" onclick="processOrder(false)" style="margin-bottom:10px;">Confirm Order</button>
-            <button class="whatsapp-btn" onclick="processOrder(true)" style="background:#25D366; color:white; border:none; padding:18px; border-radius:12px; font-weight:700; cursor:pointer; width:100%;">Order via WhatsApp</button>
+            <button onclick="processOrder(true)" style="background:#25D366; color:white; border:none; padding:18px; border-radius:12px; font-weight:700; cursor:pointer; width:100%;">Order via WhatsApp</button>
         </div>
 
-        <div class="summary-box" style="background:white; padding:30px; border-radius:var(--rounded); box-shadow:var(--shadow); height:fit-content;">
+        <div style="background:white; padding:30px; border-radius:16px; box-shadow:var(--shadow); height:fit-content;">
             <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">Your Order</h3>
             <div id="checkout-items-list"></div>
             <div style="margin-top:20px; padding-top:15px; border-top:2px solid #eee; display:flex; justify-content:space-between; font-weight:900; font-size:1.4rem;">
@@ -72,17 +77,19 @@
             const name = document.getElementById('cust-name').value;
             const addr = document.getElementById('cust-address').value;
             const phone = document.getElementById('cust-phone').value;
+            const notes = document.getElementById('cust-notes').value || "No extra notes";
 
-            if(!name || !addr || !phone) return alert("Please fill all details.");
+            if(!name || !addr || !phone) return alert("Please fill Name, Address, and Phone.");
 
             localStorage.setItem('lastMeatOrder', JSON.stringify(cart));
             
             if(isWhatsapp) {
-                let msg = `*NEW ORDER*%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Address:* ${addr}%0A%0A*Items:*%0A`;
+                let msg = `*NEW ORDER FROM THE MEAT PRO*%0A%0A`;
+                msg += `*Name:* ${name}%0A*Phone:* ${phone}%0A*Address:* ${addr}%0A*Notes:* ${notes}%0A%0A*Items:*%0A`;
                 cart.forEach(i => msg += `- ${i.quantity} x ${i.name}%0A`);
                 const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
                 msg += `%0A*Total: AED ${total.toFixed(2)}*`;
-                window.open(`https://wa.me/971589388096?text=${msg}`);
+                window.open(`https://wa.me/971501234567?text=${msg}`);
             }
 
             localStorage.removeItem('meatProCart');
