@@ -1,7 +1,19 @@
-Name,Price,ShortDescription,LongDescription,Image,Category
-Wagyu Ribeye MB7,245.00,Highly marbled premium beef,"Sourced from top-tier Australian Wagyu, this Ribeye features a Marble Score of 7. It offers a rich, buttery texture and deep flavor profile, perfect for a high-heat sear.",images/ribeye.jpg,Beef
-Organic Chicken Breast,45.00,Fresh antibiotic-free chicken,"Locally sourced organic chicken breast. Lean, tender, and perfect for grilling or meal prep. Delivered fresh, never frozen.",images/chicken-breast.jpg,Chicken
-NZ Lamb Chops,95.00,Tender New Zealand mutton,"Prime cuts of New Zealand lamb. These chops are succulent and best enjoyed with a rosemary and garlic rub. Contains 4-6 pieces per pack.",images/lamb-chops.jpg,Mutton
-Salmon Fillet,65.00,Fresh Atlantic Salmon,"Rich in Omega-3, this skin-on Atlantic salmon fillet is perfect for pan-searing or baking. Sourced sustainably and delivered chilled.",images/salmon.jpg,Fish
-Tikka Marinade,25.00,Spicy yogurt-based rub,"A traditional blend of yogurt, lemon, and secret spices. This marinade is designed to tenderize and flavor your chicken or mutton overnight.",images/tikka.jpg,Marinades
-Beef Striploin,110.00,Classic lean steak cut,"A versatile cut with a thin fat cap that provides excellent flavor. Great for roasting whole or cutting into individual steaks.",images/striploin.jpg,Beef
+Name,Price,ShortDescription,LongDescription,Image,Category,Type
+Whole Chicken,23,Per KG,"Hormone-free, locally sourced chicken—naturally fresh, wholesome, and full of flavour.",Whole chicken.jpg,Chicken,RAW
+Whole Chicken curry cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (16+ pcs)—perfect for hearty home-cooked meals.",Whole chk curry cut.jpg,Chicken,RAW
+Whole Chicken Biryani cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (12-14 pcs)—perfect for hearty home-cooked meals.",Whole chk curry cut.jpg,Chicken,RAW
+Whole Chicken 4 pc cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (4pcs)—perfect for hearty home-cooked meals.",Whole chk curry cut.jpg,Chicken,RAW
+Whole Chicken 8 pc cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (8pcs)—perfect for hearty home-cooked meals.",Whole chk curry cut.jpg,Chicken,RAW
+Chicken Breast Whole,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",Chicken Breast.jpg,Chicken,RAW
+Chicken Breast Large Cut,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",Chicken Breast Cubes Large.jpg,Chicken,RAW
+Chicken Breast Medium Cut,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",Chicken Breast Cubes Medium.jpg,Chicken,RAW
+Chicken Breast Small Cut,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",Chicken Breast Cubes Small.jpg,Chicken,RAW
+Chicken Breast Strips,40,Per KG,"Fresh chicken strips, neatly cut and ready for quick, flavourful stir-fries.",CHK Breast Slice.jpg,Chicken,RAW
+Chicken Breast Slice,39,Per KG,"Chicken Breast Slice – Tender, even-cut slices ideal for crispy schnitzels, escalope, cutlets, rolls, and other quick-fry or pan-seared dishes.",CHK Breast Slice.jpg,Chicken,RAW
+Chicken Mince,40,Per KG,"Freshly minced chicken, lean and versatile, perfect for kebabs, patties, meatballs, and everyday cooking.",Chicken Mince.jpg,Chicken,RAW
+Lamb Shashlik Kabab,98,Per KG,"Juicy lamb cubes marinated in aromatic spices, perfect for skewers, grilling, or BBQ.",Lamb Shashlik.JPG,Lamb,Marinated
+Whole Chicken Marinated Tandoori,39.5,Per KG,"Fully marinated with authentic tandoori spices, ready to roast or grill for bold, smoky flavour.",Chk whole mrinated tandoori.jpg,Chicken,Marinated
+Chicken 65 Tikka,48,Per KG,"Spicy, flavour-packed chicken marinated in signature spices, perfect for frying, grilling, or starters.",CHK 65 Tikka.JPG,Chicken,Marinated
+Chicken Maxican Tikka,48,Per KG,"Zesty chicken marinated with Mexican spices and herbs, perfect for grilling, pan-frying, or wraps.",chicken mexican.png,Chicken,Marinated
+Chicken Haryali Tikka,48,Per KG,"Fresh chicken marinated with green herbs, mint, and spices for a juicy, aromatic grill or pan-fry.",CHK HARYALI.JPG,Chicken,Marinated
+Chicken Naughty 4 Tikka,48,Per KG,"A bold, flavour-loaded mix with four exciting spice notes, marinated to perfection for grilling or pan-frying.",CHK N4.JPG,Chicken,Marinated
