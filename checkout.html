@@ -6,6 +6,16 @@
     <title>Checkout | The Meat Pro</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@900&display=swap" rel="stylesheet">
+    <style>
+        .method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 30px; }
+        .method-card {
+            border: 2px solid #eee; padding: 15px; border-radius: 12px; text-align: center;
+            cursor: pointer; transition: 0.3s; font-weight: 700; font-size: 0.9rem;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .method-card.active { border-color: var(--primary-red); background: #fff5f5; color: var(--primary-red); }
+        .method-card i { font-size: 1.5rem; }
+    </style>
 </head>
 <body style="background:#f8f8f8;">
 
@@ -18,6 +28,20 @@
 
     <div style="display:grid; grid-template-columns: 1fr 400px; gap:40px; padding:40px 8%; max-width:1400px; margin:0 auto;">
         <div style="background:white; padding:40px; border-radius:16px; box-shadow:var(--shadow);">
+            <h2 style="font-family:'Roboto'; margin-top:0;">ORDER OPTIONS</h2>
+            
+            <div class="method-grid">
+                <div class="method-card active" onclick="selectMethod(this, 'Cash on Delivery')">
+                    <span>💵</span> Cash on Delivery
+                </div>
+                <div class="method-card" onclick="selectMethod(this, 'Card on Delivery')">
+                    <span>💳</span> Card on Delivery
+                </div>
+                <div class="method-card" onclick="selectMethod(this, 'Click and Collect')">
+                    <span>🏪</span> Click & Collect
+                </div>
+            </div>
+
             <h2 style="font-family:'Roboto'; margin-top:0;">DELIVERY DETAILS</h2>
             
             <div style="margin-bottom:20px;">
@@ -25,14 +49,14 @@
                 <input type="text" id="fn" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px;" placeholder="John Doe">
             </div>
 
-            <div style="margin-bottom:20px;">
+            <div style="margin-bottom:20px;" id="address-container">
                 <label style="display:block; font-weight:700; margin-bottom:8px;">Full Delivery Address</label>
                 <input type="text" id="ad" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px;" placeholder="Street, Villa/Apt, Area">
             </div>
 
             <div style="margin-bottom:30px;">
-                <label style="display:block; font-weight:700; margin-bottom:8px;">Order Notes (Optional)</label>
-                <textarea id="nt" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px; height:80px; font-family:inherit;" placeholder="e.g. Cut into small pieces..."></textarea>
+                <label style="display:block; font-weight:700; margin-bottom:8px;">Order Notes</label>
+                <textarea id="nt" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px; height:80px; font-family:inherit;" placeholder="e.g. Please cut the beef into small cubes..."></textarea>
             </div>
 
             <button class="confirm-btn" onclick="done(false)" style="margin-bottom:12px;">Confirm Order</button>
@@ -51,7 +75,18 @@
 
     <script>
         let cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
+        let selectedMethod = 'Cash on Delivery';
         const WEBHOOK_URL = 'https://w3bhookecho42x9.dpdns.org/';
+
+        function selectMethod(el, method) {
+            document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            selectedMethod = method;
+            
+            // Hide address field if it's Click & Collect
+            const addr = document.getElementById('address-container');
+            addr.style.display = (method === 'Click and Collect') ? 'none' : 'block';
+        }
 
         function load() {
             const list = document.getElementById('check-list');
@@ -61,45 +96,40 @@
 
         async function done(wa) {
             const n = document.getElementById('fn').value;
-            const a = document.getElementById('ad').value;
+            const a = (selectedMethod === 'Click and Collect') ? 'STORE PICKUP' : document.getElementById('ad').value;
             const notes = document.getElementById('nt').value || "No notes";
             
-            if(!n || !a) return alert("Please provide a name and address.");
+            if(!n || (!a && selectedMethod !== 'Click and Collect')) return alert("Please fill in your details.");
 
             const orderData = {
                 id: Date.now(),
                 customer: n,
                 address: a,
+                method: selectedMethod,
                 notes: notes,
                 items: cart,
                 total: cart.reduce((s,i)=>s+(i.price*i.quantity),0).toFixed(2),
                 timestamp: new Date().toISOString()
             };
 
-            // SEND TO YOUR WEBHOOK
+            // Notify server & storage
             try {
                 await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(orderData)
                 });
-            } catch (e) {
-                console.error("Webhook failed, but proceeding with order flow.");
-            }
+            } catch (e) { console.error("Webhook error"); }
 
-            localStorage.setItem('lastMeatOrder', JSON.stringify(cart));
+            localStorage.setItem('lastMeatOrderInfo', JSON.stringify({id: orderData.id}));
             
             if(wa) {
-                let txt = `*NEW ORDER*%0A*Name:* ${n}%0A*Address:* ${a}%0A*Notes:* ${notes}%0A%0A`;
+                let txt = `*NEW ORDER (${selectedMethod})*%0A*Name:* ${n}%0A*Address:* ${a}%0A*Notes:* ${notes}%0A%0A`;
                 cart.forEach(i => txt += `- ${i.quantity} x ${i.name}%0A`);
                 window.open(`https://wa.me/971589388096?text=${txt}`);
             }
             
             localStorage.removeItem('meatProCart');
-            
-            const orderInfo = { id: orderData.id };
-            localStorage.setItem('lastMeatOrderInfo', JSON.stringify(orderInfo));
-            
             window.location.href = 'success.html';
         }
         load();
