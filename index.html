@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Meat Pro | Premium UAE Butchery</title>
+    <title>The Meat Pro | Butchery</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@300;500;900&display=swap" rel="stylesheet">
 </head>
@@ -11,7 +11,7 @@
 
     <nav>
         <div class="logo-container" onclick="window.location.reload()" style="display: flex; align-items: center; cursor: pointer;">
-            <img src="logo.png" alt="Meat Pro Logo" style="height: 45px; margin-right: 12px;">
+            <img src="assets/logo.png" alt="Meat Pro Logo" style="height: 45px; margin-right: 12px;">
             <div class="logo-text">THE MEAT <span>PRO</span></div>
         </div>
         
@@ -44,20 +44,65 @@
         </div>
     </div>
 
-    <div id="product-header" style="display:none; padding: 20px 8%; align-items: center; justify-content: space-between; background: #fff; border-bottom: 1px solid #eee; flex-wrap: wrap; gap: 15px;">
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <h2 id="current-category-name" style="text-transform: uppercase; margin: 0; font-family: 'Roboto'; font-weight: 900;"></h2>
-            <div class="search-container">
-                <input type="text" id="product-search" placeholder="Search..." onkeyup="handleSearch()">
+    <div id="product-header" style="display:none;">
+        <div class="header-left">
+            <h2 id="current-category-name"></h2>
+            <div class="search-box">
+                <input type="text" id="product-search" placeholder="Search in category..." onkeyup="handleSearch()">
             </div>
         </div>
-        <button onclick="showCategories()" style="background:none; border:none; text-decoration:underline; cursor:pointer; color:var(--primary-red); font-weight: 700;">&larr; Back</button>
+        <button class="back-btn" onclick="showCategories()">&larr; Back to Categories</button>
     </div>
 
     <main id="product-grid" style="display:none;"></main>
 
-    <div id="cart-sidebar">
+    <div id="product-modal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <div class="modal-content">
+                <div class="modal-image-side">
+                    <img id="modal-img" src="" alt="Product">
+                </div>
+                <div class="modal-info-side">
+                    <h2 id="modal-name"></h2>
+                    <div class="modal-price">
+                        <img src="currency-logo.png" class="currency-icon">
+                        <span id="modal-price-val"></span>
+                    </div>
+                    <p id="modal-long-desc"></p>
+                    
+                    <div class="qty-selector-container">
+                        <label>Select Quantity</label>
+                        <div class="qty-controls">
+                            <button onclick="adjustModalQty(-1)">-</button>
+                            <input type="number" id="modal-qty-input" value="1" min="1" readonly>
+                            <button onclick="adjustModalQty(1)">+</button>
+                        </div>
+                    </div>
+
+                    <button id="modal-add-btn" class="confirm-btn">Add to Cart</button>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <div id="cart-sidebar">
+        <div class="cart-header">
+            <h2>Your Order</h2>
+            <button onclick="toggleCart()" class="close-cart">&times;</button>
+        </div>
+        <div id="cart-items"></div>
+        <div class="cart-footer">
+            <div class="total-display">
+                <span>Total</span>
+                <span>
+                    <img src="currency-logo.png" class="currency-icon">
+                    <span id="cart-total">0.00</span>
+                </span>
+            </div>
+            <button class="confirm-btn mobile-sticky" onclick="goToCheckout()">Proceed to Checkout</button>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>
