@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed | The Meat Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@900&display=swap" rel="stylesheet">
+</head>
+<body style="margin:0; font-family:'Noto Sans', sans-serif; background-color:#f8f8f8; display:flex; align-items:center; justify-content:center; min-height:100vh; padding:20px;">
+
+    <div style="background:white; max-width:450px; width:100%; padding:40px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.08); text-align:center;">
+        <div style="width:70px; height:70px; background:#e8f5e9; color:#2e7d32; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:30px;">✓</div>
+        
+        <h1 style="font-family:'Roboto'; font-weight:900; color:#1a1a1a; margin:0 0 10px 0; font-size:1.8rem;">ORDER SENT!</h1>
+        <p style="color:#666; font-size:0.95rem; margin-bottom:30px; line-height:1.5;">We've received your order. If you used WhatsApp, we'll reply there shortly. Otherwise, we'll call you to confirm.</p>
+
+        <div style="background:#fdfdfd; border:1px solid #eee; border-radius:12px; padding:20px; text-align:left; margin-bottom:30px;">
+            <h3 style="margin:0 0 15px 0; font-size:0.8rem; color:#999; text-transform:uppercase; letter-spacing:1px;">Summary</h3>
+            <div id="success-items-list"></div>
+            <div style="display:flex; justify-content:space-between; margin-top:15px; padding-top:15px; border-top:1px dashed #ddd; font-weight:700; font-size:1.1rem;">
+                <span>Total Amount</span>
+                <span>AED <span id="success-total">0.00</span></span>
+            </div>
+        </div>
+
+        <button onclick="window.location.href='index.html'" style="background:#C62828; color:white; border:none; padding:16px; border-radius:12px; font-weight:700; cursor:pointer; width:100%; font-size:1rem;">Back to Store</button>
+    </div>
+
+    <script>
+        const lastOrder = JSON.parse(localStorage.getItem('lastMeatOrder')) || [];
+        if (lastOrder.length > 0) {
+            document.getElementById('success-items-list').innerHTML = lastOrder.map(i => `
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.9rem;">
+                    <span>${i.quantity} x ${i.name}</span>
+                    <span>${(i.price * i.quantity).toFixed(2)}</span>
+                </div>
+            `).join('');
+            const total = lastOrder.reduce((s, i) => s + (i.price * i.quantity), 0);
+            document.getElementById('success-total').innerText = total.toFixed(2);
+        } else {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
