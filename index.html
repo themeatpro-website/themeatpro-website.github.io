@@ -11,7 +11,7 @@
 
     <nav>
         <div class="logo-container" onclick="window.location.reload()" style="display: flex; align-items: center; cursor: pointer;">
-            <img src="assets/logo.png" alt="Meat Pro Logo" style="height: 45px; margin-right: 12px;">
+            <img src="logo.png" alt="Meat Pro Logo" style="height: 45px; margin-right: 12px;">
             <div class="logo-text">THE MEAT <span>PRO</span></div>
         </div>
         
@@ -46,39 +46,19 @@
 
     <div id="product-header" style="display:none; padding: 20px 8%; align-items: center; justify-content: space-between; background: #fff; border-bottom: 1px solid #eee; flex-wrap: wrap; gap: 15px;">
         <div style="display: flex; align-items: center; gap: 20px;">
-            <h2 id="current-category-name" style="text-transform: uppercase; margin: 0; font-family: 'Roboto'; font-weight: 900; min-width: 120px;"></h2>
-            
-            <div class="search-container" style="position: relative;">
-                <input type="text" id="product-search" placeholder="Search in this category..." 
-                    onkeyup="handleSearch()"
-                    style="padding: 10px 15px; border-radius: 25px; border: 1px solid #ddd; width: 250px; outline: none; font-family: inherit;">
+            <h2 id="current-category-name" style="text-transform: uppercase; margin: 0; font-family: 'Roboto'; font-weight: 900;"></h2>
+            <div class="search-container">
+                <input type="text" id="product-search" placeholder="Search..." onkeyup="handleSearch()">
             </div>
         </div>
-        
-        <button onclick="showCategories()" style="background:none; border:none; text-decoration:underline; cursor:pointer; color:var(--primary-red); font-weight: 700;">&larr; Back to Categories</button>
+        <button onclick="showCategories()" style="background:none; border:none; text-decoration:underline; cursor:pointer; color:var(--primary-red); font-weight: 700;">&larr; Back</button>
     </div>
 
     <main id="product-grid" style="display:none;"></main>
 
     <div id="cart-sidebar">
-        <div class="cart-header">
-            <h2>Your Order</h2>
-            <button onclick="toggleCart()" class="close-cart">&times;</button>
         </div>
-        <div id="cart-items"></div>
-        <div class="cart-footer">
-            <div class="total-display">
-                <span>Total</span>
-                <span>
-                    <img src="currency-logo.png" class="currency-icon">
-                    <span id="cart-total">0.00</span>
-                </span>
-            </div>
-            <button class="confirm-btn mobile-sticky" onclick="goToCheckout()">Proceed to Checkout</button>
-        </div>
-    </div>
 
-    <script src="xlsx.full.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
