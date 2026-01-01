@@ -96,6 +96,10 @@
             }
             
             localStorage.removeItem('meatProCart');
+            
+            const orderInfo = { id: orderData.id };
+            localStorage.setItem('lastMeatOrderInfo', JSON.stringify(orderInfo));
+            
             window.location.href = 'success.html';
         }
         load();
