@@ -3,53 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Meat Pro | Butchery</title>
+    <title>The Meat Pro | Premium Butchery</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@300;500;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@900&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <nav>
-        <div class="logo-container" onclick="window.location.reload()" style="display: flex; align-items: center; cursor: pointer;">
-            <img src="assets/logo.png" alt="Meat Pro Logo" style="height: 45px; margin-right: 12px;">
+        <div class="logo-container" onclick="window.location.reload()" style="display:flex; align-items:center; cursor:pointer;">
+            <img src="assets/logo.png" style="height:45px; margin-right:12px;" onerror="this.src='assets/logo.png'">
             <div class="logo-text">THE MEAT <span>PRO</span></div>
         </div>
-        
-        <button class="cart-trigger" onclick="toggleCart()">
-            <span>Cart</span>
-            <span id="cart-count">0</span>
-        </button>
+        <button class="cart-trigger" onclick="toggleCart()">Cart <span id="cart-count">0</span></button>
     </nav>
 
     <div id="category-section" class="category-grid">
-        <div class="cat-card" onclick="filterByCategory('Chicken')">
-            <img src="chicken-thumb.jpg" alt="Chicken" onerror="this.src='assets/logo.png'">
-            <h3>CHICKEN</h3>
-        </div>
-        <div class="cat-card" onclick="filterByCategory('Mutton')">
-            <img src="mutton-thumb.jpg" alt="Mutton" onerror="this.src='assets/logo.png'">
-            <h3>MUTTON</h3>
-        </div>
-        <div class="cat-card" onclick="filterByCategory('Beef')">
-            <img src="beef-thumb.jpg" alt="Beef" onerror="this.src='assets/logo.png'">
-            <h3>BEEF</h3>
-        </div>
-        <div class="cat-card" onclick="filterByCategory('Fish')">
-            <img src="fish-thumb.jpg" alt="Fish" onerror="this.src='assets/logo.png'">
-            <h3>FISH</h3>
-        </div>
-        <div class="cat-card" onclick="filterByCategory('Marinades')">
-            <img src="marinades-thumb.jpg" alt="Marinades" onerror="this.src='assets/logo.png'">
-            <h3>MARINADES</h3>
-        </div>
+        <div class="cat-card" onclick="filterByCategory('Chicken')"><img src="chicken.jpg" onerror="this.src='assets/logo.png'"><h3>CHICKEN</h3></div>
+        <div class="cat-card" onclick="filterByCategory('Mutton')"><img src="mutton.jpg" onerror="this.src='assets/logo.png'"><h3>MUTTON</h3></div>
+        <div class="cat-card" onclick="filterByCategory('Beef')"><img src="beef.jpg" onerror="this.src='assets/logo.png'"><h3>BEEF</h3></div>
+        <div class="cat-card" onclick="filterByCategory('Fish')"><img src="fish.jpg" onerror="this.src='assets/logo.png'"><h3>FISH</h3></div>
+        <div class="cat-card" onclick="filterByCategory('Marinades')"><img src="marinades.jpg" onerror="this.src='assets/logo.png'"><h3>MARINADES</h3></div>
     </div>
 
-    <div id="product-header" style="display:none; padding: 20px 8%; align-items: center; justify-content: space-between; background: #fff; border-bottom: 1px solid #eee;">
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <h2 id="current-category-name" style="text-transform: uppercase; margin: 0; font-family: 'Roboto'; font-weight: 900;"></h2>
-            <input type="text" id="product-search" placeholder="Search..." onkeyup="handleSearch()" class="themed-input">
-        </div>
-        <button class="back-btn" onclick="showCategories()">&larr; Back</button>
+    <div id="product-header" style="display:none; padding:20px 8%; justify-content:space-between; align-items:center; background:white;">
+        <h2 id="current-category-name" style="margin:0; font-family:'Roboto';"></h2>
+        <button class="close-modal" style="position:static;" onclick="showCategories()">Back</button>
     </div>
 
     <main id="product-grid" style="display:none;"></main>
@@ -58,26 +36,16 @@
         <div class="modal-card">
             <button class="close-modal" onclick="closeModal()">&larr; Back</button>
             <div class="modal-content">
-                <div class="modal-image-side">
-                    <img id="modal-img" src="" alt="Product" onerror="this.src='assets/logo.png'">
-                </div>
+                <div class="modal-image-side"><img id="modal-img" src="" onerror="this.src='assets/logo.png'"></div>
                 <div class="modal-info-side">
                     <h2 id="modal-name"></h2>
-                    <div class="modal-price">
-                        <img src="currency-logo.png" class="currency-icon">
-                        <span id="modal-price-val"></span>
-                    </div>
+                    <div class="price-tag"><img src="assets/currency-logo.png" class="currency-icon"><span id="modal-price-val"></span></div>
                     <p id="modal-long-desc"></p>
-                    
-                    <div class="qty-selector-container">
-                        <label>Select Quantity</label>
-                        <div class="qty-controls">
-                            <button onclick="adjustModalQty(-1)">-</button>
-                            <input type="number" id="modal-qty-input" value="1" readonly>
-                            <button onclick="adjustModalQty(1)">+</button>
-                        </div>
+                    <div class="qty-controls">
+                        <button onclick="adjustModalQty(-1)">-</button>
+                        <input type="number" id="modal-qty-input" value="1" readonly>
+                        <button onclick="adjustModalQty(1)">+</button>
                     </div>
-
                     <button id="modal-add-btn" class="confirm-btn">Add to Cart</button>
                 </div>
             </div>
@@ -87,15 +55,15 @@
     <div id="cart-sidebar">
         <div class="cart-header">
             <h2>Your Order</h2>
-            <button onclick="toggleCart()" class="close-cart-btn">&times;</button>
+            <button onclick="toggleCart()" class="close-cart-btn"><span>&times;</span></button>
         </div>
         <div id="cart-items"></div>
-        <div class="cart-footer">
-            <div class="total-display">
+        <div class="cart-footer" style="margin-top:auto;">
+            <div style="display:flex; justify-content:space-between; font-weight:900; font-size:1.3rem; margin-bottom:20px;">
                 <span>Total</span>
-                <span><img src="currency-logo.png" class="currency-icon"><span id="cart-total">0.00</span></span>
+                <span>AED <span id="cart-total">0.00</span></span>
             </div>
-            <button class="confirm-btn" onclick="goToCheckout()">Proceed to Checkout</button>
+            <button class="confirm-btn" onclick="window.location.href='checkout.html'">Checkout</button>
         </div>
     </div>
 
