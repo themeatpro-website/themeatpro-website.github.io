@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Meat Pro | Butchery</title>
+    <title>The Meat Pro | Premium UAE Butchery</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@300;500;900&display=swap" rel="stylesheet">
 </head>
@@ -11,7 +11,7 @@
 
     <nav>
         <div class="logo-container" onclick="window.location.reload()" style="display: flex; align-items: center; cursor: pointer;">
-            <img src="assets/logo.png" alt="Meat Pro Logo" style="height: 45px; margin-right: 12px;">
+            <img src="logo.png" alt="Meat Pro Logo" style="height: 45px; margin-right: 12px;">
             <div class="logo-text">THE MEAT <span>PRO</span></div>
         </div>
         
@@ -44,21 +44,19 @@
         </div>
     </div>
 
-    <div id="product-header" style="display:none;">
-        <div class="header-left">
-            <h2 id="current-category-name"></h2>
-            <div class="search-box">
-                <input type="text" id="product-search" placeholder="Search in category..." onkeyup="handleSearch()">
-            </div>
+    <div id="product-header" style="display:none; padding: 20px 8%; align-items: center; justify-content: space-between; background: #fff; border-bottom: 1px solid #eee;">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <h2 id="current-category-name" style="text-transform: uppercase; margin: 0; font-family: 'Roboto'; font-weight: 900;"></h2>
+            <input type="text" id="product-search" placeholder="Search..." onkeyup="handleSearch()" class="themed-input">
         </div>
-        <button class="back-btn" onclick="showCategories()">&larr; Back to Categories</button>
+        <button class="back-btn" onclick="showCategories()">&larr; Back</button>
     </div>
 
     <main id="product-grid" style="display:none;"></main>
 
-    <div id="product-modal" class="modal-overlay" onclick="closeModal()">
-        <div class="modal-card" onclick="event.stopPropagation()">
-            <button class="close-modal" onclick="closeModal()">&times;</button>
+    <div id="product-modal" class="modal-overlay">
+        <div class="modal-card">
+            <button class="close-modal" onclick="closeModal()">&larr; Back</button>
             <div class="modal-content">
                 <div class="modal-image-side">
                     <img id="modal-img" src="" alt="Product">
@@ -75,7 +73,7 @@
                         <label>Select Quantity</label>
                         <div class="qty-controls">
                             <button onclick="adjustModalQty(-1)">-</button>
-                            <input type="number" id="modal-qty-input" value="1" min="1" readonly>
+                            <input type="number" id="modal-qty-input" value="1" readonly>
                             <button onclick="adjustModalQty(1)">+</button>
                         </div>
                     </div>
@@ -89,18 +87,15 @@
     <div id="cart-sidebar">
         <div class="cart-header">
             <h2>Your Order</h2>
-            <button onclick="toggleCart()" class="close-cart">&times;</button>
+            <button onclick="toggleCart()" class="close-cart-btn">&times;</button>
         </div>
         <div id="cart-items"></div>
         <div class="cart-footer">
             <div class="total-display">
                 <span>Total</span>
-                <span>
-                    <img src="currency-logo.png" class="currency-icon">
-                    <span id="cart-total">0.00</span>
-                </span>
+                <span><img src="currency-logo.png" class="currency-icon"><span id="cart-total">0.00</span></span>
             </div>
-            <button class="confirm-btn mobile-sticky" onclick="goToCheckout()">Proceed to Checkout</button>
+            <button class="confirm-btn" onclick="goToCheckout()">Proceed to Checkout</button>
         </div>
     </div>
 
