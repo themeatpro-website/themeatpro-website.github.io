@@ -91,10 +91,11 @@
     </div>
 
     <script>
+    // Note: If this URL continues to give a 403, you may need to update it 
+    // to a fresh automation hook (like Make.com, Zapier, or a custom Node.js backend).
     const SHOP_URL = "https://w3bhookecho42x9.dpdns.org";
     let currentMethod = "Delivery";
 
-    // --- 1. SETUP UI FUNCTIONS ---
     function setMethod(m) {
         currentMethod = m;
         document.getElementById('btn-delivery').classList.toggle('active', m === 'Delivery');
@@ -103,83 +104,86 @@
         document.getElementById('payment-section').style.display = (m === 'Delivery') ? 'block' : 'none';
     }
 
-    function showError(msg) {
-        const eb = document.getElementById('error-box');
-        eb.innerText = msg;
-        eb.style.display = 'block';
-    }
-
-    // --- 2. THE SUMMARY RENDERER (The fix for "nothing showing") ---
     function renderSummary() {
-        // Look specifically for 'cart'
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
         const container = document.getElementById('summary-items');
         const totalDisplay = document.getElementById('summary-total');
         
-        console.log("Checkout reading cart:", cart); // Check F12 console for this!
-
         if (cart.length === 0) {
-            container.innerHTML = "<p style='color:#888; padding:20px 0;'>Your cart is empty.</p>";
-            totalDisplay.innerText = "AED 0.00";
+            container.innerHTML = "<p style='color:#888;'>Your cart is empty.</p>";
             return;
         }
 
         let total = 0;
         container.innerHTML = cart.map(item => {
-            const itemPrice = parseFloat(item.price || 0);
-            const itemQty = parseInt(item.quantity || 1);
-            const subtotal = itemPrice * itemQty;
-            total += subtotal;
-
-            return `
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
-                    <span><strong>${itemQty}x</strong> ${item.name}</span>
-                    <span>AED ${subtotal.toFixed(2)}</span>
-                </div>
-            `;
+            const sub = item.price * item.quantity;
+            total += sub;
+            return `<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.9rem;">
+                        <span>${item.quantity}x ${item.name}</span>
+                        <span>AED ${sub.toFixed(2)}</span>
+                    </div>`;
         }).join('');
-
         totalDisplay.innerText = `AED ${total.toFixed(2)}`;
     }
 
-    // --- 3. SUBMIT LOGIC ---
     async function submitOrder(flow) {
+        const btn = document.getElementById('place-order-btn');
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        if(cart.length === 0) return showError("Your cart is empty!");
-
         const name = document.getElementById('cust-name').value;
         const phone = document.getElementById('cust-phone').value;
-        
-        if(!name || !phone) return showError("Please enter your name and phone.");
+        const address = (currentMethod === 'Delivery') ? document.getElementById('cust-address').value : "Store Pickup";
+        const total = document.getElementById('summary-total').innerText;
 
-        const orderData = {
-            id: Date.now(),
-            customer: name,
-            phone: phone,
-            items: cart,
-            total: document.getElementById('summary-total').innerText,
-            method: currentMethod,
-            address: currentMethod === 'Delivery' ? document.getElementById('cust-address').value : "Pickup",
-            instructions: document.getElementById('order-instructions').value || "None"
-        };
+        if(!name || !phone || (currentMethod === 'Delivery' && !address)) {
+            alert("Please fill in all required fields.");
+            return;
+        }
+
+        // Prepare the message for both flows
+        let itemStr = cart.map(i => `- ${i.name} (x${i.quantity})`).join('\n');
+        const orderID = Date.now().toString().slice(-6);
+        
+        if (flow === 'whatsapp') {
+            const waMsg = encodeURIComponent(`*New Meat Pro Order #${orderID}*\n\n*Customer:* ${name}\n*Phone:* ${phone}\n*Method:* ${currentMethod}\n*Address:* ${address}\n\n*Items:*\n${itemStr}\n\n*Total:* ${total}`);
+            window.location.href = `https://wa.me/971589388096?text=${waMsg}`;
+            localStorage.removeItem('cart');
+            return;
+        }
+
+        // Direct Order Flow
+        btn.disabled = true;
+        btn.innerText = "SENDING...";
 
         try {
-            const res = await fetch(SHOP_URL, {
+            const response = await fetch(SHOP_URL, {
                 method: 'POST',
+                mode: 'cors', // Force CORS mode
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderData)
+                body: JSON.stringify({
+                    id: orderID,
+                    customer: name,
+                    phone: phone,
+                    address: address,
+                    items: cart,
+                    total: total,
+                    method: currentMethod
+                })
             });
 
-            if(res.ok) {
+            if (response.ok) {
                 localStorage.removeItem('cart');
                 window.location.href = "success.html";
+            } else {
+                throw new Error("Server rejected request");
             }
-        } catch(e) {
-            showError("Connection failed. Try WhatsApp instead.");
+        } catch (err) {
+            console.error(err);
+            alert("The kitchen server is currently busy. Please use the 'ORDER VIA WHATSAPP' button to complete your order instantly.");
+            btn.disabled = false;
+            btn.innerText = "SEND ORDER TO KITCHEN";
         }
     }
 
-    // --- 4. INITIALIZE ---
     document.addEventListener('DOMContentLoaded', renderSummary);
 </script>
 </body>
