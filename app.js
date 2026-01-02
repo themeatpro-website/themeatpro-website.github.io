@@ -1,13 +1,22 @@
 let allProducts = [];
 let currentFilteredProducts = [];
-let cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
+// FIX: Using 'cart' to match checkout.html
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
 function parseCSV(text) {
+    // Regex to handle commas inside quotes in CSV
     const regex = /(".*?"|[^",\n]+)(?=\s*,|\s*\n|$)/g;
     const rows = text.split('\n').filter(row => row.trim() !== '');
     return rows.slice(1).map(row => {
         const matches = row.match(regex).map(val => val.replace(/^"|"$/g, "").trim());
-        return { Name: matches[0], Price: matches[1], ShortDescription: matches[2], LongDescription: matches[3], Image: matches[4], Category: matches[5] };
+        return { 
+            Name: matches[0], 
+            Price: matches[1], 
+            ShortDescription: matches[2], 
+            LongDescription: matches[3], 
+            Image: matches[4], 
+            Category: matches[5] 
+        };
     });
 }
 
@@ -17,7 +26,9 @@ async function initStore() {
         const data = await response.text();
         allProducts = parseCSV(data);
         updateCartUI();
-    } catch (e) { console.error("CSV Load Error", e); }
+    } catch (e) { 
+        console.error("CSV Load Error", e); 
+    }
 }
 
 window.filterByCategory = function(category) {
@@ -54,6 +65,7 @@ function renderProducts(products) {
 
 window.openModal = function(name) {
     const p = allProducts.find(i => i.Name === name);
+    if (!p) return;
     document.getElementById('modal-img').src = p.Image;
     document.getElementById('modal-img').onerror = function() { this.src='assets/logo.png'; };
     document.getElementById('modal-name').innerText = p.Name;
@@ -81,32 +93,47 @@ window.adjustModalQty = function(amt) {
 
 window.addToCart = function(name, price, image, qty = 1) {
     const existing = cart.find(i => i.name === name);
-    if(existing) existing.quantity += qty;
-    else cart.push({ name, price: parseFloat(price), image, quantity: qty });
-    localStorage.setItem('meatProCart', JSON.stringify(cart));
+    if(existing) {
+        existing.quantity += qty;
+    } else {
+        cart.push({ name, price: parseFloat(price), image, quantity: qty });
+    }
+    // FIX: Using 'cart' to match checkout.html
+    localStorage.setItem('cart', JSON.stringify(cart));
     updateCartUI();
 };
 
 window.removeFromCart = function(idx) {
     cart.splice(idx, 1);
-    localStorage.setItem('meatProCart', JSON.stringify(cart));
+    // FIX: Using 'cart' to match checkout.html
+    localStorage.setItem('cart', JSON.stringify(cart));
     updateCartUI();
 };
 
 window.updateCartUI = function() {
     const itemsDiv = document.getElementById('cart-items');
+    if (!itemsDiv) return;
+
     document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.quantity, 0);
+    
     itemsDiv.innerHTML = cart.map((item, idx) => `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <div style="display:flex; gap:12px; align-items:center;">
                 <img src="${item.image}" onerror="this.src='assets/logo.png'" style="width:45px; height:45px; object-fit:cover; border-radius:6px;">
-                <div><div style="font-weight:700; font-size:0.85rem;">${item.name}</div><div style="font-size:0.75rem; color:#666;">${item.quantity} x ${item.price}</div></div>
+                <div>
+                    <div style="font-weight:700; font-size:0.85rem;">${item.name}</div>
+                    <div style="font-size:0.75rem; color:#666;">${item.quantity} x ${item.price.toFixed(2)}</div>
+                </div>
             </div>
             <button class="remove-item-btn" onclick="removeFromCart(${idx})">&times;</button>
         </div>
     `).join('');
+    
     document.getElementById('cart-total').innerText = cart.reduce((s, i) => s + (i.price * i.quantity), 0).toFixed(2);
 };
 
-window.toggleCart = function() { document.getElementById('cart-sidebar').classList.toggle('active'); };
+window.toggleCart = function() { 
+    document.getElementById('cart-sidebar').classList.toggle('active'); 
+};
+
 document.addEventListener('DOMContentLoaded', initStore);
