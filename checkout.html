@@ -185,6 +185,20 @@
         }
     }
 
+    // Auto-fill from account data
+    document.addEventListener('DOMContentLoaded', async () => {
+        renderSummary(); // Your existing function
+    
+        // Check if we have a cached profile in the browser
+        const savedProfile = localStorage.getItem('userProfile');
+        if (savedProfile) {
+            const profile = JSON.parse(savedProfile);
+            if (document.getElementById('cust-name')) document.getElementById('cust-name').value = profile.name || "";
+            if (document.getElementById('cust-phone')) document.getElementById('cust-phone').value = profile.phone || "";
+            if (document.getElementById('cust-address')) document.getElementById('cust-address').value = profile.address || "";
+        }
+    });
+
     document.addEventListener('DOMContentLoaded', renderSummary);
 </script>
 </body>
