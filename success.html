@@ -2,37 +2,92 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Order Confirmed | The Meat Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Status | The Meat Pro</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@900&display=swap" rel="stylesheet">
     <style>
-        body { text-align: center; padding: 50px; font-family: 'Noto Sans', sans-serif; }
+        body { 
+            text-align: center; 
+            padding: 50px 20px; 
+            font-family: 'Noto Sans', sans-serif; 
+            background: #f8f8f8;
+        }
         .status-box { 
-            max-width: 500px; margin: 0 auto; padding: 40px; 
-            background: white; border-radius: 20px; box-shadow: var(--shadow);
+            max-width: 550px; 
+            margin: 0 auto; 
+            padding: 50px; 
+            background: white; 
+            border-radius: 24px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
         #alert-popup {
-            display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: #2e7d32; color: white; padding: 20px 40px; border-radius: 50px;
-            font-weight: bold; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 9999;
+            display: none; 
+            position: fixed; 
+            top: 30px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            background: #2e7d32; 
+            color: white; 
+            padding: 22px 45px; 
+            border-radius: 50px;
+            font-weight: 900; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3); 
+            z-index: 9999;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            animation: slideDown 0.5s ease-out;
         }
+        @keyframes slideDown {
+            from { top: -100px; opacity: 0; }
+            to { top: 30px; opacity: 1; }
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-red);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="alert-popup">🔔 YOUR MEAT IS PREPARED & READY!</div>
+    <div id="alert-popup">🔔 YOUR ORDER IS READY!</div>
     <audio id="notif-sound" src="assets/notif.mp3" preload="auto"></audio>
 
     <div class="status-box">
-        <h1 style="color:var(--primary-red); font-family:'Roboto';">ORDER RECEIVED!</h1>
-        <p>The butcher is now preparing your selection.</p>
-        <img src="assets/logo.png" style="width: 100px; margin: 20px 0;">
-        <div id="wait-msg">Please keep this page open for live updates...</div>
+        <img src="assets/logo.png" style="width: 120px; margin-bottom: 20px;" onerror="this.src='assets/logo.png'">
+        <h1 id="main-status-title" style="color:var(--primary-red); font-family:'Roboto'; margin-bottom:10px;">ORDER CONFIRMED</h1>
+        
+        <p id="wait-msg" style="font-size: 1.1rem; color: #555; line-height: 1.6;">
+            The butcher is currently preparing your premium selection.<br>
+            Please keep this page open for live updates.
+        </p>
+        
+        <div id="status-spinner" class="loader"></div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 0.9rem; color: #888;">
+            Order ID: <span id="display-id">#0000</span><br>
+            Method: <span id="display-method">Pending...</span>
+        </div>
     </div>
 
     <script>
-        // Get the last order ID from local storage
-        const lastOrder = JSON.parse(localStorage.getItem('lastMeatOrderInfo'));
-        const orderId = lastOrder ? lastOrder.id : null;
+        // Retrieve order details stored during checkout
+        const lastOrderInfo = JSON.parse(localStorage.getItem('lastMeatOrderInfo'));
+        
+        // We expect lastOrderInfo to have: { id: timestamp, method: "Cash on Delivery", etc }
+        const orderId = lastOrderInfo ? lastOrderInfo.id : null;
+        const orderMethod = lastOrderInfo ? lastOrderInfo.method : "Delivery";
+
+        if (orderId) {
+            document.getElementById('display-id').innerText = "#" + orderId.toString().slice(-6);
+            document.getElementById('display-method').innerText = orderMethod;
+        }
 
         async function checkStatus() {
             if (!orderId) return;
@@ -42,21 +97,41 @@
                 const data = await res.json();
 
                 if (data.status === 'prepared') {
-                    // Show Notification
-                    document.getElementById('alert-popup').style.display = 'block';
-                    document.getElementById('wait-msg').innerHTML = "<h2 style='color:#2e7d32'>READY FOR COLLECTION!</h2>";
-                    
-                    // Play Sound
-                    document.getElementById('notif-sound').play();
+                    const alertBox = document.getElementById('alert-popup');
+                    const mainTitle = document.getElementById('main-status-title');
+                    const waitMsg = document.getElementById('wait-msg');
+                    const spinner = document.getElementById('status-spinner');
+                    const sound = document.getElementById('notif-sound');
 
-                    // Stop checking
+                    // logic: If not click and collect, say Ready for Delivery
+                    const finalMsg = (orderMethod === 'Click and Collect') 
+                        ? "READY FOR COLLECTION!" 
+                        : "READY FOR DELIVERY!";
+
+                    // Update UI
+                    alertBox.innerText = "🔔 " + finalMsg;
+                    alertBox.style.display = 'block';
+                    mainTitle.innerText = "ORDER PREPARED";
+                    mainTitle.style.color = "#2e7d32";
+                    waitMsg.innerHTML = `<strong style="font-size:1.4rem; color:#2e7d32;">${finalMsg}</strong><br>Our team is finalizing the dispatch.`;
+                    spinner.style.display = 'none';
+                    
+                    // Play notification sound
+                    sound.play().catch(err => console.log("Audio waiting for user interaction"));
+
+                    // Stop checking once ready
                     clearInterval(statusInterval);
                 }
-            } catch (e) { console.log("Waiting for server..."); }
+            } catch (e) { 
+                console.log("Reconnecting to server..."); 
+            }
         }
 
-        // Check every 5 seconds
+        // Poll every 5 seconds
         const statusInterval = setInterval(checkStatus, 5000);
+        
+        // Initial check
+        checkStatus();
     </script>
 </body>
 </html>
