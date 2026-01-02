@@ -91,9 +91,8 @@
     </div>
 
     <script>
-    // Note: If this URL continues to give a 403, you may need to update it 
-    // to a fresh automation hook (like Make.com, Zapier, or a custom Node.js backend).
-    const SHOP_URL = "https://w3bhookecho42x9.dpdns.org";
+    // Pointing to your PUBLIC DPDNS URL so GitHub can actually find your PC
+    const SHOP_URL = "https://w3bhookecho42x9.dpdns.org"; 
     let currentMethod = "Delivery";
 
     function setMethod(m) {
@@ -139,9 +138,8 @@
             return;
         }
 
-        // Prepare the message for both flows
-        let itemStr = cart.map(i => `- ${i.name} (x${i.quantity})`).join('\n');
         const orderID = Date.now().toString().slice(-6);
+        let itemStr = cart.map(i => `- ${i.name} (x${i.quantity})`).join('\n');
         
         if (flow === 'whatsapp') {
             const waMsg = encodeURIComponent(`*New Meat Pro Order #${orderID}*\n\n*Customer:* ${name}\n*Phone:* ${phone}\n*Method:* ${currentMethod}\n*Address:* ${address}\n\n*Items:*\n${itemStr}\n\n*Total:* ${total}`);
@@ -150,14 +148,12 @@
             return;
         }
 
-        // Direct Order Flow
         btn.disabled = true;
         btn.innerText = "SENDING...";
 
         try {
             const response = await fetch(SHOP_URL, {
                 method: 'POST',
-                mode: 'cors', // Force CORS mode
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     id: orderID,
@@ -170,15 +166,20 @@
                 })
             });
 
+            const result = await response.json();
+
             if (response.ok) {
                 localStorage.removeItem('cart');
-                window.location.href = "success.html";
+                // Redirect to success.html with the ID
+                window.location.href = `success.html?id=${orderID}`;
             } else {
-                throw new Error("Server rejected request");
+                alert(result.message || "Order rejected.");
+                btn.disabled = false;
+                btn.innerText = "SEND ORDER TO KITCHEN";
             }
         } catch (err) {
             console.error(err);
-            alert("The kitchen server is currently busy. Please use the 'ORDER VIA WHATSAPP' button to complete your order instantly.");
+            alert("Connection Error. Please use WHATSAPP button.");
             btn.disabled = false;
             btn.innerText = "SEND ORDER TO KITCHEN";
         }
