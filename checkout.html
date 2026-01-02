@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout | The Meat Pro</title>
+    <title>Checkout | The Meat Pro Dubai</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@900&display=swap" rel="stylesheet">
     <style>
@@ -29,13 +29,35 @@
         
         .input-group { margin-bottom: 20px; }
         label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.9rem; color: #555; }
-        input, textarea { 
+        input, textarea, select { 
             width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; 
             box-sizing: border-box; font-size: 1rem; transition: border 0.3s;
         }
-        input:focus { border-color: var(--red); outline: none; }
 
-        /* Error Message Styling */
+        .toggle-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-btn {
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .toggle-btn.active {
+            border-color: var(--red);
+            background: #fff5f5;
+            color: var(--red);
+        }
+
         #error-box {
             display: none;
             background: #ffebee;
@@ -45,10 +67,8 @@
             margin-bottom: 25px;
             border-left: 5px solid var(--red);
             font-weight: 700;
-            line-height: 1.4;
         }
 
-        /* Order Summary Sidebar */
         .summary-card {
             background: white;
             padding: 25px;
@@ -56,7 +76,7 @@
             height: fit-content;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
-        .summary-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
+
         .total-row { border-top: 2px solid #eee; margin-top: 15px; padding-top: 15px; font-weight: 900; font-size: 1.2rem; display: flex; justify-content: space-between; }
 
         .btn-place {
@@ -64,81 +84,70 @@
             border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer; 
             margin-top: 20px; transition: 0.3s;
         }
-        .btn-place:hover { background: #a51f1f; transform: translateY(-2px); }
-        .btn-place:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        .btn-place:disabled { background: #ccc; cursor: not-allowed; }
 
-        @media (max-width: 850px) {
-            .checkout-layout { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 850px) { .checkout-layout { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
     <div class="checkout-layout">
         <div class="checkout-card">
-            <h2>Delivery Details</h2>
+            <h2>Checkout Details</h2>
             
             <div id="error-box"></div>
 
+            <label>Order Method</label>
+            <div class="toggle-container">
+                <div class="toggle-btn active" id="btn-delivery" onclick="setMethod('Delivery')">🚚 Delivery</div>
+                <div class="toggle-btn" id="btn-collect" onclick="setMethod('Click and Collect')">🏪 Store Pickup</div>
+            </div>
+
             <div class="input-group">
                 <label>Full Name</label>
-                <input type="text" id="cust-name" placeholder="John Doe" required>
+                <input type="text" id="cust-name" placeholder="John Doe">
             </div>
 
             <div class="input-group">
-                <label>Phone Number (WhatsApp preferred)</label>
-                <input type="text" id="cust-phone" placeholder="058 938 8096" required>
+                <label>Phone Number</label>
+                <input type="text" id="cust-phone" placeholder="058 938 8096">
             </div>
 
-            <div class="input-group">
+            <div class="input-group" id="address-section">
                 <label>Dubai Delivery Address</label>
-                <textarea id="cust-address" rows="3" placeholder="Building Name, Villa Number, Area (e.g., Al Jaddaf, Dubai)" required></textarea>
-                <p style="font-size: 0.75rem; color: #888; margin-top: 5px;">* Our AI validates addresses. We only deliver within Dubai city limits.</p>
+                <textarea id="cust-address" rows="3" placeholder="Building, Villa, Area in Dubai"></textarea>
             </div>
 
-            <button class="btn-place" id="place-order-btn" onclick="submitOrder()">CONFIRM & PLACE ORDER</button>
+            <div class="input-group">
+                <label>Payment Method</label>
+                <select id="payment-mode">
+                    <option value="Cash on Delivery">💵 Cash on Delivery / Collection</option>
+                    <option value="Card on Delivery">💳 Card on Delivery / Collection</option>
+                </select>
+            </div>
+
+            <button class="btn-place" id="place-order-btn" onclick="submitOrder()">PLACE ORDER VIA WHATSAPP SYNC</button>
         </div>
 
         <div class="summary-card">
-            <h3 style="margin-top:0;">Your Order</h3>
-            <div id="summary-items">
-                </div>
+            <h3 style="margin-top:0;">Summary</h3>
+            <div id="summary-items"></div>
             <div class="total-row">
                 <span>Total</span>
                 <span id="summary-total">AED 0.00</span>
             </div>
-            <p style="font-size: 0.8rem; color: #777; margin-top: 15px; text-align: center;">
-                Payment: Cash or Card on Delivery
-            </p>
         </div>
     </div>
 
     <script>
         const SHOP_URL = "https://w3bhookecho42x9.dpdns.org";
+        let currentMethod = "Delivery";
 
-        // Load Cart Summary on start
-        function loadSummary() {
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const container = document.getElementById('summary-items');
-            let total = 0;
-
-            if(cart.length === 0) {
-                container.innerHTML = "<p>Your cart is empty.</p>";
-                return;
-            }
-
-            container.innerHTML = cart.map(item => {
-                const subtotal = item.price * (item.quantity || 1);
-                total += subtotal;
-                return `
-                    <div class="summary-item">
-                        <span>${item.quantity || 1}x ${item.name}</span>
-                        <span>AED ${subtotal.toFixed(2)}</span>
-                    </div>
-                `;
-            }).join('');
-
-            document.getElementById('summary-total').innerText = `AED ${total.toFixed(2)}`;
+        function setMethod(m) {
+            currentMethod = m;
+            document.getElementById('btn-delivery').classList.toggle('active', m === 'Delivery');
+            document.getElementById('btn-collect').classList.toggle('active', m === 'Click and Collect');
+            document.getElementById('address-section').style.display = (m === 'Delivery') ? 'block' : 'none';
         }
 
         async function submitOrder() {
@@ -147,16 +156,16 @@
             
             const name = document.getElementById('cust-name').value;
             const phone = document.getElementById('cust-phone').value;
-            const address = document.getElementById('cust-address').value;
+            const address = (currentMethod === 'Delivery') ? document.getElementById('cust-address').value : "Store Pickup - Al Jaddaf";
+            const payment = document.getElementById('payment-mode').value;
 
-            if(!name || !phone || !address) {
-                showError("Please fill in all your details.");
+            if(!name || !phone || (currentMethod === 'Delivery' && !address)) {
+                showError("Please complete all required fields.");
                 return;
             }
 
-            // UI State: Loading
             btn.disabled = true;
-            btn.innerText = "VALIDATING ADDRESS WITH AI...";
+            btn.innerText = "VALIDATING ADDRESS...";
             errorBox.style.display = 'none';
 
             const orderData = {
@@ -164,8 +173,9 @@
                 customer: name,
                 phone: phone,
                 address: address,
+                payment: payment,
+                method: currentMethod,
                 items: JSON.parse(localStorage.getItem('cart') || '[]'),
-                method: "Delivery",
                 total: document.getElementById('summary-total').innerText
             };
 
@@ -179,37 +189,46 @@
                 const result = await response.json();
 
                 if (response.status === 403) {
-                    // AI Rejection (Outside Dubai)
-                    showError(`❌ DELIVERY RESTRICTED: ${result.message}`);
+                    showError(`❌ AI BLOCK: ${result.message}`);
                     btn.disabled = false;
-                    btn.innerText = "CONFIRM & PLACE ORDER";
+                    btn.innerText = "PLACE ORDER VIA WHATSAPP SYNC";
                 } else if (response.ok) {
-                    // Success! Store info for success page and redirect
-                    localStorage.setItem('lastMeatOrderInfo', JSON.stringify({
-                        id: orderData.id, 
-                        method: "Delivery"
-                    }));
-                    localStorage.removeItem('cart'); // Clear cart
-                    window.location.href = "success.html";
-                } else {
-                    throw new Error("Server Error");
+                    // Save for success page
+                    localStorage.setItem('lastMeatOrderInfo', JSON.stringify({id: orderData.id, method: currentMethod}));
+                    
+                    // --- WHATSAPP REDIRECT ---
+                    const waMsg = `*New Order: ${orderData.id}*%0A*Customer:* ${name}%0A*Method:* ${currentMethod}%0A*Payment:* ${payment}%0A*Address:* ${address}%0A*Total:* ${orderData.total}`;
+                    window.location.href = `https://wa.me/971589388096?text=${waMsg}`;
+                    
+                    // Note: Success.html should be handled after WA or as a separate flow. 
+                    // To ensure the kitchen gets it, the fetch above already happened.
                 }
-
             } catch (err) {
-                showError("⚠️ Unable to connect to the Dubai shop server. Please check your internet or contact us via WhatsApp.");
+                showError("Shop server offline. Please contact us directly.");
                 btn.disabled = false;
-                btn.innerText = "CONFIRM & PLACE ORDER";
+                btn.innerText = "PLACE ORDER VIA WHATSAPP SYNC";
             }
         }
 
         function showError(msg) {
-            const errorBox = document.getElementById('error-box');
-            errorBox.innerText = msg;
-            errorBox.style.display = 'block';
-            errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const eb = document.getElementById('error-box');
+            eb.innerText = msg;
+            eb.style.display = 'block';
         }
 
-        loadSummary();
+        // Initialize Summary
+        (function() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            let total = 0;
+            document.getElementById('summary-items').innerHTML = cart.map(i => {
+                total += (i.price * (i.quantity || 1));
+                return `<div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:5px;">
+                            <span>${i.name} x${i.quantity || 1}</span>
+                            <span>AED ${(i.price * (i.quantity || 1)).toFixed(2)}</span>
+                        </div>`;
+            }).join('');
+            document.getElementById('summary-total').innerText = `AED ${total.toFixed(2)}`;
+        })();
     </script>
 </body>
 </html>
