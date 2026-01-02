@@ -179,8 +179,9 @@
         const userMenu = document.getElementById('user-menu');
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
+                // User is signed in - Updated to match black button style
                 userMenu.innerHTML = `
-                    <div class="user-email-display" onclick="window.location.href='account.html'">
+                    <div class="auth-button-box" onclick="window.location.href='account.html'">
                         👤 ${user.email.split('@')[0]}
                     </div>
                     <div class="dropdown-content">
@@ -188,17 +189,23 @@
                         <button id="header-logout">Logout</button>
                     </div>
                 `;
-                document.getElementById('header-logout').addEventListener('click', () => {
+        
+                document.getElementById('header-logout').addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevents triggering the button click
                     firebase.auth().signOut().then(() => {
                         localStorage.removeItem('userProfile');
                         window.location.reload();
                     });
                 });
             } else {
-                userMenu.innerHTML = `<a href="login.html" class="auth-button">Login / Sign Up</a>`;
+                // No user is signed in
+                userMenu.innerHTML = `
+                    <button class="auth-button-box" onclick="window.location.href='login.html'">
+                        Login / Sign Up
+                    </button>
+                `;
             }
         });
-    });
 
     function handleSubscribe(e) {
         e.preventDefault();
