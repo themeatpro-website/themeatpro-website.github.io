@@ -6,120 +6,145 @@
     <title>My Account | The Meat Pro</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .profile-container { max-width: 500px; margin: 40px auto; padding: 20px; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        body { font-family: 'Noto Sans', sans-serif; background: #f4f4f4; padding: 20px; }
+        .profile-container { max-width: 500px; margin: 40px auto; padding: 40px; background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        h2 { color: #C62828; font-weight: 900; margin-bottom: 5px; }
         .form-group { margin-bottom: 15px; text-align: left; }
-        input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn-save { background: #C62828; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .status-msg { margin-top: 10px; font-size: 0.9rem; }
+        .form-group label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        .btn-save { background: #C62828; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; margin-top: 10px; }
+        .status-msg { margin-top: 15px; font-size: 0.9rem; font-weight: bold; min-height: 1.2em; }
+        .logout-link { margin-top: 30px; display: block; color: #888; text-decoration: none; font-size: 0.9rem; cursor: pointer; background: none; border: none; width: 100%; }
+        .logout-link:hover { color: #C62828; }
     </style>
 </head>
 <body>
 
     <div class="profile-container">
         <h2>My Profile</h2>
-        <p id="user-email" style="color: #666;"></p>
+        <p id="user-email" style="color: #666; margin-bottom: 30px; font-size: 0.9rem;"></p>
         
-        <div id="profile-form">
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="profile-name" placeholder="Enter your name">
-            </div>
-            <div class="form-group">
-                <label>Phone Number</label>
-                <input type="text" id="profile-phone" placeholder="+971 XX XXX XXXX">
-            </div>
-            <div class="form-group">
-                <label>Default Delivery Address</label>
-                <input type="text" id="profile-address" placeholder="Building, Street, Area, Dubai">
-            </div>
-            <button class="btn-save" onclick="saveProfile()">Update Profile</button>
-            <p id="save-status" class="status-msg"></p>
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="profile-name" placeholder="Loading name...">
+        </div>
+        <div class="form-group">
+            <label>Phone Number</label>
+            <input type="text" id="profile-phone" placeholder="+971 XX XXX XXXX">
+        </div>
+        <div class="form-group">
+            <label>Default Delivery Address</label>
+            <input type="text" id="profile-address" placeholder="Building, Street, Area, Dubai">
         </div>
         
-        <button onclick="logout()" style="margin-top:20px; background:none; border:none; color: #C62828; cursor:pointer;">Logout</button>
+        <button id="save-btn" class="btn-save">Update Profile</button>
+        <p id="save-status" class="status-msg"></p>
+        
+        <button id="logout-btn" class="logout-link">Logout from Account</button>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
     <script>
-        // Use your DPDNS URL
-        const SERVER_URL = "https://w3bhookecho42x9.dpdns.org";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyC0LqPa73C7OG295rY105XApK57SQ05et4", // Get this from Firebase Console > Project Settings
-          authDomain: "the-meat-pro.firebaseapp.com",
-          projectId: "the-meat-pro",
-          storageBucket: "the-meat-pro.appspot.com",
-          messagingSenderId: "1054538254894",
-          appId: "1:680467664784:web:9ef0a533bf354926f16d15" // Get this from Firebase Console > Project Settings
-        };
-        firebase.initializeApp(firebaseConfig);
-
-        let currentUser = null;
-
-        // Check Auth State
-        firebase.auth().onAuthStateChanged(user => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('user-email').innerText = user.email;
-                fetchProfile(user.uid);
-            } else {
-                window.location.href = "login.html"; // Redirect if not logged in
-            }
-        });
-
-        async function fetchProfile(uid) {
-            try {
-                const response = await fetch(`${SERVER_URL}/api/get-profile/${uid}`);
-                const data = await response.json();
-                
-                if (!data.error) {
-                    document.getElementById('profile-name').value = data.name || "";
-                    document.getElementById('profile-phone').value = data.phone || "";
-                    document.getElementById('profile-address').value = data.address || "";
-                    
-                    // Also save to localStorage for the checkout page to use
-                    localStorage.setItem('userProfile', JSON.stringify(data));
-                }
-            } catch (err) {
-                console.error("Error fetching profile:", err);
-            }
-        }
-
-        async function saveProfile() {
-            const status = document.getElementById('save-status');
-            const profileData = {
-                uid: currentUser.uid,
-                name: document.getElementById('profile-name').value,
-                phone: document.getElementById('profile-phone').value,
-                address: document.getElementById('profile-address').value
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- CONFIG (Ensure this matches your login.html) ---
+            const firebaseConfig = {
+                apiKey: "AIzaSyC0LqPa73C7OG295rY105XApK57SQ05et4", 
+                authDomain: "the-meat-pro.firebaseapp.com",
+                projectId: "the-meat-pro",
+                storageBucket: "the-meat-pro.appspot.com",
+                messagingSenderId: "1054538254894",
+                appId: "1:680467664784:web:9ef0a533bf354926f16d15" 
             };
+            
+            firebase.initializeApp(firebaseConfig);
+            
+            const SERVER_URL = "https://w3bhookecho42x9.dpdns.org";
+            let currentUser = null;
 
-            status.innerText = "Saving...";
-            status.style.color = "blue";
+            const nameInput = document.getElementById('profile-name');
+            const phoneInput = document.getElementById('profile-phone');
+            const addrInput = document.getElementById('profile-address');
+            const statusMsg = document.getElementById('save-status');
+            const saveBtn = document.getElementById('save-btn');
+            const logoutBtn = document.getElementById('logout-btn');
 
-            try {
-                const response = await fetch(`${SERVER_URL}/api/save-profile`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(profileData)
-                });
-
-                if (response.ok) {
-                    status.innerText = "Profile updated successfully!";
-                    status.style.color = "green";
-                    localStorage.setItem('userProfile', JSON.stringify(profileData));
+            // 1. Auth State Listener
+            firebase.auth().onAuthStateChanged(user => {
+                if (user) {
+                    currentUser = user;
+                    document.getElementById('user-email').innerText = user.email;
+                    fetchProfile(user.uid);
+                } else {
+                    window.location.href = "login.html";
                 }
-            } catch (err) {
-                status.innerText = "Failed to connect to server.";
-                status.style.color = "red";
-            }
-        }
+            });
 
-        function logout() {
-            firebase.auth().signOut();
-        }
+            // 2. Fetch Profile from your PC (webhook.js)
+            async function fetchProfile(uid) {
+                try {
+                    const response = await fetch(`${SERVER_URL}/api/get-profile/${uid}`);
+                    const data = await response.json();
+                    
+                    if (!data.error) {
+                        nameInput.value = data.name || "";
+                        phoneInput.value = data.phone || "";
+                        addrInput.value = data.address || "";
+                        nameInput.placeholder = "Enter your name";
+                        // Cache for checkout auto-fill
+                        localStorage.setItem('userProfile', JSON.stringify(data));
+                    }
+                } catch (err) {
+                    console.error("Error fetching profile:", err);
+                }
+            }
+
+            // 3. Save Profile
+            saveBtn.addEventListener('click', async () => {
+                if (!currentUser) return;
+
+                const profileData = {
+                    uid: currentUser.uid,
+                    name: nameInput.value,
+                    phone: phoneInput.value,
+                    address: addrInput.value
+                };
+
+                statusMsg.innerText = "Saving to secure server...";
+                statusMsg.style.color = "#ef6c00"; // Orange
+                saveBtn.disabled = true;
+
+                try {
+                    const response = await fetch(`${SERVER_URL}/api/save-profile`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(profileData)
+                    });
+
+                    if (response.ok) {
+                        statusMsg.innerText = "✅ Profile updated successfully!";
+                        statusMsg.style.color = "#2e7d32"; // Green
+                        localStorage.setItem('userProfile', JSON.stringify(profileData));
+                    } else {
+                        throw new Error("Server rejected update");
+                    }
+                } catch (err) {
+                    statusMsg.innerText = "❌ Connection failed. Is the server running?";
+                    statusMsg.style.color = "#C62828"; // Red
+                } finally {
+                    saveBtn.disabled = false;
+                }
+            });
+
+            // 4. Logout
+            logoutBtn.addEventListener('click', () => {
+                firebase.auth().signOut().then(() => {
+                    localStorage.removeItem('userProfile');
+                    window.location.href = "login.html";
+                });
+            });
+        });
     </script>
 </body>
 </html>
