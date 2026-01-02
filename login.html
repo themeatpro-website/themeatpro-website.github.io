@@ -36,76 +36,92 @@
 
         <p id="error-msg"></p>
 
-        <button class="btn-auth" id="main-btn" onclick="handleAuth()">Login</button>
+        <button class="btn-auth" id="main-btn">Login</button>
 
         <div class="toggle-link">
-            <p id="toggle-text">Don't have an account? <span onclick="toggleMode()">Sign Up</span></p>
+            <p id="toggle-text">Don't have an account? <span id="mode-toggle-btn">Sign Up</span></p>
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
     <script>
-        // --- YOUR CONFIG (Paste your Web SDK config here) ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyC0LqPa73C7OG295rY105XApK57SQ05et4", 
-            authDomain: "the-meat-pro.firebaseapp.com",
-            projectId: "the-meat-pro",
-            storageBucket: "the-meat-pro.appspot.com",
-            messagingSenderId: "1054538254894",
-            appId: "1:680467664784:web:9ef0a533bf354926f16d15" 
-        };
-        firebase.initializeApp(firebaseConfig);
+        // Use an IIFE or wait for DOM to ensure variables are defined before use
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- YOUR CONFIG (PASTE YOUR REAL WEB SDK CONFIG HERE) ---
+            const firebaseConfig = {
+                apiKey: "AIzaSyC0LqPa73C7OG295rY105XApK57SQ05et4", 
+                authDomain: "the-meat-pro.firebaseapp.com",
+                projectId: "the-meat-pro",
+                storageBucket: "the-meat-pro.appspot.com",
+                messagingSenderId: "1054538254894",
+                appId: "1:680467664784:web:9ef0a533bf354926f16d15" 
+            };
 
-        let isLoginMode = true;
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
 
-        function toggleMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('auth-title').innerText = isLoginMode ? "Welcome Back" : "Create Account";
-            document.getElementById('auth-subtitle').innerText = isLoginMode ? "Login to manage your orders" : "Join The Meat Pro community";
-            document.getElementById('main-btn').innerText = isLoginMode ? "Login" : "Register";
-            document.getElementById('toggle-text').innerHTML = isLoginMode ? 
-                `Don't have an account? <span onclick="toggleMode()">Sign Up</span>` : 
-                `Already have an account? <span onclick="toggleMode()">Login</span>`;
-            document.getElementById('error-msg').innerText = "";
-        }
+            let isLoginMode = true;
 
-        async function handleAuth() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const authTitle = document.getElementById('auth-title');
+            const authSub = document.getElementById('auth-subtitle');
+            const mainBtn = document.getElementById('main-btn');
+            const toggleBtn = document.getElementById('mode-toggle-btn');
+            const toggleText = document.getElementById('toggle-text');
             const errorMsg = document.getElementById('error-msg');
-            const btn = document.getElementById('main-btn');
 
-            if (!email || !password) {
-                errorMsg.innerText = "Please fill in all fields.";
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerText = "Processing...";
-
-            try {
+            // Handle switching between Login and Sign Up
+            toggleBtn.addEventListener('click', () => {
+                isLoginMode = !isLoginMode;
+                
+                authTitle.innerText = isLoginMode ? "Welcome Back" : "Create Account";
+                authSub.innerText = isLoginMode ? "Login to manage your orders" : "Join The Meat Pro community";
+                mainBtn.innerText = isLoginMode ? "Login" : "Register";
+                
                 if (isLoginMode) {
-                    // LOGIN FLOW
-                    await firebase.auth().signInWithEmailAndPassword(email, password);
+                    toggleText.innerHTML = `Don't have an account? <span id="mode-toggle-btn" style="color:#C62828; cursor:pointer; font-weight:bold;">Sign Up</span>`;
                 } else {
-                    // REGISTER FLOW
-                    await firebase.auth().createUserWithEmailAndPassword(email, password);
+                    toggleText.innerHTML = `Already have an account? <span id="mode-toggle-btn" style="color:#C62828; cursor:pointer; font-weight:bold;">Login</span>`;
                 }
-                // If successful, the onAuthStateChanged in account.html will handle the rest
-                window.location.href = "account.html";
-            } catch (error) {
-                console.error(error);
-                errorMsg.innerText = error.message;
-                btn.disabled = false;
-                btn.innerText = isLoginMode ? "Login" : "Register";
-            }
-        }
+                
+                // Re-attach listener because innerHTML wipes it
+                document.getElementById('mode-toggle-btn').addEventListener('click', () => toggleBtn.click());
+                errorMsg.innerText = "";
+            });
 
-        // Redirect if already logged in
-        firebase.auth().onAuthStateChanged(user => {
-            if (user) window.location.href = "account.html";
+            // Handle Button Click
+            mainBtn.addEventListener('click', async () => {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                if (!email || !password) {
+                    errorMsg.innerText = "Please fill in all fields.";
+                    return;
+                }
+
+                mainBtn.disabled = true;
+                mainBtn.innerText = "Processing...";
+
+                try {
+                    if (isLoginMode) {
+                        await firebase.auth().signInWithEmailAndPassword(email, password);
+                    } else {
+                        await firebase.auth().createUserWithEmailAndPassword(email, password);
+                    }
+                    window.location.href = "account.html";
+                } catch (error) {
+                    errorMsg.innerText = error.message;
+                    mainBtn.disabled = false;
+                    mainBtn.innerText = isLoginMode ? "Login" : "Register";
+                }
+            });
+
+            // Check if already logged in
+            firebase.auth().onAuthStateChanged(user => {
+                if (user) window.location.href = "account.html";
+            });
         });
     </script>
 </body>
