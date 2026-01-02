@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | The Meat Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: 'Noto Sans', sans-serif; background: #f4f4f4; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .auth-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        .auth-card h2 { color: #C62828; margin-bottom: 10px; font-weight: 900; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; font-size: 0.9rem; margin-bottom: 5px; color: #666; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        .btn-auth { background: #C62828; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; margin-top: 10px; }
+        .toggle-link { margin-top: 20px; font-size: 0.9rem; color: #555; }
+        .toggle-link span { color: #C62828; cursor: pointer; font-weight: bold; }
+        #error-msg { color: #d32f2f; font-size: 0.85rem; margin-top: 10px; min-height: 1.2em; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <h2 id="auth-title">Welcome Back</h2>
+        <p id="auth-subtitle">Login to manage your orders</p>
+
+        <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="email@example.com">
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="••••••••">
+        </div>
+
+        <p id="error-msg"></p>
+
+        <button class="btn-auth" id="main-btn" onclick="handleAuth()">Login</button>
+
+        <div class="toggle-link">
+            <p id="toggle-text">Don't have an account? <span onclick="toggleMode()">Sign Up</span></p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+
+    <script>
+        // --- YOUR CONFIG (Paste your Web SDK config here) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyC0LqPa73C7OG295rY105XApK57SQ05et4", 
+            authDomain: "the-meat-pro.firebaseapp.com",
+            projectId: "the-meat-pro",
+            storageBucket: "the-meat-pro.appspot.com",
+            messagingSenderId: "1054538254894",
+            appId: "1:680467664784:web:9ef0a533bf354926f16d15" 
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        let isLoginMode = true;
+
+        function toggleMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('auth-title').innerText = isLoginMode ? "Welcome Back" : "Create Account";
+            document.getElementById('auth-subtitle').innerText = isLoginMode ? "Login to manage your orders" : "Join The Meat Pro community";
+            document.getElementById('main-btn').innerText = isLoginMode ? "Login" : "Register";
+            document.getElementById('toggle-text').innerHTML = isLoginMode ? 
+                `Don't have an account? <span onclick="toggleMode()">Sign Up</span>` : 
+                `Already have an account? <span onclick="toggleMode()">Login</span>`;
+            document.getElementById('error-msg').innerText = "";
+        }
+
+        async function handleAuth() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-msg');
+            const btn = document.getElementById('main-btn');
+
+            if (!email || !password) {
+                errorMsg.innerText = "Please fill in all fields.";
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            try {
+                if (isLoginMode) {
+                    // LOGIN FLOW
+                    await firebase.auth().signInWithEmailAndPassword(email, password);
+                } else {
+                    // REGISTER FLOW
+                    await firebase.auth().createUserWithEmailAndPassword(email, password);
+                }
+                // If successful, the onAuthStateChanged in account.html will handle the rest
+                window.location.href = "account.html";
+            } catch (error) {
+                console.error(error);
+                errorMsg.innerText = error.message;
+                btn.disabled = false;
+                btn.innerText = isLoginMode ? "Login" : "Register";
+            }
+        }
+
+        // Redirect if already logged in
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) window.location.href = "account.html";
+        });
+    </script>
+</body>
+</html>
