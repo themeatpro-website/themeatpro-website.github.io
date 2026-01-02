@@ -7,7 +7,6 @@ let allProducts = [];
 let currentFilteredProducts = [];
 
 // --- 1. STORAGE SYNC & MIGRATION ---
-// If the user has items in the old key name, move them to the new one
 if (localStorage.getItem('meatProCart') && !localStorage.getItem('cart')) {
     localStorage.setItem('cart', localStorage.getItem('meatProCart'));
 }
@@ -46,12 +45,17 @@ async function initStore() {
 window.filterByCategory = function(category) {
     document.getElementById('category-section').style.display = 'none';
     document.getElementById('product-header').style.display = 'flex';
-    document.getElementById('product-grid').style.display = 'grid';
+    
+    // Switch grid to block temporarily to center the "Coming Soon" message if needed
+    const grid = document.getElementById('product-grid');
+    grid.style.display = 'grid'; 
+    
     document.getElementById('current-category-name').innerText = category;
     
     currentFilteredProducts = allProducts.filter(p => 
         p.Category.toLowerCase() === category.toLowerCase()
     );
+    
     renderProducts(currentFilteredProducts);
 };
 
@@ -63,6 +67,27 @@ window.showCategories = function() {
 
 function renderProducts(products) {
     const grid = document.getElementById('product-grid');
+    
+    // --- COMING SOON LOGIC ---
+    if (products.length === 0) {
+        grid.style.display = 'block'; // Block display allows centering the message
+        grid.innerHTML = `
+            <div style="text-align: center; padding: 80px 20px; color: #888; grid-column: 1 / -1;">
+                <div style="font-size: 4rem; margin-bottom: 20px;">🥩</div>
+                <h2 style="font-family: 'Roboto', sans-serif; color: #333; letter-spacing: 2px;">COMING SOON</h2>
+                <p style="font-size: 1.1rem; margin-bottom: 30px; max-width: 400px; margin-left: auto; margin-right: auto;">
+                    Our master butchers are currently preparing the finest selection for this category. Stay tuned!
+                </p>
+                <button class="add-btn" style="background: #C62828; color: white; padding: 12px 25px;" onclick="showCategories()">
+                    Explore Other Categories
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    // --- STANDARD RENDER LOGIC ---
+    grid.style.display = 'grid'; 
     grid.innerHTML = products.map(p => `
         <div class="product-card" onclick="openModal('${p.Name.replace(/'/g, "\\'")}')">
             <img src="${p.Image}" onerror="this.src='assets/logo.png'" style="width:100%; height:220px; object-fit:cover;">
@@ -129,7 +154,6 @@ window.addToCart = function(name, price, image, qty = 1) {
         });
     }
     
-    // Save to 'cart' so checkout.html can read it
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartUI();
 };
@@ -172,5 +196,4 @@ window.toggleCart = function() {
     document.getElementById('cart-sidebar').classList.toggle('active'); 
 };
 
-// Initialize the store on load
 document.addEventListener('DOMContentLoaded', initStore);
