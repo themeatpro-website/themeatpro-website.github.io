@@ -9,99 +9,28 @@
     <style>
         :root { --red: #C62828; --green: #25D366; --dark: #1a1a1a; }
         body { background: #f4f4f4; font-family: 'Noto Sans', sans-serif; margin: 0; padding: 20px; }
-        
-        .checkout-layout {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 30px;
-        }
-
-        .checkout-card {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
-
-        h2 { font-family: 'Roboto'; font-size: 1.8rem; margin-top: 0; color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 15px; }
-        
+        .checkout-layout { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 350px; gap: 30px; }
+        .checkout-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         .input-group { margin-bottom: 20px; }
         label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.9rem; color: #555; }
-        input, textarea, select { 
-            width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; 
-            box-sizing: border-box; font-size: 1rem; transition: border 0.3s;
-        }
-
-        /* Toggle Button Styling */
-        .toggle-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .toggle-btn {
-            padding: 12px;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            background: white;
-            cursor: pointer;
-            font-weight: bold;
-            text-align: center;
-            transition: 0.3s;
-        }
-
-        .toggle-btn.active {
-            border-color: var(--red);
-            background: #fff5f5;
-            color: var(--red);
-        }
-
-        /* Error Message Styling */
-        #error-box {
-            display: none;
-            background: #ffebee;
-            color: #c62828;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            border-left: 5px solid var(--red);
-            font-weight: 700;
-        }
-
-        /* Button Styling */
-        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+        input, textarea, select { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1rem; }
         
-        .btn-place {
-            width: 100%; background: var(--red); color: white; border: none; padding: 20px; 
-            border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer; 
-            transition: 0.3s;
-        }
+        /* Method Toggles */
+        .toggle-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .toggle-btn { padding: 12px; border: 2px solid #eee; border-radius: 10px; background: white; cursor: pointer; font-weight: bold; text-align: center; }
+        .toggle-btn.active { border-color: var(--red); background: #fff5f5; color: var(--red); }
 
-        .btn-whatsapp {
-            width: 100%; background: var(--green); color: white; border: none; padding: 20px; 
-            border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer; 
-            text-decoration: none; display: flex; align-items: center; justify-content: center;
-        }
-
+        /* Buttons */
+        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+        .btn-place { width: 100%; background: var(--red); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 1rem; }
+        .btn-whatsapp { width: 100%; background: var(--green); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 900; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
         .btn-place:disabled { background: #ccc; cursor: not-allowed; }
-
-        /* Summary Sidebar */
-        .summary-card {
-            background: white;
-            padding: 25px;
-            border-radius: 20px;
-            height: fit-content;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
-        .summary-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
+        
+        #error-box { display: none; background: #ffebee; color: #c62828; padding: 15px; border-radius: 10px; margin-bottom: 25px; border-left: 5px solid var(--red); font-weight: 700; }
+        .summary-card { background: white; padding: 25px; border-radius: 20px; height: fit-content; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         .total-row { border-top: 2px solid #eee; margin-top: 15px; padding-top: 15px; font-weight: 900; font-size: 1.2rem; display: flex; justify-content: space-between; }
-
-        @media (max-width: 850px) {
-            .checkout-layout { grid-template-columns: 1fr; }
-        }
+        
+        @media (max-width: 850px) { .checkout-layout { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -109,7 +38,6 @@
     <div class="checkout-layout">
         <div class="checkout-card">
             <h2>Checkout Details</h2>
-            
             <div id="error-box"></div>
 
             <label>Order Method</label>
@@ -135,7 +63,7 @@
 
             <div class="input-group">
                 <label>Order Instructions (Optional)</label>
-                <textarea id="order-instructions" rows="2" placeholder="Example: Well done, cut in pieces, etc."></textarea>
+                <textarea id="order-instructions" rows="2" placeholder="Example: Cut the meat in small pieces, well done, etc."></textarea>
             </div>
 
             <div class="input-group" id="payment-section">
@@ -147,8 +75,8 @@
             </div>
 
             <div class="btn-group">
-                <button class="btn-place" id="place-order-btn" onclick="submitOrder('direct')">Order Now</button>
-                <button class="btn-whatsapp" onclick="submitOrder('whatsapp')">Order Via WhatsApp</button>
+                <button class="btn-place" id="place-order-btn" onclick="submitOrder('direct')">SEND ORDER TO KITCHEN</button>
+                <button class="btn-whatsapp" onclick="submitOrder('whatsapp')">ORDER VIA WHATSAPP SYNC</button>
             </div>
         </div>
 
@@ -170,8 +98,6 @@
             currentMethod = m;
             document.getElementById('btn-delivery').classList.toggle('active', m === 'Delivery');
             document.getElementById('btn-collect').classList.toggle('active', m === 'Click and Collect');
-            
-            // HIDE payment and address for Store Pickup
             document.getElementById('address-section').style.display = (m === 'Delivery') ? 'block' : 'none';
             document.getElementById('payment-section').style.display = (m === 'Delivery') ? 'block' : 'none';
         }
@@ -185,33 +111,29 @@
             const address = (currentMethod === 'Delivery') ? document.getElementById('cust-address').value : "Store Pickup - Al Jaddaf";
             const instructions = document.getElementById('order-instructions').value;
             const payment = (currentMethod === 'Delivery') ? document.getElementById('payment-mode').value : "Pay at Store";
+            
+            // Re-fetch cart for the final send
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
             if(!name || !phone || (currentMethod === 'Delivery' && !address)) {
-                showError("Please complete all required fields.");
+                showError("Please fill in all required fields.");
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "Checking Address...";
+            btn.innerText = "VALIDATING...";
             errorBox.style.display = 'none';
 
-            // Fixed Data Payload for Server and Kitchen
             const orderData = {
                 id: Date.now(),
                 customer: name,
                 phone: phone,
                 address: address,
-                instructions: instructions || "None",
+                instructions: instructions || "None", // Fixed "undefined"
                 payment: payment,
                 method: currentMethod,
-                items: cart.map(i => ({
-                    name: i.name,
-                    qty: i.quantity || 1,
-                    price: i.price,
-                    subtotal: (i.price * (i.quantity || 1)).toFixed(2)
-                })),
-                total: document.getElementById('summary-total').innerText
+                items: cart,
+                total: document.getElementById('summary-total').innerText.replace('AED ', '') // Send just the number
             };
 
             try {
@@ -221,18 +143,17 @@
                     body: JSON.stringify(orderData)
                 });
 
-                const result = await response.json();
-
                 if (response.status === 403) {
-                    showError(`❌ BLOCK: ${result.message}`);
+                    const result = await response.json();
+                    showError(`❌ AI BLOCK: ${result.message}`);
                     btn.disabled = false;
-                    btn.innerText = "Order Now";
+                    btn.innerText = "SEND ORDER TO KITCHEN";
                 } else if (response.ok) {
                     localStorage.setItem('lastMeatOrderInfo', JSON.stringify({id: orderData.id, method: currentMethod}));
                     
                     if (flow === 'whatsapp') {
-                        let itemStr = cart.map(i => `- ${i.name} (x${i.quantity || 1}): AED ${(i.price * (i.quantity || 1)).toFixed(2)}`).join('%0A');
-                        const waMsg = `*New Order: ${orderData.id}*%0A%0A*Name:* ${name}%0A*Method:* ${currentMethod}%0A*Address:* ${address}%0A*Note:* ${instructions || 'None'}%0A%0A*Items:*%0A${itemStr}%0A%0A*Total: ${orderData.total}*`;
+                        let itemStr = cart.map(i => `- ${i.name} (x${i.quantity || 1})`).join('%0A');
+                        const waMsg = `*Meat Pro Order: ${orderData.id}*%0A%0A*Name:* ${name}%0A*Method:* ${currentMethod}%0A*Note:* ${instructions || 'None'}%0A%0A*Items:*%0A${itemStr}%0A%0A*Total: AED ${orderData.total}*`;
                         window.location.href = `https://wa.me/971589388096?text=${waMsg}`;
                     } else {
                         window.location.href = "success.html";
@@ -240,9 +161,9 @@
                     localStorage.removeItem('cart');
                 }
             } catch (err) {
-                showError("Server offline. Please use the WhatsApp button instead.");
+                showError("Connection failed. Try the WhatsApp button.");
                 btn.disabled = false;
-                btn.innerText = "Order Now";
+                btn.innerText = "SEND ORDER TO KITCHEN";
             }
         }
 
@@ -252,22 +173,33 @@
             eb.style.display = 'block';
         }
 
-        // Initialize Summary Panel
+        // --- IMPROVED SUMMARY LOGIC ---
         (function() {
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            console.log("Cart Data Detected:", cart); // View this in F12 Console
+            
             let total = 0;
             const container = document.getElementById('summary-items');
             
+            if (cart.length === 0) {
+                container.innerHTML = "<p style='color:#888;font-size:0.8rem;'>Your cart is empty. Please add items from the shop.</p>";
+                return;
+            }
+
             container.innerHTML = cart.map(i => {
-                const price = parseFloat(i.price || 0);
-                const qty = parseInt(i.quantity || 1);
-                total += (price * qty);
-                return `<div class="summary-item">
-                            <span><strong>${qty}x</strong> ${i.name}</span>
-                            <span>AED ${(price * qty).toFixed(2)}</span>
+                // Handle different possible naming conventions for price and quantity
+                const price = parseFloat(i.price || i.itemPrice || i.cost || 0);
+                const qty = parseInt(i.quantity || i.qty || 1);
+                const sub = price * qty;
+                total += sub;
+                
+                return `<div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:8px;border-bottom:1px dashed #eee;padding-bottom:5px;">
+                            <span><strong>${qty}x</strong> ${i.name || 'Unknown Item'}</span>
+                            <span>AED ${sub.toFixed(2)}</span>
                         </div>`;
             }).join('');
             
+            // We only add "AED" here, not in the data send, to avoid "AED AED"
             document.getElementById('summary-total').innerText = `AED ${total.toFixed(2)}`;
         })();
     </script>
