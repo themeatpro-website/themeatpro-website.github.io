@@ -7,8 +7,10 @@
     <link rel="stylesheet" href="style.css">
     <style>
         body { font-family: 'Noto Sans', sans-serif; background: #f4f4f4; padding: 20px; }
-        .profile-container { max-width: 500px; margin: 40px auto; padding: 40px; background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
-        h2 { color: #C62828; font-weight: 900; margin-bottom: 5px; }
+        .profile-container { max-width: 500px; margin: 40px auto; padding: 40px; background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; position: relative; }
+        .back-link { position: absolute; top: 15px; left: 20px; text-decoration: none; color: #888; font-size: 0.85rem; font-weight: bold; transition: 0.3s; }
+        .back-link:hover { color: #C62828; }
+        h2 { color: #C62828; font-weight: 900; margin-bottom: 5px; margin-top: 10px; }
         .form-group { margin-bottom: 15px; text-align: left; }
         .form-group label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 5px; font-weight: bold; }
         input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
@@ -21,6 +23,8 @@
 <body>
 
     <div class="profile-container">
+        <a href="index.html" class="back-link">← Back to Shop</a>
+
         <h2>My Profile</h2>
         <p id="user-email" style="color: #666; margin-bottom: 30px; font-size: 0.9rem;"></p>
         
@@ -48,7 +52,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- CONFIG (Ensure this matches your login.html) ---
             const firebaseConfig = {
                 apiKey: "AIzaSyC0LqPa73C7OG295rY105XApK57SQ05et4", 
                 authDomain: "the-meat-pro.firebaseapp.com",
@@ -58,7 +61,7 @@
                 appId: "1:680467664784:web:9ef0a533bf354926f16d15" 
             };
             
-            firebase.initializeApp(firebaseConfig);
+            if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
             
             const SERVER_URL = "https://w3bhookecho42x9.dpdns.org";
             let currentUser = null;
@@ -70,7 +73,6 @@
             const saveBtn = document.getElementById('save-btn');
             const logoutBtn = document.getElementById('logout-btn');
 
-            // 1. Auth State Listener
             firebase.auth().onAuthStateChanged(user => {
                 if (user) {
                     currentUser = user;
@@ -81,67 +83,51 @@
                 }
             });
 
-            // 2. Fetch Profile from your PC (webhook.js)
             async function fetchProfile(uid) {
                 try {
                     const response = await fetch(`${SERVER_URL}/api/get-profile/${uid}`);
                     const data = await response.json();
-                    
                     if (!data.error) {
                         nameInput.value = data.name || "";
                         phoneInput.value = data.phone || "";
                         addrInput.value = data.address || "";
                         nameInput.placeholder = "Enter your name";
-                        // Cache for checkout auto-fill
                         localStorage.setItem('userProfile', JSON.stringify(data));
                     }
-                } catch (err) {
-                    console.error("Error fetching profile:", err);
-                }
+                } catch (err) { console.error("Error fetching profile:", err); }
             }
 
-            // 3. Save Profile
             saveBtn.addEventListener('click', async () => {
                 if (!currentUser) return;
-
                 const profileData = {
                     uid: currentUser.uid,
                     name: nameInput.value,
                     phone: phoneInput.value,
                     address: addrInput.value
                 };
-
                 statusMsg.innerText = "Saving to secure server...";
-                statusMsg.style.color = "#ef6c00"; // Orange
-                saveBtn.disabled = true;
-
+                statusMsg.style.color = "#ef6c00";
                 try {
                     const response = await fetch(`${SERVER_URL}/api/save-profile`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(profileData)
                     });
-
                     if (response.ok) {
                         statusMsg.innerText = "✅ Profile updated successfully!";
-                        statusMsg.style.color = "#2e7d32"; // Green
+                        statusMsg.style.color = "#2e7d32";
                         localStorage.setItem('userProfile', JSON.stringify(profileData));
-                    } else {
-                        throw new Error("Server rejected update");
                     }
                 } catch (err) {
-                    statusMsg.innerText = "❌ Connection failed. Is the server running?";
-                    statusMsg.style.color = "#C62828"; // Red
-                } finally {
-                    saveBtn.disabled = false;
+                    statusMsg.innerText = "❌ Connection failed.";
+                    statusMsg.style.color = "#C62828";
                 }
             });
 
-            // 4. Logout
             logoutBtn.addEventListener('click', () => {
                 firebase.auth().signOut().then(() => {
                     localStorage.removeItem('userProfile');
-                    window.location.href = "login.html";
+                    window.location.href = "index.html";
                 });
             });
         });
