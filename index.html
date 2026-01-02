@@ -98,6 +98,155 @@
             </button>
         </div>
     </div>
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <div class="logo-text" style="margin-bottom: 20px;">
+                    THE MEAT <span style="color:var(--primary-red, #C62828)">PRO</span>
+                </div>
+                <p style="font-size: 0.9rem; line-height: 1.6; color: #bbb;">
+                    Premium quality cuts, expertly prepared and delivered straight to your door across Dubai. 
+                    Taste the difference of hormone-free, locally sourced meat.
+                </p>
+            </div>
+    
+            <div class="footer-section">
+                <h3>CONTACT US</h3>
+                <ul class="contact-list">
+                    <li><span>📍</span> Shop #4 - Azurite Tower - Ibn Al Zahrawi St - Al Jaddaf - Dubai</li>
+                    <li><span>📞</span> <a href="tel:+971589388096">058 938 8096</a> (Call & WhatsApp)</li>
+                    <li><span>📧</span> <a href="mailto:info@themeatpro.com">info@themeatpro.com</a></li>
+                    <li><span>🛠️</span> <a href="mailto:support@themeatpro.com">support@themeatpro.com</a></li>
+                </ul>
+            </div>
+    
+            <div class="footer-section">
+                <h3>WEEKLY NEWSLETTER</h3>
+                <p style="font-size: 0.9rem; color: #bbb; margin-bottom: 15px;">
+                    Get weekly recipes, grill tips, and exclusive Dubai-only discounts.
+                </p>
+                <form class="newsletter-form" onsubmit="handleSubscribe(event)">
+                    <input type="email" id="news-email" placeholder="Your Email Address" required>
+                    <button type="submit">SUBSCRIBE</button>
+                </form>
+                <div id="subs-msg" style="margin-top: 10px; font-size: 0.8rem; color: #2e7d32; display: none;">
+                    ✓ You're on the list! Watch your inbox.
+                </div>
+            </div>
+        </div>
+    
+        <div class="footer-bottom">
+            &copy; 2026 The Meat Pro Dubai. All Rights Reserved.
+        </div>
+    </footer>
+    
+    <style>
+        .main-footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 60px 8% 20px 8%;
+            margin-top: 80px;
+            border-top: 4px solid var(--primary-red, #C62828);
+        }
+    
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+    
+        .footer-section h3 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+    
+        .contact-list {
+            list-style: none;
+            padding: 0;
+        }
+    
+        .contact-list li {
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #bbb;
+            display: flex;
+            gap: 12px;
+            line-height: 1.4;
+        }
+    
+        .contact-list a {
+            color: #bbb;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+    
+        .contact-list a:hover {
+            color: var(--primary-red, #C62828);
+        }
+    
+        .newsletter-form {
+            display: flex;
+            gap: 5px;
+        }
+    
+        .newsletter-form input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 6px;
+            border: none;
+            background: #2a2a2a;
+            color: white;
+            outline: none;
+        }
+    
+        .newsletter-form button {
+            padding: 12px 20px;
+            background: var(--primary-red, #C62828);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+    
+        .newsletter-form button:hover {
+            background: #a51f1f;
+        }
+    
+        .footer-bottom {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            font-size: 0.8rem;
+            color: #666;
+        }
+    
+        @media (max-width: 768px) {
+            .footer-container { grid-template-columns: 1fr; }
+            .main-footer { padding: 40px 5%; }
+        }
+    </style>
+    
+    <script>
+        function handleSubscribe(e) {
+            e.preventDefault();
+            const email = document.getElementById('news-email').value;
+            const msg = document.getElementById('subs-msg');
+            
+            // You can ping your server.js here to save the email
+            console.log("Subscribing email:", email);
+            
+            document.getElementById('news-email').value = '';
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 5000);
+        }
+    </script>
 
     <script src="app.js"></script>
 </body>
