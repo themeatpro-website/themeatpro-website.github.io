@@ -3,89 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout | The Meat Pro Dubai</title>
+    <title>Checkout | The Meat Pro</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@900&display=swap" rel="stylesheet">
     <style>
-        :root { --red: #C62828; --dark: #1a1a1a; }
+        :root { --red: #C62828; --green: #25D366; --dark: #1a1a1a; }
         body { background: #f4f4f4; font-family: 'Noto Sans', sans-serif; margin: 0; padding: 20px; }
-        
-        .checkout-layout {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 30px;
-        }
-
-        .checkout-card {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
-
-        h2 { font-family: 'Roboto'; font-size: 1.8rem; margin-top: 0; color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 15px; }
-        
+        .checkout-layout { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 350px; gap: 30px; }
+        .checkout-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         .input-group { margin-bottom: 20px; }
         label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.9rem; color: #555; }
-        input, textarea, select { 
-            width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; 
-            box-sizing: border-box; font-size: 1rem; transition: border 0.3s;
-        }
+        input, textarea, select { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1rem; }
+        
+        /* Toggle Styling */
+        .toggle-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .toggle-btn { padding: 12px; border: 2px solid #eee; border-radius: 10px; background: white; cursor: pointer; font-weight: bold; text-align: center; transition: 0.3s; }
+        .toggle-btn.active { border-color: var(--red); background: #fff5f5; color: var(--red); }
 
-        .toggle-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .toggle-btn {
-            padding: 12px;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            background: white;
-            cursor: pointer;
-            font-weight: bold;
-            text-align: center;
-            transition: 0.3s;
-        }
-
-        .toggle-btn.active {
-            border-color: var(--red);
-            background: #fff5f5;
-            color: var(--red);
-        }
-
-        #error-box {
-            display: none;
-            background: #ffebee;
-            color: #c62828;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            border-left: 5px solid var(--red);
-            font-weight: 700;
-        }
-
-        .summary-card {
-            background: white;
-            padding: 25px;
-            border-radius: 20px;
-            height: fit-content;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
-
-        .total-row { border-top: 2px solid #eee; margin-top: 15px; padding-top: 15px; font-weight: 900; font-size: 1.2rem; display: flex; justify-content: space-between; }
-
-        .btn-place {
-            width: 100%; background: var(--red); color: white; border: none; padding: 20px; 
-            border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer; 
-            margin-top: 20px; transition: 0.3s;
-        }
+        /* Button Styling */
+        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+        .btn-place { width: 100%; background: var(--red); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 900; cursor: pointer; }
+        .btn-whatsapp { width: 100%; background: var(--green); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 900; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; }
         .btn-place:disabled { background: #ccc; cursor: not-allowed; }
-
+        
+        #error-box { display: none; background: #ffebee; color: #c62828; padding: 15px; border-radius: 10px; margin-bottom: 25px; border-left: 5px solid var(--red); font-weight: 700; }
+        .summary-card { background: white; padding: 25px; border-radius: 20px; height: fit-content; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .total-row { border-top: 2px solid #eee; margin-top: 15px; padding-top: 15px; font-weight: 900; font-size: 1.2rem; display: flex; justify-content: space-between; }
+        
         @media (max-width: 850px) { .checkout-layout { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -94,7 +38,6 @@
     <div class="checkout-layout">
         <div class="checkout-card">
             <h2>Checkout Details</h2>
-            
             <div id="error-box"></div>
 
             <label>Order Method</label>
@@ -115,18 +58,26 @@
 
             <div class="input-group" id="address-section">
                 <label>Dubai Delivery Address</label>
-                <textarea id="cust-address" rows="3" placeholder="Building, Villa, Area in Dubai"></textarea>
+                <textarea id="cust-address" rows="2" placeholder="Building, Villa, Area"></textarea>
             </div>
 
             <div class="input-group">
+                <label>Order Instructions (Optional)</label>
+                <textarea id="order-instructions" rows="2" placeholder="Example: Leave at door, cut the meat in small pieces, etc."></textarea>
+            </div>
+
+            <div class="input-group" id="payment-section">
                 <label>Payment Method</label>
                 <select id="payment-mode">
-                    <option value="Cash on Delivery">💵 Cash on Delivery / Collection</option>
-                    <option value="Card on Delivery">💳 Card on Delivery / Collection</option>
+                    <option value="Cash on Delivery">💵 Cash on Delivery</option>
+                    <option value="Card on Delivery">💳 Card on Delivery</option>
                 </select>
             </div>
 
-            <button class="btn-place" id="place-order-btn" onclick="submitOrder()">PLACE ORDER VIA WHATSAPP SYNC</button>
+            <div class="btn-group">
+                <button class="btn-place" id="place-order-btn" onclick="submitOrder('direct')">Order Now</button>
+                <button class="btn-whatsapp" onclick="submitOrder('whatsapp')">Order Via WhatsApp</button>
+            </div>
         </div>
 
         <div class="summary-card">
@@ -147,17 +98,22 @@
             currentMethod = m;
             document.getElementById('btn-delivery').classList.toggle('active', m === 'Delivery');
             document.getElementById('btn-collect').classList.toggle('active', m === 'Click and Collect');
+            
+            // HIDE address and payment choice if it's Store Pickup
             document.getElementById('address-section').style.display = (m === 'Delivery') ? 'block' : 'none';
+            document.getElementById('payment-section').style.display = (m === 'Delivery') ? 'block' : 'none';
         }
 
-        async function submitOrder() {
+        async function submitOrder(flow) {
             const btn = document.getElementById('place-order-btn');
             const errorBox = document.getElementById('error-box');
             
             const name = document.getElementById('cust-name').value;
             const phone = document.getElementById('cust-phone').value;
             const address = (currentMethod === 'Delivery') ? document.getElementById('cust-address').value : "Store Pickup - Al Jaddaf";
-            const payment = document.getElementById('payment-mode').value;
+            const instructions = document.getElementById('order-instructions').value;
+            const payment = (currentMethod === 'Delivery') ? document.getElementById('payment-mode').value : "Pay at Store";
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
             if(!name || !phone || (currentMethod === 'Delivery' && !address)) {
                 showError("Please complete all required fields.");
@@ -165,17 +121,24 @@
             }
 
             btn.disabled = true;
-            btn.innerText = "VALIDATING ADDRESS...";
+            btn.innerText = "CHECKING ADDRESS...";
             errorBox.style.display = 'none';
 
+            // Fixed Webhook Data: Now includes Item Details, Prices, and Instructions
             const orderData = {
                 id: Date.now(),
                 customer: name,
                 phone: phone,
                 address: address,
+                instructions: instructions,
                 payment: payment,
                 method: currentMethod,
-                items: JSON.parse(localStorage.getItem('cart') || '[]'),
+                items: cart.map(item => ({
+                    name: item.name,
+                    qty: item.quantity || 1,
+                    price_each: item.price,
+                    subtotal: (item.price * (item.quantity || 1)).toFixed(2)
+                })),
                 total: document.getElementById('summary-total').innerText
             };
 
@@ -189,24 +152,26 @@
                 const result = await response.json();
 
                 if (response.status === 403) {
-                    showError(`❌ AI BLOCK: ${result.message}`);
+                    showError(`❌ ${result.message}`);
                     btn.disabled = false;
-                    btn.innerText = "PLACE ORDER VIA WHATSAPP SYNC";
+                    btn.innerText = "SEND ORDER TO KITCHEN";
                 } else if (response.ok) {
-                    // Save for success page
                     localStorage.setItem('lastMeatOrderInfo', JSON.stringify({id: orderData.id, method: currentMethod}));
                     
-                    // --- WHATSAPP REDIRECT ---
-                    const waMsg = `*New Order: ${orderData.id}*%0A*Customer:* ${name}%0A*Method:* ${currentMethod}%0A*Payment:* ${payment}%0A*Address:* ${address}%0A*Total:* ${orderData.total}`;
-                    window.location.href = `https://wa.me/971589388096?text=${waMsg}`;
-                    
-                    // Note: Success.html should be handled after WA or as a separate flow. 
-                    // To ensure the kitchen gets it, the fetch above already happened.
+                    if (flow === 'whatsapp') {
+                        // Detailed WhatsApp Message
+                        let itemString = cart.map(i => `- ${i.name} (x${i.quantity || 1}): AED ${(i.price * (i.quantity || 1)).toFixed(2)}`).join('%0A');
+                        const waMsg = `*Meat Pro Order: ${orderData.id}*%0A%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Method:* ${currentMethod}%0A*Payment:* ${payment}%0A*Address:* ${address}%0A*Instructions:* ${instructions || 'None'}%0A%0A*Items:*%0A${itemString}%0A%0A*TOTAL: ${orderData.total}*`;
+                        window.location.href = `https://wa.me/971589388096?text=${waMsg}`;
+                    } else {
+                        window.location.href = "success.html";
+                    }
+                    localStorage.removeItem('cart');
                 }
             } catch (err) {
-                showError("Shop server offline. Please contact us directly.");
+                showError("Server offline. Order via WhatsApp instead.");
                 btn.disabled = false;
-                btn.innerText = "PLACE ORDER VIA WHATSAPP SYNC";
+                btn.innerText = "SEND ORDER TO KITCHEN";
             }
         }
 
@@ -216,7 +181,7 @@
             eb.style.display = 'block';
         }
 
-        // Initialize Summary
+        // Load summary
         (function() {
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
             let total = 0;
