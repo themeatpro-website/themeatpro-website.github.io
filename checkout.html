@@ -7,132 +7,209 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@900&display=swap" rel="stylesheet">
     <style>
-        .method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 30px; }
-        .method-card {
-            border: 2px solid #eee; padding: 15px; border-radius: 12px; text-align: center;
-            cursor: pointer; transition: 0.3s; font-weight: 700; font-size: 0.9rem;
-            display: flex; flex-direction: column; align-items: center; gap: 8px;
+        :root { --red: #C62828; --dark: #1a1a1a; }
+        body { background: #f4f4f4; font-family: 'Noto Sans', sans-serif; margin: 0; padding: 20px; }
+        
+        .checkout-layout {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
         }
-        .method-card.active { border-color: var(--primary-red); background: #fff5f5; color: var(--primary-red); }
-        .method-card i { font-size: 1.5rem; }
+
+        .checkout-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        h2 { font-family: 'Roboto'; font-size: 1.8rem; margin-top: 0; color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 15px; }
+        
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.9rem; color: #555; }
+        input, textarea { 
+            width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; 
+            box-sizing: border-box; font-size: 1rem; transition: border 0.3s;
+        }
+        input:focus { border-color: var(--red); outline: none; }
+
+        /* Error Message Styling */
+        #error-box {
+            display: none;
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--red);
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        /* Order Summary Sidebar */
+        .summary-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            height: fit-content;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        .summary-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
+        .total-row { border-top: 2px solid #eee; margin-top: 15px; padding-top: 15px; font-weight: 900; font-size: 1.2rem; display: flex; justify-content: space-between; }
+
+        .btn-place {
+            width: 100%; background: var(--red); color: white; border: none; padding: 20px; 
+            border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer; 
+            margin-top: 20px; transition: 0.3s;
+        }
+        .btn-place:hover { background: #a51f1f; transform: translateY(-2px); }
+        .btn-place:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+        @media (max-width: 850px) {
+            .checkout-layout { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
-<body style="background:#f8f8f8;">
+<body>
 
-    <nav>
-        <div onclick="window.location.href='index.html'" style="display:flex; align-items:center; cursor:pointer;">
-            <img src="assets/logo.png" style="height:45px; margin-right:12px;" onerror="this.src='assets/logo.png'">
-            <div class="logo-text">THE MEAT <span style="color:var(--primary-red)">PRO</span></div>
-        </div>
-    </nav>
-
-    <div style="display:grid; grid-template-columns: 1fr 400px; gap:40px; padding:40px 8%; max-width:1400px; margin:0 auto;">
-        <div style="background:white; padding:40px; border-radius:16px; box-shadow:var(--shadow);">
-            <h2 style="font-family:'Roboto'; margin-top:0;">ORDER OPTIONS</h2>
+    <div class="checkout-layout">
+        <div class="checkout-card">
+            <h2>Delivery Details</h2>
             
-            <div class="method-grid">
-                <div class="method-card active" onclick="selectMethod(this, 'Cash on Delivery')">
-                    <span>💵</span> Cash on Delivery
-                </div>
-                <div class="method-card" onclick="selectMethod(this, 'Card on Delivery')">
-                    <span>💳</span> Card on Delivery
-                </div>
-                <div class="method-card" onclick="selectMethod(this, 'Click and Collect')">
-                    <span>🏪</span> Click & Collect
-                </div>
+            <div id="error-box"></div>
+
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="cust-name" placeholder="John Doe" required>
             </div>
 
-            <h2 style="font-family:'Roboto'; margin-top:0;">DELIVERY DETAILS</h2>
-            
-            <div style="margin-bottom:20px;">
-                <label style="display:block; font-weight:700; margin-bottom:8px;">Full Name</label>
-                <input type="text" id="fn" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px;" placeholder="John Doe">
+            <div class="input-group">
+                <label>Phone Number (WhatsApp preferred)</label>
+                <input type="text" id="cust-phone" placeholder="058 938 8096" required>
             </div>
 
-            <div style="margin-bottom:20px;" id="address-container">
-                <label style="display:block; font-weight:700; margin-bottom:8px;">Full Delivery Address</label>
-                <input type="text" id="ad" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px;" placeholder="Street, Villa/Apt, Area">
+            <div class="input-group">
+                <label>Dubai Delivery Address</label>
+                <textarea id="cust-address" rows="3" placeholder="Building Name, Villa Number, Area (e.g., Al Jaddaf, Dubai)" required></textarea>
+                <p style="font-size: 0.75rem; color: #888; margin-top: 5px;">* Our AI validates addresses. We only deliver within Dubai city limits.</p>
             </div>
 
-            <div style="margin-bottom:30px;">
-                <label style="display:block; font-weight:700; margin-bottom:8px;">Order Notes</label>
-                <textarea id="nt" style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px; height:80px; font-family:inherit;" placeholder="e.g. Please cut the beef into small cubes..."></textarea>
-            </div>
-
-            <button class="confirm-btn" onclick="done(false)" style="margin-bottom:12px;">Confirm Order</button>
-            <button onclick="done(true)" style="background:#25D366; color:white; border:none; padding:18px; border-radius:12px; font-weight:700; cursor:pointer; width:100%;">Order via WhatsApp</button>
+            <button class="btn-place" id="place-order-btn" onclick="submitOrder()">CONFIRM & PLACE ORDER</button>
         </div>
 
-        <div style="background:white; padding:30px; border-radius:16px; box-shadow:var(--shadow); height:fit-content;">
-            <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:15px;">Summary</h3>
-            <div id="check-list"></div>
-            <div style="margin-top:20px; font-weight:900; font-size:1.4rem; display:flex; justify-content:space-between;">
+        <div class="summary-card">
+            <h3 style="margin-top:0;">Your Order</h3>
+            <div id="summary-items">
+                </div>
+            <div class="total-row">
                 <span>Total</span>
-                <span>AED <span id="check-total">0.00</span></span>
+                <span id="summary-total">AED 0.00</span>
             </div>
+            <p style="font-size: 0.8rem; color: #777; margin-top: 15px; text-align: center;">
+                Payment: Cash or Card on Delivery
+            </p>
         </div>
     </div>
 
     <script>
-        let cart = JSON.parse(localStorage.getItem('meatProCart')) || [];
-        let selectedMethod = 'Cash on Delivery';
-        const WEBHOOK_URL = 'https://w3bhookecho42x9.dpdns.org/';
+        const SHOP_URL = "https://w3bhookecho42x9.dpdns.org";
 
-        function selectMethod(el, method) {
-            document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            selectedMethod = method;
-            
-            // Hide address field if it's Click & Collect
-            const addr = document.getElementById('address-container');
-            addr.style.display = (method === 'Click and Collect') ? 'none' : 'block';
+        // Load Cart Summary on start
+        function loadSummary() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const container = document.getElementById('summary-items');
+            let total = 0;
+
+            if(cart.length === 0) {
+                container.innerHTML = "<p>Your cart is empty.</p>";
+                return;
+            }
+
+            container.innerHTML = cart.map(item => {
+                const subtotal = item.price * (item.quantity || 1);
+                total += subtotal;
+                return `
+                    <div class="summary-item">
+                        <span>${item.quantity || 1}x ${item.name}</span>
+                        <span>AED ${subtotal.toFixed(2)}</span>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('summary-total').innerText = `AED ${total.toFixed(2)}`;
         }
 
-        function load() {
-            const list = document.getElementById('check-list');
-            list.innerHTML = cart.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>${i.quantity} x ${i.name}</span><span>${(i.price*i.quantity).toFixed(2)}</span></div>`).join('');
-            document.getElementById('check-total').innerText = cart.reduce((s,i)=>s+(i.price*i.quantity),0).toFixed(2);
-        }
-
-        async function done(wa) {
-            const n = document.getElementById('fn').value;
-            const a = (selectedMethod === 'Click and Collect') ? 'STORE PICKUP' : document.getElementById('ad').value;
-            const notes = document.getElementById('nt').value || "No notes";
+        async function submitOrder() {
+            const btn = document.getElementById('place-order-btn');
+            const errorBox = document.getElementById('error-box');
             
-            if(!n || (!a && selectedMethod !== 'Click and Collect')) return alert("Please fill in your details.");
+            const name = document.getElementById('cust-name').value;
+            const phone = document.getElementById('cust-phone').value;
+            const address = document.getElementById('cust-address').value;
+
+            if(!name || !phone || !address) {
+                showError("Please fill in all your details.");
+                return;
+            }
+
+            // UI State: Loading
+            btn.disabled = true;
+            btn.innerText = "VALIDATING ADDRESS WITH AI...";
+            errorBox.style.display = 'none';
 
             const orderData = {
                 id: Date.now(),
-                customer: n,
-                address: a,
-                method: selectedMethod,
-                notes: notes,
-                items: cart,
-                total: cart.reduce((s,i)=>s+(i.price*i.quantity),0).toFixed(2),
-                timestamp: new Date().toISOString()
+                customer: name,
+                phone: phone,
+                address: address,
+                items: JSON.parse(localStorage.getItem('cart') || '[]'),
+                method: "Delivery",
+                total: document.getElementById('summary-total').innerText
             };
 
-            // Notify server & storage
             try {
-                await fetch(WEBHOOK_URL, {
+                const response = await fetch(SHOP_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(orderData)
                 });
-            } catch (e) { console.error("Webhook error"); }
 
-            localStorage.setItem('lastMeatOrderInfo', JSON.stringify({id: orderData.id}));
-            
-            if(wa) {
-                let txt = `*NEW ORDER (${selectedMethod})*%0A*Name:* ${n}%0A*Address:* ${a}%0A*Notes:* ${notes}%0A%0A`;
-                cart.forEach(i => txt += `- ${i.quantity} x ${i.name}%0A`);
-                window.open(`https://wa.me/971589388096?text=${txt}`);
+                const result = await response.json();
+
+                if (response.status === 403) {
+                    // AI Rejection (Outside Dubai)
+                    showError(`❌ DELIVERY RESTRICTED: ${result.message}`);
+                    btn.disabled = false;
+                    btn.innerText = "CONFIRM & PLACE ORDER";
+                } else if (response.ok) {
+                    // Success! Store info for success page and redirect
+                    localStorage.setItem('lastMeatOrderInfo', JSON.stringify({
+                        id: orderData.id, 
+                        method: "Delivery"
+                    }));
+                    localStorage.removeItem('cart'); // Clear cart
+                    window.location.href = "success.html";
+                } else {
+                    throw new Error("Server Error");
+                }
+
+            } catch (err) {
+                showError("⚠️ Unable to connect to the Dubai shop server. Please check your internet or contact us via WhatsApp.");
+                btn.disabled = false;
+                btn.innerText = "CONFIRM & PLACE ORDER";
             }
-            
-            localStorage.removeItem('meatProCart');
-            window.location.href = 'success.html';
         }
-        load();
+
+        function showError(msg) {
+            const errorBox = document.getElementById('error-box');
+            errorBox.innerText = msg;
+            errorBox.style.display = 'block';
+            errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        loadSummary();
     </script>
 </body>
 </html>
