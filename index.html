@@ -58,6 +58,73 @@
         .dropdown-content button:hover { background-color: #f8f8f8; color: #C62828; }
         .dropdown:hover .dropdown-content { display: block; }
 
+        /* CART SIDEBAR STYLES */
+        #cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 350px;
+            height: 100%;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2000;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #cart-sidebar.active { right: 0; }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f4f4f4;
+        }
+
+        #cart-items {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .cart-footer {
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+        }
+
+        .checkout-btn-link {
+            width: 100%;
+            background: #C62828;
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-weight: 900;
+            cursor: pointer;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .checkout-btn-link:hover { background: #a31f1f; }
+
+        .remove-item-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 1.4rem;
+            transition: 0.2s;
+        }
+
+        .remove-item-btn:hover { color: #C62828; }
+
         /* FOOTER STYLES */
         .main-footer {
             background: #1a1a1a;
@@ -130,7 +197,24 @@
     <main id="product-grid" style="display:none;"></main>
 
     <div id="product-modal" class="modal-overlay"></div>
-    <div id="cart-sidebar"></div>
+
+    <div id="cart-sidebar">
+        <div class="cart-header">
+            <h2 style="margin:0; font-family: 'Roboto'; font-size: 1.2rem;">YOUR BASKET</h2>
+            <button onclick="toggleCart()" style="background:none; border:none; font-size:2rem; cursor:pointer; line-height: 1;">&times;</button>
+        </div>
+        
+        <div id="cart-items">
+            </div>
+
+        <div class="cart-footer">
+            <div style="display:flex; justify-content:space-between; font-weight:900; font-size:1.2rem; margin-bottom:15px; color: #1a1a1a;">
+                <span>Total:</span>
+                <span>AED <span id="cart-total">0.00</span></span>
+            </div>
+            <a href="checkout.html" class="checkout-btn-link">Proceed to Checkout</a>
+        </div>
+    </div>
 
     <footer class="main-footer">
         <div class="footer-container">
@@ -179,7 +263,7 @@
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 userMenu.innerHTML = `
-                    <div class="auth-button-box" onclick="window.location.href='account.html'">
+                    <div class="auth-button-box">
                         👤 ${user.email.split('@')[0]}
                     </div>
                     <div class="dropdown-content">
@@ -198,7 +282,7 @@
                 userMenu.innerHTML = `<button class="auth-button-box" onclick="window.location.href='login.html'">Login / Sign Up</button>`;
             }
         });
-    }); // End DOMContentLoaded
+    });
 
     function handleSubscribe(e) {
         e.preventDefault();
