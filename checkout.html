@@ -91,117 +91,96 @@
     </div>
 
     <script>
-        const SHOP_URL = "https://w3bhookecho42x9.dpdns.org";
-        let currentMethod = "Delivery";
+    const SHOP_URL = "https://w3bhookecho42x9.dpdns.org";
+    let currentMethod = "Delivery";
 
-        function setMethod(m) {
-            currentMethod = m;
-            document.getElementById('btn-delivery').classList.toggle('active', m === 'Delivery');
-            document.getElementById('btn-collect').classList.toggle('active', m === 'Click and Collect');
-            document.getElementById('address-section').style.display = (m === 'Delivery') ? 'block' : 'none';
-            document.getElementById('payment-section').style.display = (m === 'Delivery') ? 'block' : 'none';
+    // --- 1. SETUP UI FUNCTIONS ---
+    function setMethod(m) {
+        currentMethod = m;
+        document.getElementById('btn-delivery').classList.toggle('active', m === 'Delivery');
+        document.getElementById('btn-collect').classList.toggle('active', m === 'Click and Collect');
+        document.getElementById('address-section').style.display = (m === 'Delivery') ? 'block' : 'none';
+        document.getElementById('payment-section').style.display = (m === 'Delivery') ? 'block' : 'none';
+    }
+
+    function showError(msg) {
+        const eb = document.getElementById('error-box');
+        eb.innerText = msg;
+        eb.style.display = 'block';
+    }
+
+    // --- 2. THE SUMMARY RENDERER (The fix for "nothing showing") ---
+    function renderSummary() {
+        // Look specifically for 'cart'
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const container = document.getElementById('summary-items');
+        const totalDisplay = document.getElementById('summary-total');
+        
+        console.log("Checkout reading cart:", cart); // Check F12 console for this!
+
+        if (cart.length === 0) {
+            container.innerHTML = "<p style='color:#888; padding:20px 0;'>Your cart is empty.</p>";
+            totalDisplay.innerText = "AED 0.00";
+            return;
         }
 
-        async function submitOrder(flow) {
-            const btn = document.getElementById('place-order-btn');
-            const errorBox = document.getElementById('error-box');
-            
-            const name = document.getElementById('cust-name').value;
-            const phone = document.getElementById('cust-phone').value;
-            const address = (currentMethod === 'Delivery') ? document.getElementById('cust-address').value : "Store Pickup - Al Jaddaf";
-            const instructions = document.getElementById('order-instructions').value;
-            const payment = (currentMethod === 'Delivery') ? document.getElementById('payment-mode').value : "Pay at Store";
-            
-            // Re-fetch cart for the final send
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        let total = 0;
+        container.innerHTML = cart.map(item => {
+            const itemPrice = parseFloat(item.price || 0);
+            const itemQty = parseInt(item.quantity || 1);
+            const subtotal = itemPrice * itemQty;
+            total += subtotal;
 
-            if(!name || !phone || (currentMethod === 'Delivery' && !address)) {
-                showError("Please fill in all required fields.");
-                return;
+            return `
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                    <span><strong>${itemQty}x</strong> ${item.name}</span>
+                    <span>AED ${subtotal.toFixed(2)}</span>
+                </div>
+            `;
+        }).join('');
+
+        totalDisplay.innerText = `AED ${total.toFixed(2)}`;
+    }
+
+    // --- 3. SUBMIT LOGIC ---
+    async function submitOrder(flow) {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        if(cart.length === 0) return showError("Your cart is empty!");
+
+        const name = document.getElementById('cust-name').value;
+        const phone = document.getElementById('cust-phone').value;
+        
+        if(!name || !phone) return showError("Please enter your name and phone.");
+
+        const orderData = {
+            id: Date.now(),
+            customer: name,
+            phone: phone,
+            items: cart,
+            total: document.getElementById('summary-total').innerText,
+            method: currentMethod,
+            address: currentMethod === 'Delivery' ? document.getElementById('cust-address').value : "Pickup",
+            instructions: document.getElementById('order-instructions').value || "None"
+        };
+
+        try {
+            const res = await fetch(SHOP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
+
+            if(res.ok) {
+                localStorage.removeItem('cart');
+                window.location.href = "success.html";
             }
-
-            btn.disabled = true;
-            btn.innerText = "VALIDATING...";
-            errorBox.style.display = 'none';
-
-            const orderData = {
-                id: Date.now(),
-                customer: name,
-                phone: phone,
-                address: address,
-                instructions: instructions || "None", // Fixed "undefined"
-                payment: payment,
-                method: currentMethod,
-                items: cart,
-                total: document.getElementById('summary-total').innerText.replace('AED ', '') // Send just the number
-            };
-
-            try {
-                const response = await fetch(SHOP_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(orderData)
-                });
-
-                if (response.status === 403) {
-                    const result = await response.json();
-                    showError(`❌ AI BLOCK: ${result.message}`);
-                    btn.disabled = false;
-                    btn.innerText = "SEND ORDER TO KITCHEN";
-                } else if (response.ok) {
-                    localStorage.setItem('lastMeatOrderInfo', JSON.stringify({id: orderData.id, method: currentMethod}));
-                    
-                    if (flow === 'whatsapp') {
-                        let itemStr = cart.map(i => `- ${i.name} (x${i.quantity || 1})`).join('%0A');
-                        const waMsg = `*Meat Pro Order: ${orderData.id}*%0A%0A*Name:* ${name}%0A*Method:* ${currentMethod}%0A*Note:* ${instructions || 'None'}%0A%0A*Items:*%0A${itemStr}%0A%0A*Total: AED ${orderData.total}*`;
-                        window.location.href = `https://wa.me/971589388096?text=${waMsg}`;
-                    } else {
-                        window.location.href = "success.html";
-                    }
-                    localStorage.removeItem('cart');
-                }
-            } catch (err) {
-                showError("Connection failed. Try the WhatsApp button.");
-                btn.disabled = false;
-                btn.innerText = "SEND ORDER TO KITCHEN";
-            }
+        } catch(e) {
+            showError("Connection failed. Try WhatsApp instead.");
         }
+    }
 
-        function showError(msg) {
-            const eb = document.getElementById('error-box');
-            eb.innerText = msg;
-            eb.style.display = 'block';
-        }
-
-        // --- IMPROVED SUMMARY LOGIC ---
-        (function() {
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            console.log("Cart Data Detected:", cart); // View this in F12 Console
-            
-            let total = 0;
-            const container = document.getElementById('summary-items');
-            
-            if (cart.length === 0) {
-                container.innerHTML = "<p style='color:#888;font-size:0.8rem;'>Your cart is empty. Please add items from the shop.</p>";
-                return;
-            }
-
-            container.innerHTML = cart.map(i => {
-                // Handle different possible naming conventions for price and quantity
-                const price = parseFloat(i.price || i.itemPrice || i.cost || 0);
-                const qty = parseInt(i.quantity || i.qty || 1);
-                const sub = price * qty;
-                total += sub;
-                
-                return `<div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:8px;border-bottom:1px dashed #eee;padding-bottom:5px;">
-                            <span><strong>${qty}x</strong> ${i.name || 'Unknown Item'}</span>
-                            <span>AED ${sub.toFixed(2)}</span>
-                        </div>`;
-            }).join('');
-            
-            // We only add "AED" here, not in the data send, to avoid "AED AED"
-            document.getElementById('summary-total').innerText = `AED ${total.toFixed(2)}`;
-        })();
-    </script>
+    // --- 4. INITIALIZE ---
+    document.addEventListener('DOMContentLoaded', renderSummary);
+</script>
 </body>
 </html>
