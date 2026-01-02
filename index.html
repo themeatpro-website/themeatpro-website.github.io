@@ -25,7 +25,7 @@
         }
 
         .user-email-display {
-            color: white; /* Changed to white to look good on the dark nav */
+            color: white;
             font-size: 0.85rem;
             cursor: pointer;
             padding: 8px 12px;
@@ -62,8 +62,56 @@
         .dropdown-content button:hover { background-color: #f1f1f1; }
         .dropdown:hover .dropdown-content { display: block; }
 
-        /* Ensuring nav looks balanced */
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 10px 8%; background: #1a1a1a; color: white; }
+        /* FOOTER STYLES */
+        .main-footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 60px 8% 20px 8%;
+            margin-top: 80px;
+            border-top: 4px solid #C62828;
+        }
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .footer-section h3 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+        .contact-list { list-style: none; padding: 0; }
+        .contact-list li {
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #bbb;
+            display: flex;
+            gap: 12px;
+            line-height: 1.4;
+        }
+        .contact-list a { color: #bbb; text-decoration: none; transition: 0.3s; }
+        .contact-list a:hover { color: #C62828; }
+        .newsletter-form { display: flex; gap: 5px; }
+        .newsletter-form input {
+            flex: 1; padding: 12px; border-radius: 6px; border: none;
+            background: #2a2a2a; color: white; outline: none;
+        }
+        .newsletter-form button {
+            padding: 12px 20px; background: #C62828; color: white;
+            border: none; border-radius: 6px; font-weight: bold; cursor: pointer;
+        }
+        .footer-bottom {
+            text-align: center; margin-top: 60px; padding-top: 20px;
+            border-top: 1px solid #333; font-size: 0.8rem; color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .footer-container { grid-template-columns: 1fr; }
+            .main-footer { padding: 40px 5%; }
+        }
     </style>
 </head>
 <body>
@@ -78,7 +126,6 @@
             <div id="user-menu" class="dropdown">
                 <a href="login.html" class="auth-button">Login / Sign Up</a>
             </div>
-
             <button class="add-btn" onclick="toggleCart()">Cart (<span id="cart-count">0</span>)</button>
         </div>
     </nav>
@@ -114,47 +161,10 @@
     <main id="product-grid" style="display:none;"></main>
 
     <div id="product-modal" class="modal-overlay">
-        <div class="modal-left">
-            <img id="modal-img" src="" alt="Product" onerror="this.src='assets/logo.png'">
         </div>
-        <div class="modal-right">
-            <button class="close-big-card" onclick="closeModal()">&larr; Back to Shop</button>
-            <h1 id="modal-name" style="font-family:'Roboto'; font-size:2.7rem; margin:0 0 10px 0; line-height:1;"></h1>
-            <div class="price-tag" style="font-size:2rem; margin-bottom:20px;">
-                <img src="assets/currency-logo.png" class="currency-icon" alt="AED">
-                <span id="modal-price-val"></span>
-            </div>
-            <p id="modal-long-desc" style="color:#555; line-height:1.8; font-size:1.15rem; margin-bottom:40px;"></p>
-            <div style="border-top:1px solid #eee; padding-top:30px;">
-                <div style="font-weight:700; margin-bottom:15px; color:#888; font-size:0.9rem; letter-spacing:1px;">SELECT QUANTITY</div>
-                <div class="qty-controls">
-                    <button onclick="adjustModalQty(-1)">-</button>
-                    <input type="number" id="modal-qty-input" value="1" readonly>
-                    <button onclick="adjustModalQty(1)">+</button>
-                </div>
-                <button id="modal-add-btn" class="confirm-btn" style="margin-top:20px; padding:25px; font-size:1.3rem; letter-spacing:1px;">
-                    ADD TO MY ORDER
-                </button>
-            </div>
-        </div>
-    </div>
 
     <div id="cart-sidebar">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-            <h2 style="font-family:'Roboto'; margin:0; font-size:1.5rem;">YOUR ORDER</h2>
-            <button onclick="toggleCart()" class="close-cart-btn"><span>&times;</span></button>
         </div>
-        <div id="cart-items" style="flex-grow:1; overflow-y:auto;"></div>
-        <div style="margin-top:auto; padding-top:25px; border-top:2px solid #eee;">
-            <div style="display:flex; justify-content:space-between; font-weight:900; font-size:1.6rem; margin-bottom:25px;">
-                <span>Total</span>
-                <span style="color:#C62828;">AED <span id="cart-total">0.00</span></span>
-            </div>
-            <button class="confirm-btn" onclick="window.location.href='checkout.html'">
-                PROCEED TO CHECKOUT
-            </button>
-        </div>
-    </div>
 
     <footer class="main-footer">
         <div class="footer-container">
@@ -163,23 +173,28 @@
                     THE MEAT <span style="color:#C62828">PRO</span>
                 </div>
                 <p style="font-size: 0.9rem; line-height: 1.6; color: #bbb;">
-                    Premium quality cuts delivered straight to your door across Dubai.
+                    Premium quality cuts, expertly prepared and delivered straight to your door across Dubai. Taste the difference of hormone-free, locally sourced meat.
                 </p>
             </div>
+
             <div class="footer-section">
                 <h3>CONTACT US</h3>
                 <ul class="contact-list">
-                    <li><span>📍</span> Shop #4 - Al Jaddaf - Dubai</li>
-                    <li><span>📞</span> <a href="tel:+971589388096">058 938 8096</a></li>
+                    <li><span>📍</span> Shop #4 - Azurite Tower - Ibn Al Zahrawi St - Al Jaddaf - Dubai</li>
+                    <li><span>📞</span> <a href="tel:+971589388096">058 938 8096</a> (Call & WhatsApp)</li>
+                    <li><span>📧</span> <a href="mailto:info@themeatpro.com">info@themeatpro.com</a></li>
+                    <li><span>🛠️</span> <a href="mailto:support@themeatpro.com">support@themeatpro.com</a></li>
                 </ul>
             </div>
+
             <div class="footer-section">
-                <h3>NEWSLETTER</h3>
+                <h3>WEEKLY NEWSLETTER</h3>
+                <p style="font-size: 0.9rem; color: #bbb; margin-bottom: 15px;">Get weekly recipes, grill tips, and exclusive discounts.</p>
                 <form class="newsletter-form" onsubmit="handleSubscribe(event)">
-                    <input type="email" id="news-email" placeholder="Your Email" required>
+                    <input type="email" id="news-email" placeholder="Your Email Address" required>
                     <button type="submit">SUBSCRIBE</button>
                 </form>
-                <div id="subs-msg" style="margin-top: 10px; font-size: 0.8rem; color: #2e7d32; display: none;">✓ Subscribed!</div>
+                <div id="subs-msg" style="margin-top: 10px; font-size: 0.8rem; color: #2e7d32; display: none;">✓ You're on the list!</div>
             </div>
         </div>
         <div class="footer-bottom">&copy; 2026 The Meat Pro Dubai. All Rights Reserved.</div>
@@ -199,12 +214,9 @@
             appId: "1:680467664784:web:9ef0a533bf354926f16d15" 
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 
         const userMenu = document.getElementById('user-menu');
-
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 userMenu.innerHTML = `
@@ -216,9 +228,7 @@
                         <button id="header-logout">Logout</button>
                     </div>
                 `;
-
-                document.getElementById('header-logout').addEventListener('click', (e) => {
-                    e.stopPropagation();
+                document.getElementById('header-logout').addEventListener('click', () => {
                     firebase.auth().signOut().then(() => {
                         localStorage.removeItem('userProfile');
                         window.location.reload();
@@ -234,6 +244,7 @@
         e.preventDefault();
         document.getElementById('subs-msg').style.display = 'block';
         document.getElementById('news-email').value = '';
+        setTimeout(() => { document.getElementById('subs-msg').style.display = 'none'; }, 5000);
     }
     </script>
     <script src="app.js"></script>
