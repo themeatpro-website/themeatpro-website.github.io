@@ -125,21 +125,20 @@
             errorBox.style.display = 'none';
 
             // Fixed Webhook Data: Now includes Item Details, Prices, and Instructions
+            // REPLACE your current orderData variable with this:
             const orderData = {
                 id: Date.now(),
                 customer: name,
                 phone: phone,
                 address: address,
-                instructions: instructions,
+                // Change 'instructions' to 'notes' if your display uses 'notes', 
+                // or ensure your display script is looking for 'instructions'
+                instructions: instructions || "No special instructions", 
                 payment: payment,
                 method: currentMethod,
-                items: cart.map(item => ({
-                    name: item.name,
-                    qty: item.quantity || 1,
-                    price_each: item.price,
-                    subtotal: (item.price * (item.quantity || 1)).toFixed(2)
-                })),
-                total: document.getElementById('summary-total').innerText
+                items: cart, // Sending the full cart array
+                // Ensure this matches the string "AED XX.XX"
+                total: document.getElementById('summary-total').innerText 
             };
 
             try {
