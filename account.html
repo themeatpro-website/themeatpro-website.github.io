@@ -113,7 +113,7 @@
 
             async function fetchProfile(uid) {
                 try {
-                    const response = await fetch(`${SERVER_URL}/api/get-profile/${uid}`);
+                    const response = await fetch(`${SERVER_URL}/api/get-profile?uid=${uid}`);
                     const data = await response.json();
                     if (!data.error) {
                         document.getElementById('profile-name').value = data.name || "";
