@@ -177,14 +177,17 @@
         btn.innerText = "SENDING...";
     
         try {
+            const user = firebase.auth().currentUser;
             const response = await fetch(SHOP_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    id: orderID,        // Matches 'id' in backend
-                    name: name,         // Matches 'name' in backend
-                    address: address,   // Matches 'address' in backend
-                    cart: cart.map(i => ({ item: i.name, qty: i.quantity })) // Matches 'cart' schema
+                    id: orderID,
+                    name: name,
+                    address: address,
+                    userId: user ? user.uid : "guest", // SEND THE UID HERE
+                    total: totalAmount,
+                    cart: cart.map(i => ({ item: i.name, qty: i.quantity }))
                 })
             });
     
