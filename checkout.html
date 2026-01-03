@@ -155,7 +155,6 @@
         const phone = document.getElementById('cust-phone').value;
         const address = (currentMethod === 'Delivery') ? document.getElementById('cust-address').value : "Store Pickup";
         
-        // Calculate total as a number for the backend
         const totalAmount = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
     
         if(!name || !phone || (currentMethod === 'Delivery' && !address)) {
@@ -165,6 +164,7 @@
     
         const orderID = "ORD-" + Date.now().toString().slice(-6);
     
+        // WhatsApp Flow (Fallback)
         if (flow === 'whatsapp') {
             let itemStr = cart.map(i => `- ${i.name} (x${i.quantity})`).join('\n');
             const waMsg = encodeURIComponent(`*New Order #${orderID}*\n*Customer:* ${name}\n*Address:* ${address}\n\n*Items:*\n${itemStr}`);
@@ -173,37 +173,43 @@
             return;
         }
     
+        // Server Flow
         btn.disabled = true;
-        btn.innerText = "SENDING...";
+        btn.innerText = "SENDING TO KITCHEN...";
     
         try {
             const user = firebase.auth().currentUser;
+            
             const response = await fetch(SHOP_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json'
+                },
+                mode: 'cors', // Ensure CORS is enabled
                 body: JSON.stringify({
                     id: orderID,
                     name: name,
                     address: address,
-                    userId: user ? user.uid : "guest", // SEND THE UID HERE
+                    userId: user ? user.uid : "guest",
                     total: totalAmount,
                     cart: cart.map(i => ({ item: i.name, qty: i.quantity }))
                 })
             });
     
-            const result = await response.json();
-    
             if (response.ok) {
                 localStorage.removeItem('cart');
                 window.location.href = `success.html?id=${orderID}`;
             } else {
-                alert(result.message || "Order rejected.");
+                const result = await response.json();
+                alert(result.error || "Order rejected by server.");
                 btn.disabled = false;
                 btn.innerText = "SEND ORDER TO KITCHEN";
             }
         } catch (err) {
-            alert("Connection Error. Please use WHATSAPP.");
+            console.error("Fetch Error:", err);
+            alert("Connection Error. Please check your internet or use WHATSAPP.");
             btn.disabled = false;
+            btn.innerText = "SEND ORDER TO KITCHEN";
         }
     }
     // Auto-fill from account data
