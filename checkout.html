@@ -115,7 +115,7 @@
 
     <script>
     // Pointing to your PUBLIC DPDNS URL so GitHub can actually find your PC
-    const SHOP_URL = "https://w3bhookecho42x9.dpdns.org"; 
+    const SHOP_URL = "https://themeatpro-backend.vercel.app/api/order-webhook"; 
     let currentMethod = "Delivery";
 
     function setMethod(m) {
@@ -154,46 +154,44 @@
         const name = document.getElementById('cust-name').value;
         const phone = document.getElementById('cust-phone').value;
         const address = (currentMethod === 'Delivery') ? document.getElementById('cust-address').value : "Store Pickup";
-        const total = document.getElementById('summary-total').innerText;
-
+        
+        // Calculate total as a number for the backend
+        const totalAmount = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+    
         if(!name || !phone || (currentMethod === 'Delivery' && !address)) {
             alert("Please fill in all required fields.");
             return;
         }
-
-        const orderID = Date.now().toString().slice(-6);
-        let itemStr = cart.map(i => `- ${i.name} (x${i.quantity})`).join('\n');
-        
+    
+        const orderID = "ORD-" + Date.now().toString().slice(-6);
+    
         if (flow === 'whatsapp') {
-            const waMsg = encodeURIComponent(`*New Meat Pro Order #${orderID}*\n\n*Customer:* ${name}\n*Phone:* ${phone}\n*Method:* ${currentMethod}\n*Address:* ${address}\n\n*Items:*\n${itemStr}\n\n*Total:* ${total}`);
+            let itemStr = cart.map(i => `- ${i.name} (x${i.quantity})`).join('\n');
+            const waMsg = encodeURIComponent(`*New Order #${orderID}*\n*Customer:* ${name}\n*Address:* ${address}\n\n*Items:*\n${itemStr}`);
             window.location.href = `https://wa.me/971589388096?text=${waMsg}`;
             localStorage.removeItem('cart');
             return;
         }
-
+    
         btn.disabled = true;
         btn.innerText = "SENDING...";
-
+    
         try {
             const response = await fetch(SHOP_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    id: orderID,
-                    customer: name,
-                    phone: phone,
-                    address: address,
-                    items: cart,
-                    total: total,
-                    method: currentMethod
+                    id: orderID,        // Matches 'id' in backend
+                    name: name,         // Matches 'name' in backend
+                    address: address,   // Matches 'address' in backend
+                    cart: cart.map(i => ({ item: i.name, qty: i.quantity })) // Matches 'cart' schema
                 })
             });
-
+    
             const result = await response.json();
-
+    
             if (response.ok) {
                 localStorage.removeItem('cart');
-                // Redirect to success.html with the ID
                 window.location.href = `success.html?id=${orderID}`;
             } else {
                 alert(result.message || "Order rejected.");
@@ -201,13 +199,10 @@
                 btn.innerText = "SEND ORDER TO KITCHEN";
             }
         } catch (err) {
-            console.error(err);
-            alert("Connection Error. Please use WHATSAPP button.");
+            alert("Connection Error. Please use WHATSAPP.");
             btn.disabled = false;
-            btn.innerText = "SEND ORDER TO KITCHEN";
         }
     }
-
     // Auto-fill from account data
     document.addEventListener('DOMContentLoaded', async () => {
         renderSummary(); // Your existing function
