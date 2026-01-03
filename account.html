@@ -99,7 +99,7 @@
             
             if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
             const db = firebase.firestore();
-            const SERVER_URL = "https://w3bhookecho42x9.dpdns.org";
+            const SERVER_URL = "https://themeatpro-backend.vercel.app";
 
             firebase.auth().onAuthStateChanged(user => {
                 if (user) {
@@ -179,9 +179,8 @@
                     phone: document.getElementById('profile-phone').value,
                     address: document.getElementById('profile-address').value
                 };
-
+            
                 status.innerText = "Saving...";
-                status.style.color = "orange";
                 try {
                     const res = await fetch(`${SERVER_URL}/api/save-profile`, {
                         method: 'POST',
@@ -189,15 +188,16 @@
                         body: JSON.stringify(profileData)
                     });
                     if (res.ok) {
-                        status.innerText = "✅ Details Updated Successfully!";
+                        status.innerText = "✅ Updated!";
                         status.style.color = "green";
+                        // Cache locally for checkout auto-fill
+                        localStorage.setItem('userProfile', JSON.stringify(profileData));
                     }
                 } catch (e) {
-                    status.innerText = "❌ Connection Error.";
-                    status.style.color = "red";
+                    status.innerText = "❌ Error.";
                 }
             };
-
+            
             document.getElementById('logout-btn').onclick = () => {
                 firebase.auth().signOut().then(() => {
                     localStorage.removeItem('userProfile');
