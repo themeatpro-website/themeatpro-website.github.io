@@ -96,64 +96,69 @@
         // 1. Get Order ID from the browser URL (e.g., success.html?id=12345)
         const params = new URLSearchParams(window.location.search);
         const orderId = params.get('id');
-        
+        const BACKEND_URL = "https://themeatpro-backend.vercel.app"; // Your production Vercel URL
+    
         if (orderId) {
             document.getElementById('display-order-id').innerText = `#${orderId}`;
         } else {
             document.getElementById('sub-text').innerText = "We couldn't find your order ID, but the kitchen has received your request.";
         }
-
+    
         // 2. The Polling Logic
         async function checkOrderStatus() {
             if (!orderId) return;
-
+    
             try {
-                // Pointing to your Master Server on 4427
-                const response = await fetch(`http://localhost:4427/api/order-status/${orderId}`);
-                
+                // Updated to use the Vercel production URL and the query param (?id=) structure
+                const response = await fetch(`${BACKEND_URL}/api/order-status?id=${orderId}`);
+    
                 if (!response.ok) return;
-                
+    
                 const data = await response.json();
-
+    
+                // Logic remains the same: trigger UI update if status is 'prepared'
                 if (data.status === 'prepared') {
-                    handleOrderReady(data.method);
+                    // Note: Ensure your backend includes 'method' in the response if you want dynamic messages
+                    handleOrderReady(data.method || "Delivery"); 
                 }
             } catch (err) {
                 console.error("Connection to kitchen lost. Retrying...");
             }
         }
-
+    
         // 3. Update UI when ready
         function handleOrderReady(method) {
             const pendingBadge = document.getElementById('status-pending');
             const readyBadge = document.getElementById('status-ready');
             const heading = document.getElementById('main-heading');
             const subText = document.getElementById('sub-text');
-
-            pendingBadge.style.display = 'none';
-            readyBadge.style.display = 'inline-block';
-            heading.innerText = "Order Complete!";
-
+    
+            if (pendingBadge) pendingBadge.style.display = 'none';
+            if (readyBadge) readyBadge.style.display = 'inline-block';
+            if (heading) heading.innerText = "Order Complete!";
+    
             // DYNAMIC MESSAGE LOGIC
             if (method === "Click and Collect") {
-                readyBadge.innerHTML = "✅ Ready for Collection";
-                subText.innerHTML = "Your order is packed and waiting at the <strong>Al Jaddaf Store</strong> counter.";
+                if (readyBadge) readyBadge.innerHTML = "✅ Ready for Collection";
+                if (subText) subText.innerHTML = "Your order is packed and waiting at the <strong>Al Jaddaf Store</strong> counter.";
             } else {
-                readyBadge.innerHTML = "✅ Out for Delivery";
-                subText.innerHTML = "Our dispatch team has finished preparing your order. Our driver is now on the way!";
+                if (readyBadge) readyBadge.innerHTML = "✅ Out for Delivery";
+                if (subText) subText.innerHTML = "Our dispatch team has finished preparing your order. Our driver is now on the way!";
             }
-
+    
             // Notification Sound
             const sound = document.getElementById('notif-sound');
-            sound.play().catch(() => console.log("Sound play delayed until user interaction."));
-
+            if (sound) {
+                sound.play().catch(() => console.log("Sound play delayed until user interaction."));
+            }
+    
             // Stop the loop once the order is ready
             clearInterval(pollingInterval);
         }
-
-        // 4. Run check every 4 seconds
-        const pollingInterval = setInterval(checkOrderStatus, 4000);
-        
+    
+        // 4. Run check every 5 seconds for production efficiency
+        const pollingInterval = setInterval(checkOrderStatus, 5000);
+    
         // Run once immediately on load
         checkOrderStatus();
     </script>
