@@ -126,13 +126,11 @@
             async function fetchOrders(uid) {
                 const ordersList = document.getElementById('orders-list');
                 try {
-                    // This queries the 'orders' collection for the current user
-                    const snapshot = await db.collection("orders")
-                        .where("userId", "==", uid)
-                        .orderBy("orderDate", "desc")
-                        .get();
-
-                    if (snapshot.empty) {
+                    // We now call your Vercel backend instead of the local db variable
+                    const response = await fetch(`${SERVER_URL}/api/get-orders?uid=${uid}`);
+                    const orders = await response.json();
+            
+                    if (!orders || orders.length === 0) {
                         ordersList.innerHTML = `
                             <div style="text-align:center; padding: 40px; color:#bbb;">
                                 <div style="font-size: 3rem; margin-bottom:10px;">📦</div>
@@ -140,26 +138,30 @@
                             </div>`;
                         return;
                     }
-
-                    ordersList.innerHTML = snapshot.docs.map(doc => {
-                        const order = doc.data();
-                        const date = new Date(order.orderDate).toLocaleDateString('en-AE', { 
-                            year: 'numeric', month: 'long', day: 'numeric' 
+            
+                    ordersList.innerHTML = orders.map(order => {
+                        // Handle different date formats (string or Firestore timestamp)
+                        const dateObj = order.orderDate?.seconds ? new Date(order.orderDate.seconds * 1000) : new Date(order.orderDate);
+                        const date = dateObj.toLocaleDateString('en-AE', {
+                            year: 'numeric', month: 'long', day: 'numeric'
                         });
+            
                         return `
                             <div class="order-item">
                                 <div class="order-header">
-                                    <span class="order-id">#${order.orderNumber}</span>
+                                    <span class="order-id">#${order.id.slice(-6).toUpperCase()}</span>
                                     <span class="order-date">${date}</span>
                                 </div>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <span style="font-size:0.85rem; color:#666;">
-                                        ${order.items.map(i => i.name).join(', ')}
+                                        ${Array.isArray(order.cart) ? order.cart.map(i => i.item).join(', ') : 'Order Details'}
                                     </span>
-                                    <span class="order-total">AED ${order.total.toFixed(2)}</span>
+                                    <span class="order-total">AED ${parseFloat(order.total || 0).toFixed(2)}</span>
                                 </div>
                                 <div style="margin-top:12px;">
-                                    <span class="order-status">${order.status || 'Processing'}</span>
+                                    <span class="order-status" style="background: ${order.status === 'prepared' ? '#e8f5e9' : '#fff3e0'}; color: ${order.status === 'prepared' ? '#2e7d32' : '#ef6c00'};">
+                                        ${order.status || 'Processing'}
+                                    </span>
                                 </div>
                             </div>
                         `;
