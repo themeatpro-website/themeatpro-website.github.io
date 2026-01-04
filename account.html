@@ -43,6 +43,13 @@
         .order-total { color: #C62828; font-weight: 900; font-size: 1.1rem; }
         .order-status { font-size: 0.7rem; background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; font-weight: bold; }
 
+        /* New Action Buttons */
+        .order-actions { display: flex; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee; }
+        .btn-track { flex: 1; background: #2e7d32; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-track:hover { background: #1b5e20; }
+        .btn-reorder { flex: 1; background: #ef6c00; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-reorder:hover { background: #e65100; }
+
         @media (max-width: 850px) { .container { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -87,6 +94,24 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <script>
+    // --- REORDER LOGIC ---
+    function reorderItems(encodedCart) {
+        try {
+            const items = JSON.parse(decodeURIComponent(escape(atob(encodedCart))));
+            const cartToSave = items.map(i => ({
+                name: i.item,
+                quantity: i.qty,
+                price: i.price || 0 
+            }));
+
+            localStorage.setItem('cart', JSON.stringify(cartToSave));
+            alert("Items added to cart! Redirecting to checkout...");
+            window.location.href = 'checkout.html';
+        } catch (e) {
+            alert("Could not reorder. Please add items manually.");
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const firebaseConfig = {
             apiKey: "AIzaSyC0LqPa73C7OG295rY105XApK57SQ05et4", 
@@ -100,12 +125,11 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const SERVER_URL = "https://themeatpro-backend.vercel.app";
 
-        // SINGLE AUTH LISTENER
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('user-email').value = user.email;
                 fetchProfile(user.uid);
-                fetchOrders(user.uid); // Starts the history fetch
+                fetchOrders(user.uid);
             } else {
                 window.location.href = "login.html";
             }
@@ -130,7 +154,6 @@
                 if (!response.ok) throw new Error("Server Error");
                 
                 const orders = await response.json();
-                console.table(orders); // Check F12 Console for data!
 
                 if (!orders || orders.length === 0) {
                     ordersList.innerHTML = `<p style="text-align:center; padding: 40px; color:#bbb;">No orders found.</p>`;
@@ -143,10 +166,13 @@
                         year: 'numeric', month: 'short', day: 'numeric'
                     });
 
+                    // Prepare cart for reorder button (Base64 encoded to keep HTML clean)
+                    const cartData = btoa(unescape(encodeURIComponent(JSON.stringify(order.cart || []))));
+
                     return `
                         <div class="order-item">
                             <div class="order-header">
-                                <span class="order-id">#${order.id.slice(-6).toUpperCase()}</span>
+                                <span class="order-id">#${order.id.toUpperCase()}</span>
                                 <span class="order-date">${date}</span>
                             </div>
                             <div style="font-size:0.9rem; color:#444; margin-bottom:10px;">
@@ -158,6 +184,10 @@
                                     ${order.status || 'pending'}
                                 </span>
                             </div>
+                            <div class="order-actions">
+                                <button class="btn-track" onclick="window.location.href='success.html?id=${order.id}'">Track Order</button>
+                                <button class="btn-reorder" onclick="reorderItems('${cartData}')">Order Again</button>
+                            </div>
                         </div>
                     `;
                 }).join('');
@@ -166,7 +196,6 @@
             }
         }
 
-        // SAVE BUTTON LOGIC
         document.getElementById('save-btn').onclick = async () => {
             const user = firebase.auth().currentUser;
             const status = document.getElementById('save-status');
@@ -192,7 +221,6 @@
             } catch (e) { status.innerText = "❌ Error."; }
         };
         
-        // LOGOUT LOGIC
         document.getElementById('logout-btn').onclick = () => {
             firebase.auth().signOut().then(() => {
                 localStorage.removeItem('userProfile');
