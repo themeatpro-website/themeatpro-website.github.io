@@ -10,6 +10,7 @@
             --red: #C62828;
             --green: #2e7d32;
             --orange: #ef6c00;
+            --grey: #757575;
         }
         body { 
             font-family: 'Noto Sans', sans-serif; 
@@ -41,21 +42,30 @@
             margin-top: 20px; 
             font-size: 1.1rem; 
             text-transform: uppercase;
+            transition: all 0.4s ease;
         }
-        .pending { 
+
+        /* Status Colors */
+        .status-pending { 
+            background: #f5f5f5; 
+            color: var(--grey); 
+            border: 1px solid #ddd; 
+        }
+        .status-prepared { 
             background: #fff3e0; 
             color: var(--orange); 
-            border: 1px solid #ffe0b2; 
+            border: 2px solid var(--orange);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .ready { 
+        .status-delivery { 
             background: #e8f5e9; 
             color: var(--green); 
             border: 2px solid var(--green); 
-            display: none; 
             animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+
         h1 { margin-bottom: 5px; font-weight: 900; }
-        #sub-text { color: #666; line-height: 1.5; margin-bottom: 30px; }
+        #sub-text { color: #666; line-height: 1.5; margin-bottom: 30px; height: 50px; }
         
         .pulse { animation: pulse-animation 2s infinite; }
         @keyframes pulse-animation { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
@@ -78,12 +88,13 @@
 
     <div class="status-card">
         <h1 id="main-heading">Order Received</h1>
-        <p id="sub-text">The butcher is currently preparing your selection.</p>
+        <p id="sub-text">Connecting to the kitchen...</p>
         
         <div class="order-id" id="display-order-id">#0000</div>
 
-        <div id="status-pending" class="status-badge pending pulse">⏲️ Butcher is cutting...</div>
-        <div id="status-ready" class="status-badge ready"></div>
+        <div id="status-display" class="status-badge status-pending pulse">
+            Checking Status...
+        </div>
 
         <hr style="margin: 40px 0; border: 0; border-top: 1px solid #eee;">
         
@@ -93,73 +104,76 @@
     <audio id="notif-sound" src="assets/notif.mp3" preload="auto"></audio>
 
     <script>
-        // 1. Get Order ID from the browser URL (e.g., success.html?id=12345)
         const params = new URLSearchParams(window.location.search);
         const orderId = params.get('id');
-        const BACKEND_URL = "https://themeatpro-backend.vercel.app"; // Your production Vercel URL
-    
+        const BACKEND_URL = "https://themeatpro-backend.vercel.app";
+        let lastKnownStatus = "";
+
         if (orderId) {
-            document.getElementById('display-order-id').innerText = `#${orderId}`;
-        } else {
-            document.getElementById('sub-text').innerText = "We couldn't find your order ID, but the kitchen has received your request.";
+            document.getElementById('display-order-id').innerText = `#${orderId.toUpperCase()}`;
         }
-    
-        // 2. The Polling Logic
+
         async function checkOrderStatus() {
             if (!orderId) return;
-    
+
             try {
-                // Updated to use the Vercel production URL and the query param (?id=) structure
                 const response = await fetch(`${BACKEND_URL}/api/order-status?id=${orderId}`);
-    
                 if (!response.ok) return;
-    
                 const data = await response.json();
-    
-                // Logic remains the same: trigger UI update if status is 'prepared'
-                if (data.status === 'prepared') {
-                    // Note: Ensure your backend includes 'method' in the response if you want dynamic messages
-                    handleOrderReady(data.method || "Delivery"); 
+                
+                if (data.status !== lastKnownStatus) {
+                    updateUI(data.status, data.method);
+                    lastKnownStatus = data.status;
                 }
             } catch (err) {
-                console.error("Connection to kitchen lost. Retrying...");
+                console.error("Connection to kitchen lost.");
             }
         }
-    
-        // 3. Update UI when ready
-        function handleOrderReady(method) {
-            const pendingBadge = document.getElementById('status-pending');
-            const readyBadge = document.getElementById('status-ready');
+
+        function updateUI(status, method) {
+            const display = document.getElementById('status-display');
             const heading = document.getElementById('main-heading');
             const subText = document.getElementById('sub-text');
-    
-            if (pendingBadge) pendingBadge.style.display = 'none';
-            if (readyBadge) readyBadge.style.display = 'inline-block';
-            if (heading) heading.innerText = "Order Complete!";
-    
-            // DYNAMIC MESSAGE LOGIC
-            if (method === "Click and Collect") {
-                if (readyBadge) readyBadge.innerHTML = "✅ Ready for Collection";
-                if (subText) subText.innerHTML = "Your order is packed and waiting at the <strong>Al Jaddaf Store</strong> counter.";
-            } else {
-                if (readyBadge) readyBadge.innerHTML = "✅ Out for Delivery";
-                if (subText) subText.innerHTML = "Our dispatch team has finished preparing your order. Our driver is now on the way!";
-            }
-    
-            // Notification Sound
             const sound = document.getElementById('notif-sound');
-            if (sound) {
-                sound.play().catch(() => console.log("Sound play delayed until user interaction."));
+
+            // Reset classes
+            display.className = "status-badge";
+            
+            if (status === 'prepared') {
+                heading.innerText = "Order Prepared!";
+                display.innerText = "🥩 Ready & Packed";
+                display.classList.add('status-prepared');
+                subText.innerHTML = "The butcher has finished cutting and packing your order.";
+                if (sound) sound.play().catch(() => {});
+            } 
+            else if (status === 'out-for-delivery') {
+                heading.innerText = "On Its Way!";
+                display.innerText = "🚚 Out for Delivery";
+                display.classList.add('status-delivery');
+                subText.innerHTML = "Our driver has left the shop and is heading to your location.";
+                if (sound) sound.play().catch(() => {});
+                
+                // If it's out for delivery, we can stop polling as this is the final active state
+                clearInterval(pollingInterval);
+            } 
+            else if (status === 'delivered') {
+                heading.innerText = "Order Delivered";
+                display.innerText = "✅ Enjoy Your Meal";
+                display.classList.add('status-delivery');
+                subText.innerHTML = "Order has been successfully delivered. Thank you for choosing The Meat Pro!";
+                clearInterval(pollingInterval);
             }
-    
-            // Stop the loop once the order is ready
-            clearInterval(pollingInterval);
+            else {
+                // Default: Pending
+                heading.innerText = "Order Received";
+                display.innerText = "⏲️ Butcher is cutting...";
+                display.classList.add('status-pending', 'pulse');
+                subText.innerText = "The butcher is currently preparing your selection.";
+            }
         }
-    
-        // 4. Run check every 5 seconds for production efficiency
-        const pollingInterval = setInterval(checkOrderStatus, 5000);
-    
-        // Run once immediately on load
+
+        // Run check every 1.75 seconds
+        const pollingInterval = setInterval(checkOrderStatus, 1750);
         checkOrderStatus();
     </script>
 </body>
