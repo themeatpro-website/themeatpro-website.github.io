@@ -28,7 +28,6 @@
         .btn-save { background: #C62828; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
         .btn-save:hover { background: #a31f1f; }
         
-        /* Order History Items */
         .order-item { 
             border: 1px solid #eee; 
             padding: 20px; 
@@ -43,7 +42,6 @@
         .order-total { color: #C62828; font-weight: 900; font-size: 1.1rem; }
         .order-status { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; font-weight: bold; }
 
-        /* New Action Buttons */
         .order-actions { display: flex; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee; }
         .btn-track { flex: 1; background: #2e7d32; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-track:hover { background: #1b5e20; }
@@ -91,7 +89,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <script>
     function reorderItems(encodedCart, orderTotal) {
@@ -149,13 +146,14 @@
         async function fetchOrders(uid) {
             const ordersList = document.getElementById('orders-list');
             try {
-                const response = await fetch(`${SERVER_URL}/api/history?uid=${uid}`); // Updated to use history endpoint
+                // FIXED: Changed history to get-orders to match your actual file name
+                const response = await fetch(`${SERVER_URL}/api/get-orders?uid=${uid}`); 
                 if (!response.ok) throw new Error("Server Error");
                 
                 const orders = await response.json();
         
                 if (!orders || orders.length === 0) {
-                    ordersList.innerHTML = `<p style="text-align:center; padding: 40px; color:#bbb;">No orders found. Time for steak? 🥩</p>`;
+                    ordersList.innerHTML = `<p style="text-align:center; padding: 40px; color:#bbb;">No orders found yet. Time for steak? 🥩</p>`;
                     return;
                 }
         
@@ -177,7 +175,6 @@
                         statusBg = '#e3f2fd'; statusColor = '#1565c0';
                     }
         
-                    // Base64 encode cart for reorder logic
                     const cartData = btoa(unescape(encodeURIComponent(JSON.stringify(order.cart || []))));
         
                     return `
@@ -228,14 +225,12 @@
                 if (res.ok) {
                     status.innerText = "✅ Profile Updated!";
                     status.style.color = "green";
-                    localStorage.setItem('userProfile', JSON.stringify(profileData));
                 }
             } catch (e) { status.innerText = "❌ Error saving profile."; status.style.color = "red"; }
         };
         
         document.getElementById('logout-btn').onclick = () => {
             firebase.auth().signOut().then(() => {
-                localStorage.removeItem('userProfile');
                 window.location.href = "index.html";
             });
         };
