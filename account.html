@@ -95,19 +95,28 @@
 
     <script>
     // --- REORDER LOGIC ---
-    function reorderItems(encodedCart) {
+    function reorderItems(encodedCart, orderTotal) {
         try {
+            // 1. Decode the items
             const items = JSON.parse(decodeURIComponent(escape(atob(encodedCart))));
+            
+            // 2. Map items and handle missing prices
+            // If your database cart items don't have prices, we attempt to 
+            // approximate or we rely on the checkout page to re-calculate them.
             const cartToSave = items.map(i => ({
-                name: i.item,
-                quantity: i.qty,
-                price: i.price || 0 
+                name: i.item || i.name, // Support both 'item' and 'name' keys
+                quantity: i.qty || i.quantity,
+                price: i.price || (orderTotal / items.length) // Fallback: Split total if per-item price is missing
             }));
-
+    
+            // 3. Save to localStorage
             localStorage.setItem('cart', JSON.stringify(cartToSave));
+    
+            // 4. Redirect
             alert("Items added to cart! Redirecting to checkout...");
             window.location.href = 'checkout.html';
         } catch (e) {
+            console.error("Reorder Error:", e);
             alert("Could not reorder. Please add items manually.");
         }
     }
