@@ -87,126 +87,119 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const firebaseConfig = {
-                apiKey: "AIzaSyC0LqPa73C7OG295rY105XApK57SQ05et4", 
-                authDomain: "the-meat-pro.firebaseapp.com",
-                projectId: "the-meat-pro",
-                storageBucket: "the-meat-pro.appspot.com",
-                messagingSenderId: "1054538254894",
-                appId: "1:680467664784:web:9ef0a533bf354926f16d15" 
-            };
-            
-            if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-            const db = firebase.firestore();
-            const SERVER_URL = "https://themeatpro-backend.vercel.app";
+    document.addEventListener('DOMContentLoaded', () => {
+        const firebaseConfig = {
+            apiKey: "AIzaSyC0LqPa73C7OG295rY105XApK57SQ05et4", 
+            authDomain: "the-meat-pro.firebaseapp.com",
+            projectId: "the-meat-pro",
+            storageBucket: "the-meat-pro.appspot.com",
+            messagingSenderId: "1054538254894",
+            appId: "1:680467664784:web:9ef0a533bf354926f16d15" 
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const SERVER_URL = "https://themeatpro-backend.vercel.app";
 
-            firebase.auth().onAuthStateChanged(user => {
-                if (user) {
-                    document.getElementById('user-email').value = user.email;
-                    fetchProfile(user.uid);
-                    fetchOrders(user.uid);
-                } else {
-                    window.location.href = "login.html";
-                }
-            });
-
-            async function fetchProfile(uid) {
-                try {
-                    const response = await fetch(`${SERVER_URL}/api/get-profile?uid=${uid}`);
-                    const data = await response.json();
-                    if (!data.error) {
-                        document.getElementById('profile-name').value = data.name || "";
-                        document.getElementById('profile-phone').value = data.phone || "";
-                        document.getElementById('profile-address').value = data.address || "";
-                    }
-                } catch (err) { console.error("Profile load failed"); }
+        // SINGLE AUTH LISTENER
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('user-email').value = user.email;
+                fetchProfile(user.uid);
+                fetchOrders(user.uid); // Starts the history fetch
+            } else {
+                window.location.href = "login.html";
             }
-
-            async function fetchOrders(uid) {
-                const ordersList = document.getElementById('orders-list');
-                if (!ordersList) return;
-            
-                try {
-                    console.log("Fetching history for UID:", uid);
-                    const response = await fetch(`${SERVER_URL}/api/get-orders?uid=${uid}`);
-                    
-                    if (!response.ok) throw new Error("Failed to fetch from server");
-                    
-                    const orders = await response.json();
-            
-                    if (!orders || orders.length === 0) {
-                        ordersList.innerHTML = `
-                            <div style="text-align:center; padding: 40px; color:#bbb;">
-                                <p>No orders found in your history.</p>
-                            </div>`;
-                        return;
-                    }
-            
-                    ordersList.innerHTML = orders.map(order => {
-                        const date = new Date(order.orderDate).toLocaleDateString('en-AE', {
-                            year: 'numeric', month: 'short', day: 'numeric'
-                        });
-            
-                        return `
-                            <div class="order-item" style="background:#fff; padding:15px; border-radius:10px; margin-bottom:10px; border:1px solid #eee;">
-                                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                                    <span style="font-weight:bold; color:#C62828;">#${order.id.slice(-6).toUpperCase()}</span>
-                                    <span style="font-size:0.8rem; color:#888;">${date}</span>
-                                </div>
-                                <div style="font-size:0.9rem; color:#444;">
-                                    ${Array.isArray(order.cart) ? order.cart.map(i => `${i.qty}x ${i.item}`).join(', ') : 'Details unavailable'}
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                                    <span style="font-weight:bold;">AED ${parseFloat(order.total || 0).toFixed(2)}</span>
-                                    <span style="font-size:0.7rem; padding:3px 8px; border-radius:5px; background:${order.status === 'prepared' ? '#e8f5e9' : '#fff3e0'}; color:${order.status === 'prepared' ? '#2e7d32' : '#ef6c00'}; text-transform:uppercase;">
-                                        ${order.status || 'pending'}
-                                    </span>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                } catch (err) {
-                    console.error("Order History UI Error:", err);
-                    ordersList.innerHTML = `<p style="color:red; text-align:center;">Error loading history.</p>`;
-                }
-            }
-
-            document.getElementById('save-btn').onclick = async () => {
-                const user = firebase.auth().currentUser;
-                const status = document.getElementById('save-status');
-                const profileData = {
-                    uid: user.uid,
-                    name: document.getElementById('profile-name').value,
-                    phone: document.getElementById('profile-phone').value,
-                    address: document.getElementById('profile-address').value
-                };
-            
-                status.innerText = "Saving...";
-                try {
-                    const res = await fetch(`${SERVER_URL}/api/save-profile`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(profileData)
-                    });
-                    if (res.ok) {
-                        status.innerText = "✅ Updated!";
-                        status.style.color = "green";
-                        // Cache locally for checkout auto-fill
-                        localStorage.setItem('userProfile', JSON.stringify(profileData));
-                    }
-                } catch (e) {
-                    status.innerText = "❌ Error.";
-                }
-            };
-            
-            document.getElementById('logout-btn').onclick = () => {
-                firebase.auth().signOut().then(() => {
-                    localStorage.removeItem('userProfile');
-                    window.location.href = "index.html";
-                });
-            };
         });
-    </script>
+
+        async function fetchProfile(uid) {
+            try {
+                const response = await fetch(`${SERVER_URL}/api/get-profile?uid=${uid}`);
+                const data = await response.json();
+                if (!data.error) {
+                    document.getElementById('profile-name').value = data.name || "";
+                    document.getElementById('profile-phone').value = data.phone || "";
+                    document.getElementById('profile-address').value = data.address || "";
+                }
+            } catch (err) { console.error("Profile load failed"); }
+        }
+
+        async function fetchOrders(uid) {
+            const ordersList = document.getElementById('orders-list');
+            try {
+                const response = await fetch(`${SERVER_URL}/api/get-orders?uid=${uid}`);
+                if (!response.ok) throw new Error("Server Error");
+                
+                const orders = await response.json();
+                console.table(orders); // Check F12 Console for data!
+
+                if (!orders || orders.length === 0) {
+                    ordersList.innerHTML = `<p style="text-align:center; padding: 40px; color:#bbb;">No orders found.</p>`;
+                    return;
+                }
+
+                ordersList.innerHTML = orders.map(order => {
+                    const rawDate = order.orderDate || order.createdAt || new Date().toISOString();
+                    const date = new Date(rawDate).toLocaleDateString('en-AE', {
+                        year: 'numeric', month: 'short', day: 'numeric'
+                    });
+
+                    return `
+                        <div class="order-item">
+                            <div class="order-header">
+                                <span class="order-id">#${order.id.slice(-6).toUpperCase()}</span>
+                                <span class="order-date">${date}</span>
+                            </div>
+                            <div style="font-size:0.9rem; color:#444; margin-bottom:10px;">
+                                ${Array.isArray(order.cart) ? order.cart.map(i => `<strong>${i.qty}x</strong> ${i.item}`).join(', ') : 'Details unavailable'}
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span class="order-total">AED ${parseFloat(order.total || 0).toFixed(2)}</span>
+                                <span class="order-status" style="background:${order.status === 'prepared' ? '#e8f5e9' : '#fff3e0'}; color:${order.status === 'prepared' ? '#2e7d32' : '#ef6c00'};">
+                                    ${order.status || 'pending'}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                ordersList.innerHTML = `<p style="color:red; text-align:center;">Failed to load history.</p>`;
+            }
+        }
+
+        // SAVE BUTTON LOGIC
+        document.getElementById('save-btn').onclick = async () => {
+            const user = firebase.auth().currentUser;
+            const status = document.getElementById('save-status');
+            const profileData = {
+                uid: user.uid,
+                name: document.getElementById('profile-name').value,
+                phone: document.getElementById('profile-phone').value,
+                address: document.getElementById('profile-address').value
+            };
+        
+            status.innerText = "Saving...";
+            try {
+                const res = await fetch(`${SERVER_URL}/api/save-profile`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(profileData)
+                });
+                if (res.ok) {
+                    status.innerText = "✅ Updated!";
+                    status.style.color = "green";
+                    localStorage.setItem('userProfile', JSON.stringify(profileData));
+                }
+            } catch (e) { status.innerText = "❌ Error."; }
+        };
+        
+        // LOGOUT LOGIC
+        document.getElementById('logout-btn').onclick = () => {
+            firebase.auth().signOut().then(() => {
+                localStorage.removeItem('userProfile');
+                window.location.href = "index.html";
+            });
+        };
+    });
+</script>
 </body>
 </html>
