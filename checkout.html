@@ -88,7 +88,7 @@
 
     <script>
     const firebaseConfig = {
-        apiKey: "AIzaSyC0LqPa73C70G295rY105XApK57SQ05et4",
+        apiKey: "AIzaSyC0LqPa73C7OG295rY105XApK57SQ05et4",
         authDomain: "the-meat-pro.firebaseapp.com",
         projectId: "the-meat-pro",
         storageBucket: "the-meat-pro.firebasestorage.app",
@@ -100,6 +100,7 @@
         firebase.initializeApp(firebaseConfig);
     }
     
+    // Pointing to your Vercel Production URL
     const SHOP_URL = "https://themeatpro-backend.vercel.app/api/order-webhook";
     let currentMethod = 'Delivery'; 
 
@@ -109,7 +110,7 @@
         document.getElementById('btn-collect').classList.toggle('active', method === 'Click and Collect');
         
         const addrDiv = document.getElementById('address-section');
-        addrDiv.style.display = (method === 'Delivery') ? 'block' : 'none';
+        if(addrDiv) addrDiv.style.display = (method === 'Delivery') ? 'block' : 'none';
     }
 
     function renderSummary() {
@@ -118,7 +119,7 @@
         const totalDisplay = document.getElementById('summary-total');
         
         if (cart.length === 0) {
-            container.innerHTML = "<p style='color:#888;'>Your cart is empty.</p>";
+            if(container) container.innerHTML = "<p style='color:#888;'>Your cart is empty.</p>";
             return;
         }
 
@@ -131,7 +132,7 @@
                         <span>AED ${sub.toFixed(2)}</span>
                     </div>`;
         }).join('');
-        totalDisplay.innerText = `AED ${total.toFixed(2)}`;
+        if(totalDisplay) totalDisplay.innerText = `AED ${total.toFixed(2)}`;
     }
 
     async function submitOrder(flow) {
@@ -152,6 +153,7 @@
 
         const orderID = "ORD-" + Date.now().toString().slice(-6);
 
+        // WhatsApp Fallback
         if (flow === 'whatsapp') {
             let itemStr = cart.map(i => `- ${i.name} (x${i.quantity})`).join('\n');
             const waMsg = encodeURIComponent(`*New Order #${orderID}*\n*Customer:* ${name}\n*Method:* ${currentMethod}\n*Address:* ${address}\n\n*Items:*\n${itemStr}`);
@@ -171,14 +173,16 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     id: orderID,
-                    name: name,
+                    customerName: name,      // Changed from 'name' to 'customerName' to match your history UI
                     phone: phone,
                     address: address,
-                    method: currentMethod, // Crucial for success page logic
+                    method: currentMethod,
                     instructions: instructions,
-                    payment: payment,
+                    paymentMethod: payment,  // Changed from 'payment' to 'paymentMethod'
                     userId: user ? user.uid : "guest",
-                    total: totalAmount,
+                    total: totalAmount.toFixed(2),
+                    orderDate: new Date().toISOString(), // CRUCIAL: Must match your history index
+                    status: 'pending',
                     cart: cart.map(i => ({ item: i.name, qty: i.quantity }))
                 })
             });
@@ -194,7 +198,7 @@
             }
         } catch (err) {
             console.error("Submit Error:", err);
-            alert("Connection Error. Please use WHATSAPP.");
+            alert("Connection Error. Please check your internet or use WHATSAPP.");
             btn.disabled = false;
             btn.innerText = "SEND ORDER TO KITCHEN";
         }
