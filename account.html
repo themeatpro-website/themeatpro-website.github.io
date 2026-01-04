@@ -125,50 +125,50 @@
 
             async function fetchOrders(uid) {
                 const ordersList = document.getElementById('orders-list');
+                if (!ordersList) return;
+            
                 try {
-                    // We now call your Vercel backend instead of the local db variable
+                    console.log("Fetching history for UID:", uid);
                     const response = await fetch(`${SERVER_URL}/api/get-orders?uid=${uid}`);
+                    
+                    if (!response.ok) throw new Error("Failed to fetch from server");
+                    
                     const orders = await response.json();
             
                     if (!orders || orders.length === 0) {
                         ordersList.innerHTML = `
                             <div style="text-align:center; padding: 40px; color:#bbb;">
-                                <div style="font-size: 3rem; margin-bottom:10px;">📦</div>
-                                <p>You haven't placed any orders yet.</p>
+                                <p>No orders found in your history.</p>
                             </div>`;
                         return;
                     }
             
                     ordersList.innerHTML = orders.map(order => {
-                        // Handle different date formats (string or Firestore timestamp)
-                        const dateObj = order.orderDate?.seconds ? new Date(order.orderDate.seconds * 1000) : new Date(order.orderDate);
-                        const date = dateObj.toLocaleDateString('en-AE', {
-                            year: 'numeric', month: 'long', day: 'numeric'
+                        const date = new Date(order.orderDate).toLocaleDateString('en-AE', {
+                            year: 'numeric', month: 'short', day: 'numeric'
                         });
             
                         return `
-                            <div class="order-item">
-                                <div class="order-header">
-                                    <span class="order-id">#${order.id.slice(-6).toUpperCase()}</span>
-                                    <span class="order-date">${date}</span>
+                            <div class="order-item" style="background:#fff; padding:15px; border-radius:10px; margin-bottom:10px; border:1px solid #eee;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                    <span style="font-weight:bold; color:#C62828;">#${order.id.slice(-6).toUpperCase()}</span>
+                                    <span style="font-size:0.8rem; color:#888;">${date}</span>
                                 </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="font-size:0.85rem; color:#666;">
-                                        ${Array.isArray(order.cart) ? order.cart.map(i => i.item).join(', ') : 'Order Details'}
-                                    </span>
-                                    <span class="order-total">AED ${parseFloat(order.total || 0).toFixed(2)}</span>
+                                <div style="font-size:0.9rem; color:#444;">
+                                    ${Array.isArray(order.cart) ? order.cart.map(i => `${i.qty}x ${i.item}`).join(', ') : 'Details unavailable'}
                                 </div>
-                                <div style="margin-top:12px;">
-                                    <span class="order-status" style="background: ${order.status === 'prepared' ? '#e8f5e9' : '#fff3e0'}; color: ${order.status === 'prepared' ? '#2e7d32' : '#ef6c00'};">
-                                        ${order.status || 'Processing'}
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                                    <span style="font-weight:bold;">AED ${parseFloat(order.total || 0).toFixed(2)}</span>
+                                    <span style="font-size:0.7rem; padding:3px 8px; border-radius:5px; background:${order.status === 'prepared' ? '#e8f5e9' : '#fff3e0'}; color:${order.status === 'prepared' ? '#2e7d32' : '#ef6c00'}; text-transform:uppercase;">
+                                        ${order.status || 'pending'}
                                     </span>
                                 </div>
                             </div>
                         `;
                     }).join('');
                 } catch (err) {
-                    console.error("Orders load failed:", err);
-                    ordersList.innerHTML = `<p style="color:red; text-align:center;">Could not load order history.</p>`;
+                    console.error("Order History UI Error:", err);
+                    ordersList.innerHTML = `<p style="color:red; text-align:center;">Error loading history.</p>`;
                 }
             }
 
