@@ -100,7 +100,6 @@
         firebase.initializeApp(firebaseConfig);
     }
     
-    // Pointing to your Vercel Production URL
     const SHOP_URL = "https://themeatpro-backend.vercel.app/api/order-webhook";
     let currentMethod = 'Delivery'; 
 
@@ -151,9 +150,9 @@
             return;
         }
 
-        const orderID = "ORD-" + Date.now().toString().slice(-6);
+        // Generate a unique ID
+        const orderID = "ORD-" + Math.random().toString(36).substr(2, 6).toUpperCase();
 
-        // WhatsApp Fallback
         if (flow === 'whatsapp') {
             let itemStr = cart.map(i => `- ${i.name} (x${i.quantity})`).join('\n');
             const waMsg = encodeURIComponent(`*New Order #${orderID}*\n*Customer:* ${name}\n*Method:* ${currentMethod}\n*Address:* ${address}\n\n*Items:*\n${itemStr}`);
@@ -173,16 +172,15 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     id: orderID,
-                    customerName: name,      // Changed from 'name' to 'customerName' to match your history UI
+                    customerName: name,
                     phone: phone,
                     address: address,
                     method: currentMethod,
                     instructions: instructions,
-                    paymentMethod: payment,  // Changed from 'payment' to 'paymentMethod'
-                    userId: user ? user.uid : "guest",
+                    paymentMethod: payment,
+                    userId: user ? user.uid : "guest", // This is the fix for your history!
                     total: totalAmount.toFixed(2),
-                    orderDate: new Date().toISOString(), // CRUCIAL: Must match your history index
-                    status: 'pending',
+                    orderDate: new Date().toISOString(), // This ensures sorting works
                     cart: cart.map(i => ({ item: i.name, qty: i.quantity }))
                 })
             });
@@ -191,28 +189,32 @@
                 localStorage.removeItem('cart');
                 window.location.href = `success.html?id=${orderID}`;
             } else {
-                const result = await response.json();
-                alert(result.error || "Order rejected by server.");
-                btn.disabled = false;
-                btn.innerText = "SEND ORDER TO KITCHEN";
+                throw new Error("Server rejected order");
             }
         } catch (err) {
-            console.error("Submit Error:", err);
-            alert("Connection Error. Please check your internet or use WHATSAPP.");
+            console.error("Order Error:", err);
+            alert("Connection Error. Try again or use WhatsApp.");
             btn.disabled = false;
             btn.innerText = "SEND ORDER TO KITCHEN";
         }
     }
 
+    // AUTO-FILL Profile Data on Load
     document.addEventListener('DOMContentLoaded', () => {
         renderSummary();
-        const savedProfile = localStorage.getItem('userProfile');
-        if (savedProfile) {
-            const profile = JSON.parse(savedProfile);
-            if (profile.name) document.getElementById('cust-name').value = profile.name;
-            if (profile.phone) document.getElementById('cust-phone').value = profile.phone;
-            if (profile.address) document.getElementById('cust-address').value = profile.address;
-        }
+        
+        // Listen for Auth to get the latest saved profile
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                const savedProfile = localStorage.getItem('userProfile');
+                if (savedProfile) {
+                    const profile = JSON.parse(savedProfile);
+                    if (profile.name) document.getElementById('cust-name').value = profile.name;
+                    if (profile.phone) document.getElementById('cust-phone').value = profile.phone;
+                    if (profile.address) document.getElementById('cust-address').value = profile.address;
+                }
+            }
+        });
     });
 </script>
 </body>
