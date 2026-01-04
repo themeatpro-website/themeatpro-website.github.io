@@ -163,21 +163,36 @@
                 if (!response.ok) throw new Error("Server Error");
                 
                 const orders = await response.json();
-
+        
                 if (!orders || orders.length === 0) {
                     ordersList.innerHTML = `<p style="text-align:center; padding: 40px; color:#bbb;">No orders found.</p>`;
                     return;
                 }
-
+        
                 ordersList.innerHTML = orders.map(order => {
                     const rawDate = order.orderDate || order.createdAt || new Date().toISOString();
                     const date = new Date(rawDate).toLocaleDateString('en-AE', {
                         year: 'numeric', month: 'short', day: 'numeric'
                     });
-
-                    // Prepare cart for reorder button (Base64 encoded to keep HTML clean)
+        
+                    // Status Badge Logic to match Butcher Dashboard
+                    let statusLabel = order.status || 'pending';
+                    let statusBg = '#eee';
+                    let statusColor = '#666';
+        
+                    if (statusLabel === 'prepared') {
+                        statusBg = '#fff3e0'; // Light Orange
+                        statusColor = '#ef6c00'; // Prepared Orange
+                    } else if (statusLabel === 'out-for-delivery') {
+                        statusBg = '#e8f5e9'; // Light Green
+                        statusColor = '#2e7d32'; // Delivery Green
+                    } else if (statusLabel === 'delivered') {
+                        statusBg = '#e3f2fd'; // Light Blue
+                        statusColor = '#1565c0';
+                    }
+        
                     const cartData = btoa(unescape(encodeURIComponent(JSON.stringify(order.cart || []))));
-
+        
                     return `
                         <div class="order-item">
                             <div class="order-header">
@@ -189,8 +204,8 @@
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span class="order-total">AED ${parseFloat(order.total || 0).toFixed(2)}</span>
-                                <span class="order-status" style="background:${order.status === 'prepared' ? '#e8f5e9' : '#fff3e0'}; color:${order.status === 'prepared' ? '#2e7d32' : '#ef6c00'};">
-                                    ${order.status || 'pending'}
+                                <span class="order-status" style="background:${statusBg}; color:${statusColor}; border: 1px solid ${statusColor}44;">
+                                    ${statusLabel.replace(/-/g, ' ')}
                                 </span>
                             </div>
                             <div class="order-actions">
@@ -204,7 +219,7 @@
                 ordersList.innerHTML = `<p style="color:red; text-align:center;">Failed to load history.</p>`;
             }
         }
-
+        
         document.getElementById('save-btn').onclick = async () => {
             const user = firebase.auth().currentUser;
             const status = document.getElementById('save-status');
