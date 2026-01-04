@@ -195,7 +195,7 @@
                             </div>
                             <div class="order-actions">
                                 <button class="btn-track" onclick="window.location.href='success.html?id=${order.id}'">Track Order</button>
-                                <button class="btn-reorder" onclick="reorderItems('${cartData}')">Order Again</button>
+                                <button class="btn-reorder" onclick="reorderItems('${cartData}', ${order.total || 0})">Order Again</button>
                             </div>
                         </div>
                     `;
