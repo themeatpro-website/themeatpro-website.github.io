@@ -38,10 +38,10 @@
         }
         .order-item:hover { border-color: #C62828; }
         .order-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .order-id { font-weight: bold; color: #333; font-family: 'Roboto', sans-serif; }
+        .order-id { font-weight: bold; color: #333; font-family: 'Roboto', sans-serif; font-size: 1.1rem; }
         .order-date { color: #999; font-size: 0.85rem; }
         .order-total { color: #C62828; font-weight: 900; font-size: 1.1rem; }
-        .order-status { font-size: 0.7rem; background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; font-weight: bold; }
+        .order-status { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; font-weight: bold; }
 
         /* New Action Buttons */
         .order-actions { display: flex; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee; }
@@ -94,25 +94,15 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <script>
-    // --- REORDER LOGIC ---
     function reorderItems(encodedCart, orderTotal) {
         try {
-            // 1. Decode the items
             const items = JSON.parse(decodeURIComponent(escape(atob(encodedCart))));
-            
-            // 2. Map items and handle missing prices
-            // If your database cart items don't have prices, we attempt to 
-            // approximate or we rely on the checkout page to re-calculate them.
             const cartToSave = items.map(i => ({
-                name: i.item || i.name, // Support both 'item' and 'name' keys
+                name: i.item || i.name,
                 quantity: i.qty || i.quantity,
-                price: i.price || (orderTotal / items.length) // Fallback: Split total if per-item price is missing
+                price: i.price || (orderTotal / items.length)
             }));
-    
-            // 3. Save to localStorage
             localStorage.setItem('cart', JSON.stringify(cartToSave));
-    
-            // 4. Redirect
             alert("Items added to cart! Redirecting to checkout...");
             window.location.href = 'checkout.html';
         } catch (e) {
@@ -159,48 +149,45 @@
         async function fetchOrders(uid) {
             const ordersList = document.getElementById('orders-list');
             try {
-                const response = await fetch(`${SERVER_URL}/api/get-orders?uid=${uid}`);
+                const response = await fetch(`${SERVER_URL}/api/history?uid=${uid}`); // Updated to use history endpoint
                 if (!response.ok) throw new Error("Server Error");
                 
                 const orders = await response.json();
         
                 if (!orders || orders.length === 0) {
-                    ordersList.innerHTML = `<p style="text-align:center; padding: 40px; color:#bbb;">No orders found.</p>`;
+                    ordersList.innerHTML = `<p style="text-align:center; padding: 40px; color:#bbb;">No orders found. Time for steak? 🥩</p>`;
                     return;
                 }
         
                 ordersList.innerHTML = orders.map(order => {
-                    const rawDate = order.orderDate || order.createdAt || new Date().toISOString();
+                    const rawDate = order.orderDate || new Date().toISOString();
                     const date = new Date(rawDate).toLocaleDateString('en-AE', {
                         year: 'numeric', month: 'short', day: 'numeric'
                     });
         
-                    // Status Badge Logic to match Butcher Dashboard
                     let statusLabel = order.status || 'pending';
                     let statusBg = '#eee';
                     let statusColor = '#666';
         
                     if (statusLabel === 'prepared') {
-                        statusBg = '#fff3e0'; // Light Orange
-                        statusColor = '#ef6c00'; // Prepared Orange
+                        statusBg = '#fff3e0'; statusColor = '#ef6c00';
                     } else if (statusLabel === 'out-for-delivery') {
-                        statusBg = '#e8f5e9'; // Light Green
-                        statusColor = '#2e7d32'; // Delivery Green
+                        statusBg = '#e8f5e9'; statusColor = '#2e7d32';
                     } else if (statusLabel === 'delivered') {
-                        statusBg = '#e3f2fd'; // Light Blue
-                        statusColor = '#1565c0';
+                        statusBg = '#e3f2fd'; statusColor = '#1565c0';
                     }
         
+                    // Base64 encode cart for reorder logic
                     const cartData = btoa(unescape(encodeURIComponent(JSON.stringify(order.cart || []))));
         
                     return `
                         <div class="order-item">
                             <div class="order-header">
-                                <span class="order-id">#${order.id.toUpperCase()}</span>
+                                <span class="order-id">#${order.id}</span>
                                 <span class="order-date">${date}</span>
                             </div>
                             <div style="font-size:0.9rem; color:#444; margin-bottom:10px;">
-                                ${Array.isArray(order.cart) ? order.cart.map(i => `<strong>${i.qty}x</strong> ${i.item}`).join(', ') : 'Details unavailable'}
+                                ${Array.isArray(order.cart) ? order.cart.map(i => `<strong>${i.qty || i.quantity}x</strong> ${i.item || i.name}`).join(', ') : 'Details unavailable'}
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span class="order-total">AED ${parseFloat(order.total || 0).toFixed(2)}</span>
@@ -209,8 +196,8 @@
                                 </span>
                             </div>
                             <div class="order-actions">
-                                <button class="btn-track" onclick="window.location.href='success.html?id=${order.id}'">Track Order</button>
-                                <button class="btn-reorder" onclick="reorderItems('${cartData}', ${order.total || 0})">Order Again</button>
+                                <button class="btn-track" onclick="window.location.href='success.html?id=${order.id}'">Track Status</button>
+                                <button class="btn-reorder" onclick="reorderItems('${cartData}', ${order.total || 0})">Reorder Items</button>
                             </div>
                         </div>
                     `;
@@ -231,6 +218,7 @@
             };
         
             status.innerText = "Saving...";
+            status.style.color = "#888";
             try {
                 const res = await fetch(`${SERVER_URL}/api/save-profile`, {
                     method: 'POST',
@@ -238,11 +226,11 @@
                     body: JSON.stringify(profileData)
                 });
                 if (res.ok) {
-                    status.innerText = "✅ Updated!";
+                    status.innerText = "✅ Profile Updated!";
                     status.style.color = "green";
                     localStorage.setItem('userProfile', JSON.stringify(profileData));
                 }
-            } catch (e) { status.innerText = "❌ Error."; }
+            } catch (e) { status.innerText = "❌ Error saving profile."; status.style.color = "red"; }
         };
         
         document.getElementById('logout-btn').onclick = () => {
