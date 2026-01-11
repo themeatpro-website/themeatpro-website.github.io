@@ -1,19 +1,19 @@
 Name,Price,ShortDescription,LongDescription,Image,Category,Type
-Whole Chicken,23,Per KG,"Hormone-free, locally sourced chicken—naturally fresh, wholesome, and full of flavour.",assets/Chicken/Whole chicken.jpg,Chicken,RAW
-Whole Chicken curry cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (16+ pcs)—perfect for hearty home-cooked meals.",assets/Chicken/Whole chk curry cut.jpg,Chicken,RAW
-Whole Chicken Biryani cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (12-14 pcs)—perfect for hearty home-cooked meals.",assets/Chicken/Whole chk curry cut.jpg,Chicken,RAW
-Whole Chicken 4 pc cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (4pcs)—perfect for hearty home-cooked meals.",assets/Chicken/Whole chk curry cut.jpg,Chicken,RAW
-Whole Chicken 8 pc cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (8pcs)—perfect for hearty home-cooked meals.",assets/Chicken/Whole chk curry cut.jpg,Chicken,RAW
-Chicken Breast Whole,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",assets/Chicken/Chicken Breast.jpg,Chicken,RAW
-Chicken Breast Large Cut,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",assets/Chicken/Chicken Breast Cubes Large.jpg,Chicken,RAW
-Chicken Breast Medium Cut,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",assets/Chicken/Chicken Breast Cubes Medium.jpg,Chicken,RAW
-Chicken Breast Small Cut,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",assets/Chicken/Chicken Breast Cubes Small.jpg,Chicken,RAW
-Chicken Breast Strips,40,Per KG,"Fresh chicken strips, neatly cut and ready for quick, flavourful stir-fries.",assets/Chicken/CHK Breast Slice.jpg,Chicken,RAW
-Chicken Breast Slice,39,Per KG,"Chicken Breast Slice – Tender, even-cut slices ideal for crispy schnitzels, escalope, cutlets, rolls, and other quick-fry or pan-seared dishes.",assets/Chicken/CHK Breast Slice.jpg,Chicken,RAW
-Chicken Mince,40,Per KG,"Freshly minced chicken, lean and versatile, perfect for kebabs, patties, meatballs, and everyday cooking.",assets/Chicken/Chicken Mince.jpg,Chicken,RAW
-Lamb Shashlik Kabab,98,Per KG,"Juicy lamb cubes marinated in aromatic spices, perfect for skewers, grilling, or BBQ.",assets/Chicken/Lamb Shashlik.JPG,Lamb,Marinated
-Whole Chicken Marinated Tandoori,39.5,Per KG,"Fully marinated with authentic tandoori spices, ready to roast or grill for bold, smoky flavour.",assets/Chicken/Chk whole mrinated tandoori.jpg,Chicken,Marinated
-Chicken 65 Tikka,48,Per KG,"Spicy, flavour-packed chicken marinated in signature spices, perfect for frying, grilling, or starters.",assets/Chicken/CHK 65 Tikka.JPG,Chicken,Marinated
-Chicken Mexican Tikka,48,Per KG,"Zesty chicken marinated with Mexican spices and herbs, perfect for grilling, pan-frying, or wraps.",assets/Chicken/chicken mexican.png,Chicken,Marinated
-Chicken Haryali Tikka,48,Per KG,"Fresh chicken marinated with green herbs, mint, and spices for a juicy, aromatic grill or pan-fry.",assets/Chicken/CHK HARYALI.JPG,Chicken,Marinated
-Chicken Naughty 4 Tikka,48,Per KG,"A bold, flavour-loaded mix with four exciting spice notes, marinated to perfection for grilling or pan-frying.",assets/Chicken/CHK N4.JPG,Chicken,Marinated
+Whole Chicken,23,Per KG,"Hormone-free, locally sourced chicken—naturally fresh, wholesome, and full of flavour.",https://images.themeatpro.com/Chicken/Whole chicken.jpg,Chicken,RAW
+Whole Chicken curry cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (16+ pcs)—perfect for hearty home-cooked meals.",https://images.themeatpro.com/Chicken/Whole chk curry cut.jpg,Chicken,RAW
+Whole Chicken Biryani cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (12-14 pcs)—perfect for hearty home-cooked meals.",https://images.themeatpro.com/Chicken/Whole chk curry cut.jpg,Chicken,RAW
+Whole Chicken 4 pc cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (4pcs)—perfect for hearty home-cooked meals.",https://images.themeatpro.com/Chicken/Whole chk curry cut.jpg,Chicken,RAW
+Whole Chicken 8 pc cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (8pcs)—perfect for hearty home-cooked meals.",https://images.themeatpro.com/Chicken/Whole chk curry cut.jpg,Chicken,RAW
+Chicken Breast Whole,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",https://images.themeatpro.com/Chicken/Chicken Breast.jpg,Chicken,RAW
+Chicken Breast Large Cut,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",https://images.themeatpro.com/Chicken/Chicken Breast Cubes Large.jpg,Chicken,RAW
+Chicken Breast Medium Cut,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",https://images.themeatpro.com/Chicken/Chicken Breast Cubes Medium.jpg,Chicken,RAW
+Chicken Breast Small Cut,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",https://images.themeatpro.com/Chicken/Chicken Breast Cubes Small.jpg,Chicken,RAW
+Chicken Breast Strips,40,Per KG,"Fresh chicken strips, neatly cut and ready for quick, flavourful stir-fries.",https://images.themeatpro.com/Chicken/CHK Breast Slice.jpg,Chicken,RAW
+Chicken Breast Slice,39,Per KG,"Chicken Breast Slice – Tender, even-cut slices ideal for crispy schnitzels, escalope, cutlets, rolls, and other quick-fry or pan-seared dishes.",https://images.themeatpro.com/Chicken/CHK Breast Slice.jpg,Chicken,RAW
+Chicken Mince,40,Per KG,"Freshly minced chicken, lean and versatile, perfect for kebabs, patties, meatballs, and everyday cooking.",https://images.themeatpro.com/Chicken/Chicken Mince.jpg,Chicken,RAW
+Lamb Shashlik Kabab,98,Per KG,"Juicy lamb cubes marinated in aromatic spices, perfect for skewers, grilling, or BBQ.",https://images.themeatpro.com/Chicken/Lamb Shashlik.JPG,Lamb,Marinated
+Whole Chicken Marinated Tandoori,39.5,Per KG,"Fully marinated with authentic tandoori spices, ready to roast or grill for bold, smoky flavour.",https://images.themeatpro.com/Chicken/Chk whole mrinated tandoori.jpg,Chicken,Marinated
+Chicken 65 Tikka,48,Per KG,"Spicy, flavour-packed chicken marinated in signature spices, perfect for frying, grilling, or starters.",https://images.themeatpro.com/Chicken/CHK 65 Tikka.JPG,Chicken,Marinated
+Chicken Mexican Tikka,48,Per KG,"Zesty chicken marinated with Mexican spices and herbs, perfect for grilling, pan-frying, or wraps.",https://images.themeatpro.com/Chicken/chicken mexican.png,Chicken,Marinated
+Chicken Haryali Tikka,48,Per KG,"Fresh chicken marinated with green herbs, mint, and spices for a juicy, aromatic grill or pan-fry.",https://images.themeatpro.com/Chicken/CHK HARYALI.JPG,Chicken,Marinated
+Chicken Naughty 4 Tikka,48,Per KG,"A bold, flavour-loaded mix with four exciting spice notes, marinated to perfection for grilling or pan-frying.",https://images.themeatpro.com/Chicken/CHK N4.JPG,Chicken,Marinated
