@@ -59,6 +59,47 @@
         .dropdown-content button:hover { background-color: #f8f8f8; color: #C62828; }
         .dropdown:hover .dropdown-content { display: block; }
 
+        /* AD BANNER STYLES */
+        .hero-banner {
+            width: 100%;
+            height: 450px;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.themeatpro.com/banners/hero-steak.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .hero-content h1 {
+            font-family: 'Roboto';
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+
+        .hero-btn {
+            background: #C62828;
+            color: white;
+            padding: 15px 40px;
+            text-decoration: none;
+            font-weight: 900;
+            border-radius: 50px;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .hero-btn:hover { background: #e53935; transform: scale(1.05); }
+
         /* CART SIDEBAR STYLES */
         #cart-sidebar {
             position: fixed;
@@ -166,6 +207,14 @@
             <button class="add-btn" onclick="toggleCart()">Cart (<span id="cart-count">0</span>)</button>
         </div>
     </nav>
+
+    <header class="hero-banner" id="main-hero">
+        <div class="hero-content">
+            <h1>PRIME CUTS. DELIVERED.</h1>
+            <p>Experience the finest Wagyu, Black Angus, and Organic Poultry in Dubai.</p>
+            <a href="#category-section" class="hero-btn" onclick="filterByCategory('Beef')">Shop Best Sellers</a>
+        </div>
+    </header>
 
     <div id="category-section" class="category-grid">
         <div class="cat-card" onclick="filterByCategory('Chicken')">
@@ -284,6 +333,20 @@
             }
         });
     });
+
+    // Modified to hide banner when looking at products
+    const originalFilterByCategory = window.filterByCategory;
+    window.filterByCategory = function(category) {
+        document.getElementById('main-hero').style.display = 'none';
+        // Your existing logic in app.js will handle the rest
+        if(typeof originalFilterByCategory === "function") originalFilterByCategory(category);
+    };
+
+    const originalShowCategories = window.showCategories;
+    window.showCategories = function() {
+        document.getElementById('main-hero').style.display = 'flex';
+        if(typeof originalShowCategories === "function") originalShowCategories();
+    };
 
     function handleSubscribe(e) {
         e.preventDefault();
