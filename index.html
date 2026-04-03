@@ -74,7 +74,20 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            line-height: 0;
+            background: #e0e0e0; /* Default Grey */
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Class added if image fails to load */
+        .promo-banner.no-image::after {
+            content: "THE MEAT PRO | PREMIUM CUTS";
+            font-family: 'Roboto';
+            color: #999;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
         }
 
         .promo-banner img {
@@ -161,17 +174,6 @@
 
         .checkout-btn-link:hover { background: #a31f1f; }
 
-        .remove-item-btn {
-            background: none;
-            border: none;
-            color: #ccc;
-            cursor: pointer;
-            font-size: 1.4rem;
-            transition: 0.2s;
-        }
-
-        .remove-item-btn:hover { color: #C62828; }
-
         /* FOOTER STYLES */
         .main-footer {
             background: #1a1a1a;
@@ -198,6 +200,8 @@
 
         @media (max-width: 768px) {
             .promo-banner-wrapper { padding: 10px 15px 0 15px; }
+            .promo-banner { min-height: 120px; }
+            .promo-banner.no-image::after { font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -218,9 +222,9 @@
     </nav>
 
     <div id="promo-ad-container" class="promo-banner-wrapper">
-        <div class="promo-banner">
+        <div class="promo-banner" id="banner-box">
             <button class="close-banner" onclick="document.getElementById('promo-ad-container').remove()">×</button>
-            <img src="assets/banner.png" alt="Special Offer" onerror="this.parentElement.parentElement.style.display='none'">
+            <img src="assets/banner.png" alt="Special Offer" id="banner-img" onerror="handleBannerError(this)">
         </div>
     </div>
 
@@ -303,6 +307,12 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     
     <script>
+    // Handle Image Load Error
+    function handleBannerError(img) {
+        img.style.display = 'none';
+        document.getElementById('banner-box').classList.add('no-image');
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const firebaseConfig = {
             apiKey: "AIzaSyC0LqPa73C7OG295rY105XApK57SQ05et4", 
@@ -341,7 +351,6 @@
         });
     });
 
-    // Handle banner visibility during navigation
     const originalFilter = window.filterByCategory;
     window.filterByCategory = function(category) {
         const banner = document.getElementById('promo-ad-container');
