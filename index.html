@@ -59,46 +59,51 @@
         .dropdown-content button:hover { background-color: #f8f8f8; color: #C62828; }
         .dropdown:hover .dropdown-content { display: block; }
 
-        /* AD BANNER STYLES */
-        .hero-banner {
+        /* PROMO BANNER STYLES */
+        .promo-banner-wrapper {
             width: 100%;
-            height: 450px;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.themeatpro.com/banners/hero-steak.jpg');
-            background-size: cover;
-            background-position: center;
+            padding: 20px 8% 0 8%;
+            box-sizing: border-box;
+        }
+
+        .promo-banner {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            line-height: 0;
+        }
+
+        .promo-banner img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        .close-banner {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            color: white;
-            margin-bottom: 40px;
-        }
-
-        .hero-content h1 {
-            font-family: 'Roboto';
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-            letter-spacing: -1px;
-        }
-
-        .hero-content p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            font-weight: 400;
-        }
-
-        .hero-btn {
-            background: #C62828;
-            color: white;
-            padding: 15px 40px;
-            text-decoration: none;
-            font-weight: 900;
-            border-radius: 50px;
             transition: 0.3s;
-            text-transform: uppercase;
+            z-index: 10;
         }
 
-        .hero-btn:hover { background: #e53935; transform: scale(1.05); }
+        .close-banner:hover { background: #C62828; }
 
         /* CART SIDEBAR STYLES */
         #cart-sidebar {
@@ -190,6 +195,10 @@
         .newsletter-form input { flex: 1; padding: 12px; border-radius: 6px; border: none; background: #2a2a2a; color: white; }
         .newsletter-form button { padding: 12px 20px; background: #C62828; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .footer-bottom { text-align: center; margin-top: 60px; padding-top: 20px; border-top: 1px solid #333; font-size: 0.8rem; color: #666; }
+
+        @media (max-width: 768px) {
+            .promo-banner-wrapper { padding: 10px 15px 0 15px; }
+        }
     </style>
 </head>
 <body>
@@ -208,13 +217,12 @@
         </div>
     </nav>
 
-    <header class="hero-banner" id="main-hero">
-        <div class="hero-content">
-            <h1>PRIME CUTS. DELIVERED.</h1>
-            <p>Experience the finest Wagyu, Black Angus, and Organic Poultry in Dubai.</p>
-            <a href="#category-section" class="hero-btn" onclick="filterByCategory('Beef')">Shop Best Sellers</a>
+    <div id="promo-ad-container" class="promo-banner-wrapper">
+        <div class="promo-banner">
+            <button class="close-banner" onclick="document.getElementById('promo-ad-container').remove()">×</button>
+            <img src="assets/banner.png" alt="Special Offer" onerror="this.parentElement.parentElement.style.display='none'">
         </div>
-    </header>
+    </div>
 
     <div id="category-section" class="category-grid">
         <div class="cat-card" onclick="filterByCategory('Chicken')">
@@ -254,8 +262,7 @@
             <button onclick="toggleCart()" style="background:none; border:none; font-size:2rem; cursor:pointer; line-height: 1;">&times;</button>
         </div>
         
-        <div id="cart-items">
-            </div>
+        <div id="cart-items"></div>
 
         <div class="cart-footer">
             <div style="display:flex; justify-content:space-between; font-weight:900; font-size:1.2rem; margin-bottom:15px; color: #1a1a1a;">
@@ -275,7 +282,7 @@
             <div class="footer-section">
                 <h3>CONTACT US</h3>
                 <ul class="contact-list">
-                    <li><span>📍</span> Shop #4 - Azurite Tower - Ibn Al Zahrawi St - Al Jaddaf - Dubai</li>
+                    <li><span>📍</span> Shop #4 - Azurite Tower - Al Jaddaf - Dubai</li>
                     <li><span>📞</span> <a href="tel:+971589388096">058 938 8096</a></li>
                     <li><span>📧</span> <a href="mailto:info@themeatpro.com">info@themeatpro.com</a></li>
                 </ul>
@@ -334,18 +341,19 @@
         });
     });
 
-    // Modified to hide banner when looking at products
-    const originalFilterByCategory = window.filterByCategory;
+    // Handle banner visibility during navigation
+    const originalFilter = window.filterByCategory;
     window.filterByCategory = function(category) {
-        document.getElementById('main-hero').style.display = 'none';
-        // Your existing logic in app.js will handle the rest
-        if(typeof originalFilterByCategory === "function") originalFilterByCategory(category);
+        const banner = document.getElementById('promo-ad-container');
+        if (banner) banner.style.display = 'none';
+        if (typeof originalFilter === 'function') originalFilter(category);
     };
 
-    const originalShowCategories = window.showCategories;
+    const originalShowCats = window.showCategories;
     window.showCategories = function() {
-        document.getElementById('main-hero').style.display = 'flex';
-        if(typeof originalShowCategories === "function") originalShowCategories();
+        const banner = document.getElementById('promo-ad-container');
+        if (banner) banner.style.display = 'block';
+        if (typeof originalShowCats === 'function') originalShowCats();
     };
 
     function handleSubscribe(e) {
