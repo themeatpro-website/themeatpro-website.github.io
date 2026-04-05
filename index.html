@@ -74,14 +74,13 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            background: #e0e0e0; /* Default Grey */
+            background: #e0e0e0; 
             min-height: 200px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* Class added if image fails to load */
         .promo-banner.no-image::after {
             content: "THE MEAT PRO | PREMIUM CUTS";
             font-family: 'Roboto';
@@ -305,9 +304,9 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
     <script>
-    // Handle Image Load Error
     function handleBannerError(img) {
         img.style.display = 'none';
         document.getElementById('banner-box').classList.add('no-image');
@@ -325,19 +324,39 @@
 
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 
-        const userMenu = document.getElementById('user-menu');
-        
-        firebase.auth().onAuthStateChanged(user => {
+        firebase.auth().onAuthStateChanged(async (user) => {
+            const userMenu = document.getElementById('user-menu');
+            
             if (user) {
+                let userPoints = 0;
+                try {
+                    const db = firebase.firestore();
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        userPoints = userDoc.data().points || 0;
+                    } else {
+                        await db.collection('users').doc(user.uid).set({ 
+                            email: user.email, 
+                            points: 0 
+                        }, { merge: true });
+                    }
+                } catch (error) {
+                    console.error("Error fetching points:", error);
+                }
+
                 userMenu.innerHTML = `
                     <div class="auth-button-box">
-                        👤 ${user.email.split('@')[0]}
+                        👤 ${user.email.split('@')[0]} 
+                        <span style="background: #FFD700; color: #1a1a1a; padding: 2px 8px; border-radius: 12px; margin-left: 10px; font-size: 0.75rem; border: 1px solid #b8860b;">
+                            ${userPoints} Pts
+                        </span>
                     </div>
                     <div class="dropdown-content">
                         <button onclick="window.location.href='account.html'">My Profile</button>
                         <button id="header-logout">Logout</button>
                     </div>
                 `;
+
                 document.getElementById('header-logout').addEventListener('click', (e) => {
                     e.stopPropagation();
                     firebase.auth().signOut().then(() => {
@@ -349,21 +368,21 @@
                 userMenu.innerHTML = `<button class="auth-button-box" onclick="window.location.href='login.html'">Login / Sign Up</button>`;
             }
         });
+
+        const originalFilter = window.filterByCategory;
+        window.filterByCategory = function(category) {
+            const banner = document.getElementById('promo-ad-container');
+            if (banner) banner.style.display = 'none';
+            if (typeof originalFilter === 'function') originalFilter(category);
+        };
+
+        const originalShowCats = window.showCategories;
+        window.showCategories = function() {
+            const banner = document.getElementById('promo-ad-container');
+            if (banner) banner.style.display = 'block';
+            if (typeof originalShowCats === 'function') originalShowCats();
+        };
     });
-
-    const originalFilter = window.filterByCategory;
-    window.filterByCategory = function(category) {
-        const banner = document.getElementById('promo-ad-container');
-        if (banner) banner.style.display = 'none';
-        if (typeof originalFilter === 'function') originalFilter(category);
-    };
-
-    const originalShowCats = window.showCategories;
-    window.showCategories = function() {
-        const banner = document.getElementById('promo-ad-container');
-        if (banner) banner.style.display = 'block';
-        if (typeof originalShowCats === 'function') originalShowCats();
-    };
 
     function handleSubscribe(e) {
         e.preventDefault();
