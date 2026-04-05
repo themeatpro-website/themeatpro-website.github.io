@@ -6,7 +6,12 @@
     <title>My Account | The Meat Pro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
     <style>
+        :root { --red: #C62828; --gold: #FFD700; --dark: #1a1a1a; }
         body { font-family: 'Noto Sans', sans-serif; background: #f4f4f4; padding: 20px; }
         .container { max-width: 1000px; margin: 40px auto; display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
         
@@ -17,37 +22,50 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
         }
         
+        /* Loyalty Badge Styling */
+        .loyalty-badge {
+            background: linear-gradient(135deg, var(--dark) 0%, #333 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,215,0,0.3);
+        }
+        .loyalty-badge::after {
+            content: '🌟';
+            position: absolute;
+            right: -10px;
+            bottom: -10px;
+            font-size: 4rem;
+            opacity: 0.1;
+        }
+        .points-count { font-size: 2.2rem; font-weight: 900; color: var(--gold); display: block; margin: 5px 0; }
+        .points-value { font-size: 0.85rem; color: #ccc; }
+
         .back-link { text-decoration: none; color: #888; font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 20px; transition: 0.3s; }
-        .back-link:hover { color: #C62828; }
+        .back-link:hover { color: var(--red); }
         
-        h2 { color: #C62828; font-weight: 900; margin-bottom: 25px; margin-top: 0; font-size: 1.4rem; border-bottom: 2px solid #f4f4f4; padding-bottom: 10px; }
+        h2 { color: var(--red); font-weight: 900; margin-bottom: 25px; margin-top: 0; font-size: 1.4rem; border-bottom: 2px solid #f4f4f4; padding-bottom: 10px; }
         
         .form-group { margin-bottom: 15px; text-align: left; }
         .form-group label { display: block; font-size: 0.75rem; color: #888; margin-bottom: 4px; font-weight: bold; text-transform: uppercase; }
         input { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px; box-sizing: border-box; background: #fafafa; font-size: 0.9rem; }
         
-        .btn-save { background: #C62828; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
+        .btn-save { background: var(--red); color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
         .btn-save:hover { background: #a31f1f; }
         
-        .order-item { 
-            border: 1px solid #eee; 
-            padding: 20px; 
-            border-radius: 12px; 
-            margin-bottom: 15px;
-            transition: 0.2s;
-        }
-        .order-item:hover { border-color: #C62828; }
+        .order-item { border: 1px solid #eee; padding: 20px; border-radius: 12px; margin-bottom: 15px; transition: 0.2s; }
+        .order-item:hover { border-color: var(--red); }
         .order-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
         .order-id { font-weight: bold; color: #333; font-family: 'Roboto', sans-serif; font-size: 1.1rem; }
-        .order-date { color: #999; font-size: 0.85rem; }
-        .order-total { color: #C62828; font-weight: 900; font-size: 1.1rem; }
+        .order-total { color: var(--red); font-weight: 900; font-size: 1.1rem; }
         .order-status { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; font-weight: bold; }
 
         .order-actions { display: flex; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee; }
         .btn-track { flex: 1; background: #2e7d32; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-track:hover { background: #1b5e20; }
         .btn-reorder { flex: 1; background: #ef6c00; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-reorder:hover { background: #e65100; }
 
         @media (max-width: 850px) { .container { grid-template-columns: 1fr; } }
     </style>
@@ -57,6 +75,13 @@
     <div class="container">
         <div class="profile-card">
             <a href="index.html" class="back-link">← Back to Shop</a>
+            
+            <div class="loyalty-badge">
+                <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; color: #aaa;">Pro Points Balance</span>
+                <span id="user-points" class="points-count">0</span>
+                <span class="points-value">Redeemable Value: <strong id="user-points-value" style="color: white;">AED 0.00</strong></span>
+            </div>
+
             <h2>Account Details</h2>
             <div class="form-group">
                 <label>Login Email</label>
@@ -88,49 +113,51 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
     <script>
-    function reorderItems(encodedCart, orderTotal) {
+    const firebaseConfig = {
+        apiKey: "AIzaSyC0LqPa73C7OG295rY105XApK57SQ05et4", 
+        authDomain: "the-meat-pro.firebaseapp.com",
+        projectId: "the-meat-pro",
+        storageBucket: "the-meat-pro.appspot.com",
+        messagingSenderId: "1054538254894",
+        appId: "1:680467664784:web:9ef0a533bf354926f16d15" 
+    };
+    
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    const db = firebase.firestore();
+    const SERVER_URL = "https://themeatpro-backend.vercel.app";
+
+    function reorderItems(encodedCart) {
         try {
             const items = JSON.parse(decodeURIComponent(escape(atob(encodedCart))));
-            const cartToSave = items.map(i => ({
-                name: i.item || i.name,
-                quantity: i.qty || i.quantity,
-                price: i.price || (orderTotal / items.length)
-            }));
-            localStorage.setItem('cart', JSON.stringify(cartToSave));
+            localStorage.setItem('cart', JSON.stringify(items));
             alert("Items added to cart! Redirecting to checkout...");
             window.location.href = 'checkout.html';
-        } catch (e) {
-            console.error("Reorder Error:", e);
-            alert("Could not reorder. Please add items manually.");
-        }
+        } catch (e) { alert("Could not reorder. Please add items manually."); }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        const firebaseConfig = {
-            apiKey: "AIzaSyC0LqPa73C7OG295rY105XApK57SQ05et4", 
-            authDomain: "the-meat-pro.firebaseapp.com",
-            projectId: "the-meat-pro",
-            storageBucket: "the-meat-pro.appspot.com",
-            messagingSenderId: "1054538254894",
-            appId: "1:680467664784:web:9ef0a533bf354926f16d15" 
-        };
-        
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const SERVER_URL = "https://themeatpro-backend.vercel.app";
-
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('user-email').value = user.email;
                 fetchProfile(user.uid);
                 fetchOrders(user.uid);
+                listenToPoints(user.uid);
             } else {
                 window.location.href = "login.html";
             }
         });
+
+        // Real-time points listener
+        function listenToPoints(uid) {
+            db.collection('users').doc(uid).onSnapshot(doc => {
+                if (doc.exists) {
+                    const points = doc.data().points || 0;
+                    document.getElementById('user-points').innerText = points.toLocaleString();
+                    document.getElementById('user-points-value').innerText = `AED ${(points * 0.05).toFixed(2)}`;
+                }
+            });
+        }
 
         async function fetchProfile(uid) {
             try {
@@ -147,64 +174,45 @@
         async function fetchOrders(uid) {
             const ordersList = document.getElementById('orders-list');
             try {
-                // FIXED: Changed history to get-orders to match your actual file name
                 const response = await fetch(`${SERVER_URL}/api/get-orders?uid=${uid}`); 
                 if (!response.ok) throw new Error("Server Error");
-                
                 const orders = await response.json();
-        
+
                 if (!orders || orders.length === 0) {
                     ordersList.innerHTML = `<p style="text-align:center; padding: 40px; color:#bbb;">No orders found yet. Time for steak? 🥩</p>`;
                     return;
                 }
-        
+
                 ordersList.innerHTML = orders.map(order => {
-                    const rawDate = order.orderDate || new Date().toISOString();
-                    const date = new Date(rawDate).toLocaleDateString('en-AE', {
+                    const date = new Date(order.orderDate || Date.now()).toLocaleDateString('en-AE', {
                         year: 'numeric', month: 'short', day: 'numeric'
                     });
-        
-                    let statusLabel = order.status || 'pending';
-                    let statusBg = '#eee';
-                    let statusColor = '#666';
-        
-                    if (statusLabel === 'prepared') {
-                        statusBg = '#fff3e0'; statusColor = '#ef6c00';
-                    } else if (statusLabel === 'out-for-delivery') {
-                        statusBg = '#e8f5e9'; statusColor = '#2e7d32';
-                    } else if (statusLabel === 'delivered') {
-                        statusBg = '#e3f2fd'; statusColor = '#1565c0';
-                    }
-        
                     const cartData = btoa(unescape(encodeURIComponent(JSON.stringify(order.cart || []))));
-        
+                    
                     return `
                         <div class="order-item">
                             <div class="order-header">
                                 <span class="order-id">#${order.id}</span>
-                                <span class="order-date">${date}</span>
+                                <span style="color: #999; font-size: 0.85rem;">${date}</span>
                             </div>
                             <div style="font-size:0.9rem; color:#444; margin-bottom:10px;">
-                                ${Array.isArray(order.cart) ? order.cart.map(i => `<strong>${i.qty || i.quantity}x</strong> ${i.item || i.name}`).join(', ') : 'Details unavailable'}
+                                ${Array.isArray(order.cart) ? order.cart.map(i => `<strong>${i.qty}x</strong> ${i.item}`).join(', ') : 'Details unavailable'}
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span class="order-total">AED ${parseFloat(order.total || 0).toFixed(2)}</span>
-                                <span class="order-status" style="background:${statusBg}; color:${statusColor}; border: 1px solid ${statusColor}44;">
-                                    ${statusLabel.replace(/-/g, ' ')}
-                                </span>
+                                <span class="order-status" style="background:#eee; color:#666;">${order.status || 'pending'}</span>
                             </div>
                             <div class="order-actions">
                                 <button class="btn-track" onclick="window.location.href='success.html?id=${order.id}'">Track Status</button>
-                                <button class="btn-reorder" onclick="reorderItems('${cartData}', ${order.total || 0})">Reorder Items</button>
+                                <button class="btn-reorder" onclick="reorderItems('${cartData}')">Reorder</button>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 }).join('');
             } catch (err) {
                 ordersList.innerHTML = `<p style="color:red; text-align:center;">Failed to load history.</p>`;
             }
         }
-        
+
         document.getElementById('save-btn').onclick = async () => {
             const user = firebase.auth().currentUser;
             const status = document.getElementById('save-status');
@@ -214,28 +222,21 @@
                 phone: document.getElementById('profile-phone').value,
                 address: document.getElementById('profile-address').value
             };
-        
             status.innerText = "Saving...";
-            status.style.color = "#888";
             try {
                 const res = await fetch(`${SERVER_URL}/api/save-profile`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(profileData)
                 });
-                if (res.ok) {
-                    status.innerText = "✅ Profile Updated!";
-                    status.style.color = "green";
-                }
-            } catch (e) { status.innerText = "❌ Error saving profile."; status.style.color = "red"; }
+                if (res.ok) status.innerText = "✅ Profile Updated!";
+            } catch (e) { status.innerText = "❌ Error saving."; }
         };
-        
+
         document.getElementById('logout-btn').onclick = () => {
-            firebase.auth().signOut().then(() => {
-                window.location.href = "index.html";
-            });
+            firebase.auth().signOut().then(() => { window.location.href = "index.html"; });
         };
     });
-</script>
+    </script>
 </body>
 </html>
