@@ -1,6 +1,5 @@
 /**
  * THE MEAT PRO - Core Application Logic
- * Standardized to use 'cart' as the localStorage key
  */
 
 let allProducts = [];
@@ -46,7 +45,6 @@ window.filterByCategory = function(category) {
     document.getElementById('category-section').style.display = 'none';
     document.getElementById('product-header').style.display = 'flex';
     
-    // Switch grid to block temporarily to center the "Coming Soon" message if needed
     const grid = document.getElementById('product-grid');
     grid.style.display = 'grid'; 
     
@@ -68,9 +66,8 @@ window.showCategories = function() {
 function renderProducts(products) {
     const grid = document.getElementById('product-grid');
     
-    // --- COMING SOON LOGIC ---
     if (products.length === 0) {
-        grid.style.display = 'block'; // Block display allows centering the message
+        grid.style.display = 'block';
         grid.innerHTML = `
             <div style="text-align: center; padding: 80px 20px; color: #888; grid-column: 1 / -1;">
                 <div style="font-size: 4rem; margin-bottom: 20px;">🥩</div>
@@ -86,7 +83,6 @@ function renderProducts(products) {
         return;
     }
 
-    // --- STANDARD RENDER LOGIC ---
     grid.style.display = 'grid'; 
     grid.innerHTML = products.map(p => `
         <div class="product-card" onclick="openModal('${p.Name.replace(/'/g, "\\'")}')">
@@ -96,8 +92,7 @@ function renderProducts(products) {
                 <p style="font-size:0.85rem; color:#666; margin-bottom:15px;">${p.ShortDescription}</p>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <span class="price-tag">
-                        <img src="assets/currency-logo.png" class="currency-icon">
-                        ${parseFloat(p.Price).toFixed(2)}
+                        AED ${parseFloat(p.Price).toFixed(2)}
                     </span>
                     <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.Name.replace(/'/g, "\\'")}', ${p.Price}, '${p.Image}')">Add +</button>
                 </div>
@@ -111,20 +106,34 @@ window.openModal = function(name) {
     const p = allProducts.find(i => i.Name === name);
     if (!p) return;
 
-    document.getElementById('modal-img').src = p.Image;
-    document.getElementById('modal-img').onerror = function() { this.src='assets/logo.png'; };
-    document.getElementById('modal-name').innerText = p.Name;
-    document.getElementById('modal-price-val').innerText = parseFloat(p.Price).toFixed(2);
-    document.getElementById('modal-long-desc').innerText = p.LongDescription;
-    document.getElementById('modal-qty-input').value = 1;
-    
+    const modal = document.getElementById('product-modal');
+    modal.innerHTML = `
+        <div class="modal-content" style="background:white; max-width:500px; margin:50px auto; padding:30px; border-radius:20px; position:relative;">
+            <button onclick="closeModal()" style="position:absolute; right:20px; top:20px; border:none; background:none; font-size:2rem; cursor:pointer;">&times;</button>
+            <img id="modal-img" src="${p.Image}" onerror="this.src='assets/logo.png'" style="width:100%; height:300px; object-fit:cover; border-radius:15px; margin-bottom:20px;">
+            <h2 id="modal-name">${p.Name}</h2>
+            <p id="modal-long-desc" style="color:#666; line-height:1.6;">${p.LongDescription}</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:25px;">
+                <span style="font-size:1.5rem; font-weight:900; color:#C62828;">AED <span id="modal-price-val">${parseFloat(p.Price).toFixed(2)}</span></span>
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <div style="display:flex; align-items:center; border:1px solid #ddd; border-radius:8px;">
+                        <button onclick="adjustModalQty(-1)" style="padding:10px 15px; border:none; background:none; cursor:pointer;">-</button>
+                        <input type="number" id="modal-qty-input" value="1" readonly style="width:40px; text-align:center; border:none; padding:0; font-weight:bold;">
+                        <button onclick="adjustModalQty(1)" style="padding:10px 15px; border:none; background:none; cursor:pointer;">+</button>
+                    </div>
+                    <button class="add-btn" id="modal-add-btn">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    `;
+
     document.getElementById('modal-add-btn').onclick = () => {
         const qty = parseInt(document.getElementById('modal-qty-input').value);
         addToCart(p.Name, p.Price, p.Image, qty);
         closeModal();
     };
     
-    document.getElementById('product-modal').classList.add('active');
+    modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 };
 
@@ -181,9 +190,23 @@ window.updateCartUI = function() {
                         <div style="font-size:0.75rem; color:#666;">${item.quantity} x AED ${item.price.toFixed(2)}</div>
                     </div>
                 </div>
-                <button class="remove-item-btn" onclick="removeFromCart(${idx})">&times;</button>
+                <button class="remove-item-btn" style="background:none; border:none; color:#999; cursor:pointer; font-size:1.2rem;" onclick="removeFromCart(${idx})">&times;</button>
             </div>
         `).join('');
+
+        // --- ADDED: Points Preview Logic ---
+        const subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+        const earnablePoints = Math.floor(subtotal);
+        
+        if (cart.length > 0) {
+            itemsDiv.innerHTML += `
+                <div style="background: #fffdf0; border: 1px solid #FFD700; border-radius: 8px; padding: 10px; margin-top: 20px; text-align: center;">
+                    <span style="font-size: 0.8rem; color: #b8860b; font-weight: bold;">
+                        🌟 You'll earn ${earnablePoints} points!
+                    </span>
+                </div>
+            `;
+        }
     }
 
     if (totalSpan) {
