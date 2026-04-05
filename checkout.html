@@ -40,6 +40,16 @@
             cursor: pointer; 
             font-weight: bold; 
         }
+        .btn-max-points {
+            background: var(--gold);
+            color: #5d4037;
+            border: none;
+            padding: 0 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 0.75rem;
+        }
 
         .toggle-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .toggle-btn { padding: 12px; border: 2px solid #eee; border-radius: 10px; background: white; cursor: pointer; font-weight: bold; text-align: center; }
@@ -50,7 +60,7 @@
         
         .summary-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: sticky; top: 20px; }
         .total-row { border-top: 2px solid #eee; margin-top: 15px; padding-top: 15px; font-weight: 900; font-size: 1.2rem; display: flex; justify-content: space-between; }
-        .discount-row { color: #2e7d32; display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 8px; }
+        .discount-row { color: #2e7d32; display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 8px; font-weight: bold; }
 
         @media (max-width: 850px) { .checkout-layout { grid-template-columns: 1fr; } .summary-card { position: static; } }
     </style>
@@ -64,11 +74,12 @@
             <div id="points-section" class="points-box" style="display: none;">
                 <label style="color: #b8860b;">🌟 Loyalty Points</label>
                 <p style="font-size: 0.85rem; margin: 0; color: #666;">
-                    Available: <span id="display-available-pts">0</span> Pts 
+                    Available: <strong id="display-available-pts">0</strong> Pts 
                     (Value: AED <span id="display-pts-value">0.00</span>)
                 </p>
                 <div class="points-input-wrapper">
                     <input type="number" id="points-to-use" placeholder="How many points?" min="0">
+                    <button class="btn-max-points" onclick="setMaxPoints()">MAX</button>
                     <button class="btn-apply-points" onclick="applyPoints()">Apply</button>
                 </div>
                 <div id="points-msg" style="font-size: 0.8rem; margin-top: 8px;"></div>
@@ -118,7 +129,8 @@
             <h3 style="margin-top:0;">Summary</h3>
             <div id="summary-items"></div>
             
-            <div id="discount-area"></div> <div class="total-row">
+            <div id="discount-area"></div> 
+            <div class="total-row">
                 <span>Total</span>
                 <span id="summary-total">AED 0.00</span>
             </div>
@@ -141,6 +153,7 @@
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     
     const SHOP_URL = "https://themeatpro-backend.vercel.app/api/order-webhook";
+    const POINT_VAL = 0.05; // 1 point = 0.05 AED
     let currentMethod = 'Delivery'; 
     let userPointsBalance = 0;
     let appliedDiscount = 0;
@@ -175,13 +188,11 @@
                     </div>`;
         }).join('');
 
-        const finalTotal = subtotal - appliedDiscount;
-        if(totalDisplay) totalDisplay.innerText = `AED ${Math.max(0, finalTotal).toFixed(2)}`;
+        const finalTotal = Math.max(0, subtotal - appliedDiscount);
+        if(totalDisplay) totalDisplay.innerText = `AED ${finalTotal.toFixed(2)}`;
         
-        // Show points earned (1 AED = 1 Point logic, adjust if needed)
         if(earnDisplay) earnDisplay.innerText = Math.floor(finalTotal);
 
-        // Update Discount UI
         const discArea = document.getElementById('discount-area');
         if (appliedDiscount > 0) {
             discArea.innerHTML = `<div class="discount-row"><span>Points Discount</span><span>-AED ${appliedDiscount.toFixed(2)}</span></div>`;
@@ -190,29 +201,60 @@
         }
     }
 
+    // Safety logic for MAX button
+    function setMaxPoints() {
+        const subtotal = calculateCartSubtotal();
+        const pointsNeededForFree = Math.ceil(subtotal / POINT_VAL);
+        
+        // Use all user points OR just enough to cover the order total
+        const maxSpendable = Math.min(userPointsBalance, pointsNeededForFree);
+        document.getElementById('points-to-use').value = maxSpendable;
+        applyPoints();
+    }
+
     function applyPoints() {
         const input = document.getElementById('points-to-use');
         const msg = document.getElementById('points-msg');
-        const pts = parseInt(input.value) || 0;
+        let pts = parseInt(input.value) || 0;
+        const subtotal = calculateCartSubtotal();
 
-        if (pts > userPointsBalance) {
+        // Safety Check 1: Negative
+        if (pts < 0) {
             msg.style.color = 'red';
-            msg.innerText = "❌ Not enough points.";
+            msg.innerText = "❌ Please enter a valid number.";
             return;
         }
 
-        appliedPoints = pts;
-        appliedDiscount = pts * 0.05; // 1 point = 0.05 AED
-
-        msg.style.color = 'green';
-        msg.innerText = `✅ Applied AED ${appliedDiscount.toFixed(2)} discount!`;
-        
-        // If points cover everything, hide payment selection
-        const cartTotal = calculateCartSubtotal();
-        if (appliedDiscount >= cartTotal) {
-            document.getElementById('payment-method-wrapper').style.display = 'none';
+        // Safety Check 2: Balance check
+        if (pts > userPointsBalance) {
+            msg.style.color = 'red';
+            msg.innerText = `❌ Not enough points. You have ${userPointsBalance}.`;
+            appliedPoints = 0;
+            appliedDiscount = 0;
         } else {
-            document.getElementById('payment-method-wrapper').style.display = 'block';
+            // Safety Check 3: Cap at Order Total
+            const potentialDiscount = pts * POINT_VAL;
+            if (potentialDiscount > subtotal) {
+                // If they try to use 5000 points on a 10 AED order, we only take what is needed
+                pts = Math.ceil(subtotal / POINT_VAL);
+                msg.style.color = 'orange';
+                msg.innerText = `⚠️ Points capped to cover order total.`;
+                input.value = pts;
+            } else {
+                msg.style.color = 'green';
+                msg.innerText = `✅ Applied AED ${(pts * POINT_VAL).toFixed(2)} discount!`;
+            }
+
+            appliedPoints = pts;
+            appliedDiscount = pts * POINT_VAL;
+        }
+
+        // UI Adjustments
+        const paymentWrapper = document.getElementById('payment-method-wrapper');
+        if (appliedDiscount >= subtotal) {
+            paymentWrapper.style.display = 'none';
+        } else {
+            paymentWrapper.style.display = 'block';
         }
 
         renderSummary();
@@ -235,7 +277,6 @@
         const subtotal = calculateCartSubtotal();
         const finalAmount = Math.max(0, subtotal - appliedDiscount);
 
-        // If paid fully by points
         if (appliedDiscount >= subtotal) payment = "Points Full Payment";
 
         if(!name || !phone || (currentMethod === 'Delivery' && !address)) {
@@ -293,14 +334,13 @@
         renderSummary();
         firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
-                // Fetch Points from Firestore
                 const db = firebase.firestore();
                 const userDoc = await db.collection('users').doc(user.uid).get();
                 if (userDoc.exists) {
                     userPointsBalance = userDoc.data().points || 0;
                     document.getElementById('points-section').style.display = 'block';
                     document.getElementById('display-available-pts').innerText = userPointsBalance;
-                    document.getElementById('display-pts-value').innerText = (userPointsBalance * 0.05).toFixed(2);
+                    document.getElementById('display-pts-value').innerText = (userPointsBalance * POINT_VAL).toFixed(2);
                 }
 
                 const savedProfile = localStorage.getItem('userProfile');
