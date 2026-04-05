@@ -13,20 +13,45 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Roboto:wght@900&display=swap" rel="stylesheet">
     
     <style>
-        :root { --red: #C62828; --green: #25D366; --dark: #1a1a1a; }
+        :root { --red: #C62828; --green: #25D366; --dark: #1a1a1a; --gold: #FFD700; }
         body { background: #f4f4f4; font-family: 'Noto Sans', sans-serif; margin: 0; padding: 20px; }
         .checkout-layout { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 350px; gap: 30px; }
         .checkout-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         .input-group { margin-bottom: 20px; }
         label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.9rem; color: #555; }
         input, textarea, select { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1rem; }
+        
+        /* Points Section Styling */
+        .points-box { 
+            background: #fffdf0; 
+            border: 2px dashed var(--gold); 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin-bottom: 25px; 
+        }
+        .points-input-wrapper { display: flex; gap: 10px; margin-top: 10px; }
+        .points-input-wrapper input { flex: 1; }
+        .btn-apply-points { 
+            background: var(--dark); 
+            color: white; 
+            border: none; 
+            padding: 0 20px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: bold; 
+        }
+
         .toggle-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .toggle-btn { padding: 12px; border: 2px solid #eee; border-radius: 10px; background: white; cursor: pointer; font-weight: bold; text-align: center; }
         .toggle-btn.active { border-color: var(--red); background: #fff5f5; color: var(--red); }
+        
         .btn-place { width: 100%; background: var(--red); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 1rem; }
         .btn-whatsapp { width: 100%; background: var(--green); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 900; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; font-size: 1rem; margin-top: 10px;}
+        
         .summary-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: sticky; top: 20px; }
         .total-row { border-top: 2px solid #eee; margin-top: 15px; padding-top: 15px; font-weight: 900; font-size: 1.2rem; display: flex; justify-content: space-between; }
+        .discount-row { color: #2e7d32; display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 8px; }
+
         @media (max-width: 850px) { .checkout-layout { grid-template-columns: 1fr; } .summary-card { position: static; } }
     </style>
 </head>
@@ -35,6 +60,19 @@
     <div class="checkout-layout">
         <div class="checkout-card">
             <h2>Checkout Details</h2>
+
+            <div id="points-section" class="points-box" style="display: none;">
+                <label style="color: #b8860b;">🌟 Loyalty Points</label>
+                <p style="font-size: 0.85rem; margin: 0; color: #666;">
+                    Available: <span id="display-available-pts">0</span> Pts 
+                    (Value: AED <span id="display-pts-value">0.00</span>)
+                </p>
+                <div class="points-input-wrapper">
+                    <input type="number" id="points-to-use" placeholder="How many points?" min="0">
+                    <button class="btn-apply-points" onclick="applyPoints()">Apply</button>
+                </div>
+                <div id="points-msg" style="font-size: 0.8rem; margin-top: 8px;"></div>
+            </div>
 
             <label>Order Method</label>
             <div class="toggle-container">
@@ -62,7 +100,7 @@
                 <textarea id="order-instructions" rows="2" placeholder="Example: Cut the meat in small pieces, etc."></textarea>
             </div>
 
-            <div class="input-group">
+            <div class="input-group" id="payment-method-wrapper">
                 <label>Payment Method</label>
                 <select id="payment-mode">
                     <option value="Cash on Delivery">💵 Cash on Delivery</option>
@@ -79,10 +117,14 @@
         <div class="summary-card">
             <h3 style="margin-top:0;">Summary</h3>
             <div id="summary-items"></div>
-            <div class="total-row">
+            
+            <div id="discount-area"></div> <div class="total-row">
                 <span>Total</span>
                 <span id="summary-total">AED 0.00</span>
             </div>
+            <p id="earn-msg" style="font-size: 0.75rem; color: #888; text-align: right; margin-top: 10px;">
+                Earn <span id="pts-to-earn">0</span> points with this order
+            </p>
         </div>
     </div>
 
@@ -96,18 +138,18 @@
         appId: "1:367375252877:web:86b86064c126ec0058b76c"
     };
 
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     
     const SHOP_URL = "https://themeatpro-backend.vercel.app/api/order-webhook";
     let currentMethod = 'Delivery'; 
+    let userPointsBalance = 0;
+    let appliedDiscount = 0;
+    let appliedPoints = 0;
 
     function setMethod(method) {
         currentMethod = method;
         document.getElementById('btn-delivery').classList.toggle('active', method === 'Delivery');
         document.getElementById('btn-collect').classList.toggle('active', method === 'Click and Collect');
-        
         const addrDiv = document.getElementById('address-section');
         if(addrDiv) addrDiv.style.display = (method === 'Delivery') ? 'block' : 'none';
     }
@@ -116,22 +158,69 @@
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
         const container = document.getElementById('summary-items');
         const totalDisplay = document.getElementById('summary-total');
+        const earnDisplay = document.getElementById('pts-to-earn');
         
         if (cart.length === 0) {
             if(container) container.innerHTML = "<p style='color:#888;'>Your cart is empty.</p>";
             return;
         }
 
-        let total = 0;
+        let subtotal = 0;
         container.innerHTML = cart.map(item => {
             const sub = item.price * item.quantity;
-            total += sub;
+            subtotal += sub;
             return `<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.9rem;">
                         <span>${item.quantity}x ${item.name}</span>
                         <span>AED ${sub.toFixed(2)}</span>
                     </div>`;
         }).join('');
-        if(totalDisplay) totalDisplay.innerText = `AED ${total.toFixed(2)}`;
+
+        const finalTotal = subtotal - appliedDiscount;
+        if(totalDisplay) totalDisplay.innerText = `AED ${Math.max(0, finalTotal).toFixed(2)}`;
+        
+        // Show points earned (1 AED = 1 Point logic, adjust if needed)
+        if(earnDisplay) earnDisplay.innerText = Math.floor(finalTotal);
+
+        // Update Discount UI
+        const discArea = document.getElementById('discount-area');
+        if (appliedDiscount > 0) {
+            discArea.innerHTML = `<div class="discount-row"><span>Points Discount</span><span>-AED ${appliedDiscount.toFixed(2)}</span></div>`;
+        } else {
+            discArea.innerHTML = '';
+        }
+    }
+
+    function applyPoints() {
+        const input = document.getElementById('points-to-use');
+        const msg = document.getElementById('points-msg');
+        const pts = parseInt(input.value) || 0;
+
+        if (pts > userPointsBalance) {
+            msg.style.color = 'red';
+            msg.innerText = "❌ Not enough points.";
+            return;
+        }
+
+        appliedPoints = pts;
+        appliedDiscount = pts * 0.05; // 1 point = 0.05 AED
+
+        msg.style.color = 'green';
+        msg.innerText = `✅ Applied AED ${appliedDiscount.toFixed(2)} discount!`;
+        
+        // If points cover everything, hide payment selection
+        const cartTotal = calculateCartSubtotal();
+        if (appliedDiscount >= cartTotal) {
+            document.getElementById('payment-method-wrapper').style.display = 'none';
+        } else {
+            document.getElementById('payment-method-wrapper').style.display = 'block';
+        }
+
+        renderSummary();
+    }
+
+    function calculateCartSubtotal() {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        return cart.reduce((s, i) => s + (i.price * i.quantity), 0);
     }
 
     async function submitOrder(flow) {
@@ -141,20 +230,22 @@
         const phone = document.getElementById('cust-phone').value;
         const address = (currentMethod === 'Delivery') ? document.getElementById('cust-address').value : "Store Pickup";
         const instructions = document.getElementById('order-instructions').value;
-        const payment = document.getElementById('payment-mode').value;
+        let payment = document.getElementById('payment-mode').value;
         
-        const totalAmount = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+        const subtotal = calculateCartSubtotal();
+        const finalAmount = Math.max(0, subtotal - appliedDiscount);
+
+        // If paid fully by points
+        if (appliedDiscount >= subtotal) payment = "Points Full Payment";
 
         if(!name || !phone || (currentMethod === 'Delivery' && !address)) {
             alert("Please fill in all required fields.");
             return;
         }
 
-        // WhatsApp still uses a random string for quick reference as it doesn't wait for backend
         if (flow === 'whatsapp') {
-            const tempID = "WA-" + Math.random().toString(36).substr(2, 4).toUpperCase();
             let itemStr = cart.map(i => `- ${i.name} (x${i.quantity})`).join('\n');
-            const waMsg = encodeURIComponent(`*New Order Request*\n*Customer:* ${name}\n*Method:* ${currentMethod}\n*Address:* ${address}\n\n*Items:*\n${itemStr}`);
+            const waMsg = encodeURIComponent(`*New Order Request*\n*Customer:* ${name}\n*Method:* ${currentMethod}\n*Points Used:* ${appliedPoints}\n*Total:* AED ${finalAmount.toFixed(2)}\n\n*Items:*\n${itemStr}`);
             window.location.href = `https://wa.me/971589388096?text=${waMsg}`;
             localStorage.removeItem('cart');
             return;
@@ -165,9 +256,6 @@
 
         try {
             const user = firebase.auth().currentUser;
-            
-            // We no longer send an 'id' from here. 
-            // The backend (order-webhook.js) will generate #DDMMYY-X and return it.
             const response = await fetch(SHOP_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -179,22 +267,22 @@
                     instructions: instructions,
                     paymentMethod: payment,
                     userId: user ? user.uid : "guest",
-                    total: totalAmount.toFixed(2),
+                    subtotal: subtotal.toFixed(2),
+                    discount: appliedDiscount.toFixed(2),
+                    pointsUsed: appliedPoints,
+                    total: finalAmount.toFixed(2),
                     cart: cart.map(i => ({ item: i.name, qty: i.quantity }))
                 })
             });
 
             const result = await response.json();
-
             if (result.success) {
                 localStorage.removeItem('cart');
-                // Use result.orderId which is the new #DDMMYY-X format from backend
                 window.location.href = `success.html?id=${result.orderId}`;
             } else {
                 throw new Error(result.error || "Server rejected order");
             }
         } catch (err) {
-            console.error("Order Error:", err);
             alert("Connection Error. Try again or use WhatsApp.");
             btn.disabled = false;
             btn.innerText = "SEND ORDER TO KITCHEN";
@@ -205,6 +293,16 @@
         renderSummary();
         firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
+                // Fetch Points from Firestore
+                const db = firebase.firestore();
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    userPointsBalance = userDoc.data().points || 0;
+                    document.getElementById('points-section').style.display = 'block';
+                    document.getElementById('display-available-pts').innerText = userPointsBalance;
+                    document.getElementById('display-pts-value').innerText = (userPointsBalance * 0.05).toFixed(2);
+                }
+
                 const savedProfile = localStorage.getItem('userProfile');
                 if (savedProfile) {
                     const profile = JSON.parse(savedProfile);
