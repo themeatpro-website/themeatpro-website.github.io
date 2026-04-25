@@ -1,19 +1,42 @@
-Name,Price,ShortDescription,LongDescription,Image,Category,Type
-Whole Chicken,23,Per KG,"Hormone-free, locally sourced chicken—naturally fresh, wholesome, and full of flavour.",https://images.themeatpro.com/Chicken/Whole chicken.jpg,Chicken,RAW
-Whole Chicken curry cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (16+ pcs)—perfect for hearty home-cooked meals.",https://images.themeatpro.com/Chicken/Whole chk curry cut.jpg,Chicken,RAW
-Whole Chicken Biryani cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (12-14 pcs)—perfect for hearty home-cooked meals.",https://images.themeatpro.com/Chicken/Whole chk curry cut.jpg,Chicken,RAW
-Whole Chicken 4 pc cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (4pcs)—perfect for hearty home-cooked meals.",https://images.themeatpro.com/Chicken/Whole chk curry cut.jpg,Chicken,RAW
-Whole Chicken 8 pc cut,23,Per KG,"Fresh whole chicken, expertly cleaned and cut (8pcs)—perfect for hearty home-cooked meals.",https://images.themeatpro.com/Chicken/Whole chk curry cut.jpg,Chicken,RAW
-Chicken Breast Whole,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",https://images.themeatpro.com/Chicken/Chicken Breast.jpg,Chicken,RAW
-Chicken Breast Large Cut,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",https://images.themeatpro.com/Chicken/Chicken Breast Cubes Large.jpg,Chicken,RAW
-Chicken Breast Medium Cut,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",https://images.themeatpro.com/Chicken/Chicken Breast Cubes Medium.jpg,Chicken,RAW
-Chicken Breast Small Cut,39,Per KG,"Fresh chicken breast—lean, tender, and perfect for healthy everyday cooking.",https://images.themeatpro.com/Chicken/Chicken Breast Cubes Small.jpg,Chicken,RAW
-Chicken Breast Strips,40,Per KG,"Fresh chicken strips, neatly cut and ready for quick, flavourful stir-fries.",https://images.themeatpro.com/Chicken/CHK Breast Slice.jpg,Chicken,RAW
-Chicken Breast Slice,39,Per KG,"Chicken Breast Slice – Tender, even-cut slices ideal for crispy schnitzels, escalope, cutlets, rolls, and other quick-fry or pan-seared dishes.",https://images.themeatpro.com/Chicken/CHK Breast Slice.jpg,Chicken,RAW
-Chicken Mince,40,Per KG,"Freshly minced chicken, lean and versatile, perfect for kebabs, patties, meatballs, and everyday cooking.",https://images.themeatpro.com/Chicken/Chicken Mince.jpg,Chicken,RAW
-Lamb Shashlik Kabab,98,Per KG,"Juicy lamb cubes marinated in aromatic spices, perfect for skewers, grilling, or BBQ.",https://images.themeatpro.com/Chicken/Lamb Shashlik.JPG,Lamb,Marinated
-Whole Chicken Marinated Tandoori,39.5,Per KG,"Fully marinated with authentic tandoori spices, ready to roast or grill for bold, smoky flavour.",https://images.themeatpro.com/Chicken/Chk whole mrinated tandoori.jpg,Chicken,Marinated
-Chicken 65 Tikka,48,Per KG,"Spicy, flavour-packed chicken marinated in signature spices, perfect for frying, grilling, or starters.",https://images.themeatpro.com/Chicken/CHK 65 Tikka.JPG,Chicken,Marinated
-Chicken Mexican Tikka,48,Per KG,"Zesty chicken marinated with Mexican spices and herbs, perfect for grilling, pan-frying, or wraps.",https://images.themeatpro.com/Chicken/chicken mexican.png,Chicken,Marinated
-Chicken Haryali Tikka,48,Per KG,"Fresh chicken marinated with green herbs, mint, and spices for a juicy, aromatic grill or pan-fry.",https://images.themeatpro.com/Chicken/CHK HARYALI.JPG,Chicken,Marinated
-Chicken Naughty 4 Tikka,48,Per KG,"A bold, flavour-loaded mix with four exciting spice notes, marinated to perfection for grilling or pan-frying.",https://images.themeatpro.com/Chicken/CHK N4.JPG,Chicken,Marinated
+Name,Price,ShortDescription,longDescription,image,Category,Type
+Beef Ribeye, Brazil,79,500 gm,A premium cut of tender beef from Brazil.,,Steaks, Ribs & Chops,RAW
+Beef Tenderloin, Brazil,75,500 gm,A tender and lean cut from Brazil.,,Steaks, Ribs & Chops,RAW
+Beef Tenderloin, Australia,93,500 gm,A premium tenderloin from Australia.,,Steaks, Ribs & Chops,RAW
+Beef Ribeye, Australia,83,500 gm,A premium ribeye steak from Australia.,,Steaks, Ribs & Chops,RAW
+Beef Knuckle, Brazil,34,500 gm,A flavorful cut from Brazil.,,Steaks, Ribs & Chops,RAW
+Boneless Beef, India,45,1 kg,Lean and tender boneless beef from India.,,Steaks, Ribs & Chops,RAW
+Minced Beef, Brazil,37,500 gm,Freshly ground beef from Brazil.,,Steaks, Ribs & Chops,RAW
+Minced Beef, Australia,48,500 gm,Freshly ground beef from Australia.,,Steaks, Ribs & Chops,RAW
+Mince Beef, Australia,48,500 gm,Freshly ground beef from Australia.,,Steaks, Ribs & Chops,RAW
+Beef Topside, Brazil,36,500 gm,A versatile cut of beef from Brazil.,,Steaks, Ribs & Chops,RAW
+Boneless Lamb, Australia,39.5,500 gm,Tender lamb meat from Australia.,,Cubes & Strips,RAW
+Fresh Mutton Leg,68,1 kg,Lean and tender leg of mutton.,,Cubes & Strips,RAW
+Mutton Liver, India,24,500 gm,Tender liver from India.,,Cubes & Strips,RAW
+Premium Mutton Shoulder, India,68,1 kg,High-quality mutton shoulder from India.,,Cubes & Strips,RAW
+Premium Mutton, India,68,1 kg,High-quality mutton meat from India.,,Cubes & Strips,RAW
+Mutton, Pakistan,68,1 kg,Quality mutton from Pakistan.,,Cubes & Strips,RAW
+Premium Mutton Leg, Pakistan,68,1 kg,Quality mutton leg from Pakistan.,,Cubes & Strips,RAW
+Lamb Chops, Australia,72,500 gm,Tender lamb chops from Australia.,,Cubes & Strips,RAW
+Premium Mutton Leg, India,68,1 kg,Quality mutton leg from India.,,Cubes & Strips,RAW
+Fresh Mutton,75,1 kg,Quality mutton meat.,,Cubes & Strips,RAW
+Premium Mutton Mince, India,78,1 kg,Ground premium mutton from India.,,Minced Meat,RAW
+Premium Mutton Mince, Pakistan,70,1 kg,Ground premium mutton from Pakistan.,,Minced Meat,RAW
+Chicken Mince, UAE,20,500 gm,Freshly minced chicken from UAE.,,Minced Meat,RAW
+Chicken Breast, UAE,19.5,500 gm,Tender chicken breast from UAE.,,Poultry,RAW
+Chicken Breast Cubes, UAE,19.5,500 gm,Cut chicken breast cubes from UAE.,,Poultry,RAW
+Chicken Burger,30.25,500 gm,Chicken burger patty.,,Burgers & Sausages,RAW
+The Meat Pro Blast Beef Steak, Marinated,23,250 gm,Blast marinated beef steak.,,Marinated,RAW
+The Meat Pro Beef Stragonoff, Marinated,23,250 gm,Blast marinated beef stroganoff.,,Marinated,RAW
+The Meat Pro Beef Cubes, Marinated,23,250 gm,Blast marinated beef cubes.,,Marinated,RAW
+The Meat Pro Beef Burger, Marinated,23,250 gm,Blast marinated beef burger patty.,,Marinated,RAW
+Mutton Sheek Kebab, India,45,500 gm,Marinated mutton sheek kebab from India.,,Marinated,RAW
+Mutton Tikka, India,44,500 gm,Marinated mutton tikka from India.,,Marinated,RAW
+Mutton Galawati Kebab, India,45,500 gm,Marinated mutton galawati kebab from India.,,Marinated,RAW
+Mutton Tundai, India,45,500 gm,Marinated mutton tundai from India.,,Marinated,RAW
+Chicken Schnitzel, Marinated,26.75,500 gm,Marinated chicken schnitzel.,,Marinated,RAW
+Chicken Escalope, Marinated,28,500 gm,Marinated chicken escalope.,,Marinated,RAW
+Local Kingfish Fillet,43.45,500 gm,Local kingfish fillet.,,Meats & Seafood,RAW
+Deveined Medium Shrimps,32.5,500 gm,Deveined medium-sized shrimps.,,Meats & Seafood,RAW
+Salmon Slice, Norway,37,300 gm,Sliced Norwegian salmon.,,Meats & Seafood,RAW
+Local Kingfish Slice,41,500 gm,Sliced local kingfish.,,Meats & Seafood,RAW
+Salmon Fillet, Norway,45,300 gm,Norwegian salmon fillet.,,Meats & Seafood,RAW
